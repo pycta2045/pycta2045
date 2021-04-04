@@ -1,0 +1,16 @@
+{
+	"common":{
+		"lock screen":"SYST:RWL",
+		"clear status":"*CLS",
+		"event status enable":"*ESE",
+		"event status register":"*ESR",
+		"identify":"*IDN",
+		"operation complete":"*OPC",
+		"reset":"*RST",
+		"service request enable":"*SRE"
+	},
+	"configure":{
+		"cmd1":"somethin",
+		"cmd2":"something"
+	}
+}
