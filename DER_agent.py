@@ -10,6 +10,8 @@ from agents.gen_agent import generic_agent
 
 
 
-scpi = SCPI()
+# scpi = SCPI()
+# r = scpi.send('lock screen')
 DER_agent = generic_agent('file.json')
 print(DER_agent.get_state())
+DER_agent.charge()

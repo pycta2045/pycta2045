@@ -7,7 +7,21 @@
 		"identify":"*IDN",
 		"operation complete":"*OPC",
 		"reset":"*RST",
-		"service request enable":"*SRE"
+		"service request enable":"*SRE",
+		"status byte register":"*STB?",
+		"trigger":"*TRG",
+		"selftest":"*TST",
+		"wait":"*WAI",
+		"operation event value latched":"STATus:OPERation[:EVENt]?",
+		"operation condition value":"*STATus:OPERation:CONDition",
+		"operation enable value":"STATus:OPERation:ENABle",
+		"preset enable registers":"STATus:PRESet", 
+		"questionable status value latched":"STATus:QUEStionable[:EVENt]?",
+		"questionable condition value":"STATus:QUEStionable:CONDition?",
+		"questionable enable value":"STATus:QUEStionable:ENABle"
+	},
+	"status": {
+		"error status": "SYSTem:ERRor?"
 	},
 	"configure":{
 		"cmd1":"somethin",
