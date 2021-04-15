@@ -57,6 +57,7 @@ class generic_agent:
         i = 0
         while i < 5:
             t = time.pop(0)
+            
             print(t)
             i+=1
         
