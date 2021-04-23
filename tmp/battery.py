@@ -54,7 +54,7 @@ currs = []
 ts = []
 # SOC = soc
 time_slots = []
-def model(rampup_time=5,rampup_delay = 3,cutoff_soc=0.75,max_cap = 40,max_volt = 230,curr = 15,rate = 0.12,fname='plot',soc=0):
+def model(rampup_time=5,rampup_delay = 3,cutoff_soc=0.75,max_cap = 40,max_volt = 230,curr = 15,rate = 0.12,fname='plot',soc=0,max_capacity = 1.):
     max_cap *= 1000 # kwh
     time = 1000
     time = [x for x in range(0,int(time))]
@@ -62,7 +62,7 @@ def model(rampup_time=5,rampup_delay = 3,cutoff_soc=0.75,max_cap = 40,max_volt =
     print(f'ramp_volts: {ramp_volts}')
     SOC = soc
     i = curr
-    v = 5
+    v = 0
     min_curr = 2
 
     
@@ -109,7 +109,7 @@ def model(rampup_time=5,rampup_delay = 3,cutoff_soc=0.75,max_cap = 40,max_volt =
     time_slots.append(t-1)
     print('-'*20,'\n3nd PHASE')
     # third phase CV (ramp down -- decrease current)
-    while SOC < 1:
+    while SOC < max_capacity:
         # if i > min_curr:
         i =  i * np.exp(-rate) #np.exp(-t/rate)
         i = max(i,min_curr)  
@@ -138,6 +138,7 @@ parser.add_argument('-cap', type=int, help='max capacity (kWh)',default=40) # in
 parser.add_argument('-v', type=int, help='voltage (V)',default=240) 
 parser.add_argument('-c', type=int, help='current (Amp)',default=15) 
 parser.add_argument('-dr', type=float, help='decay rate (%)',default=.12)
+parser.add_argument('-mc', type=float, help='max capacity (%)',default=1.)
 
 
 
@@ -152,7 +153,8 @@ cap = args.cap
 v = args.v
 c = args.c
 dr = args.dr
+mc = args.mc
 
-model(rt,rd,cs,cap,v,c,dr,out,soc)
+model(rt,rd,cs,cap,v,c,dr,out,soc,mc)
 # print(args.accumulate(args.integers))
 

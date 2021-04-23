@@ -18,14 +18,3 @@ class command_handler:
         except Exception as e:
             print(e)
         return v
-
-# def command(op,off):
-#     op = [hex(x) for x in op]
-#     #op = ' '.join(op)
-#     off = [hex(x) for x in off]
-#     #off = ' '.join(off)
-#     return ' '.join(op + off).upper()
-
-# print(command(op_code,shed))
-# print(command(op_code,loadup))
-# print(command(op_code,endshed))
