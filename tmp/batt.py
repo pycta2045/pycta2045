@@ -22,8 +22,13 @@ def plot(xs,ys,x_name='Time',vlines = None):
         i+=1
 
 
+def decay(x,m,t,b):
+    i = m * np.exp(-t*x)+b
+    # print(f'x: {x}, m :{m}, t: {t}, b: {b} exp: {np.exp(-t*x)}= {i}')
+    return i
+
 class charger:
-    def __init__(self,max_volt,max_curr,max_cap,min_comfort,max_comfort):
+    def __init__(self,max_volt,max_curr,max_cap,min_comfort,max_comfort,decay_rate,rampup_delay,rampup_time=5,verbose=False):
         self.SOC = []
         self.time = []
         self.power = []
@@ -32,59 +37,164 @@ class charger:
         self.timer = 0
         self.max_curr = max_curr
         self.max_volt = max_volt
-        self.max_cap = max_cap
+        self.max_cap = max_cap * 1000 # in Kwh
         self.min_comfort = min_comfort
         self.max_comfort = max_comfort
+        self.user_comfort = (min_comfort,max_comfort)
+        self.min_shed = min_comfort - 0.2 # drop by 20%
+        self.max_shed = max_comfort - 0.1 # drop by 10% 
+        self.verbose = verbose
+        self.rampup_time = rampup_time
+        self.decay_rate = decay_rate
+        self.rampup_delay = rampup_delay
+        print(f'min_com: {self.min_comfort}  max: {self.max_comfort} shed: {self.min_shed,self.max_shed}')# soc: {SoC}')
+
         return
    
-    def charge(current,voltage,time): # returns (power, cap)
-    p = current * voltage
-    q = current * time
-    soc = q/self.max_cap
-    return (p,soc)
-def update_state(self,c,v,soc,p,t):
-    self.time.append(t)
-    self.power.append(p)
-    self.SOC.append(soc)
-    self.volts.append(v)
-    self.currs.append(c)
-    return
-def delay(self,delay):
-    times = list(range(delay))
-    v = i = 0 # init to 0s
-    for t in times:
-        p,soc = charge(i,v,t)
-        self.update_state(i,v,soc,p,t)
-    self.timer = times[-1]
-    return
+    def calculate_SoC(self,current,voltage): # returns (power, SoC)
+        p = current * voltage
+        q = current * self.timer
+        soc = q/self.max_cap
+        # print(f'i: {current} p: {p} q: {q} soc: {soc}')
+        return (p,soc)
 
-def phase1(SOCs,max_v,max_i):
-    v = i = 0 # init to 0s
-    while v < max_v:
-        v+=1 # increment voltage
-        i+=1 # increment current
-        self.timer+=1
-        v = min(v,max_v)
-        i = min(i,min_i)
-        p,soc = charge(i,v,t) # calculate power, cap
-        self.update_state(i,v,soc,p,t)
-    
+    def update_state(self,c,v,soc,p):
+        self.time.append(self.timer)
+        self.power.append(p)
+        self.SOC.append(soc)
+        self.volts.append(v)
+        self.currs.append(c)
+        if self.verbose:
+            print(f'V: {v} I: {c} SOC:{int(soc*100)}%')
+        return
 
+    def delay(self,init_SoC):
+        times = list(range(self.rampup_delay+1))
+        v = i = 0 # init to 0s
+        SoC = init_SoC
+        for t in times:
+            self.timer +=1
+            p,soc = self.calculate_SoC(i,v)
+            SoC += soc
+            self.update_state(i,v,SoC,p)
+        return
 
-def phase2():
+    def phase1(self,init_SoC):
+        v = i = 0 # init to 0s
+        SoC = init_SoC
+        ramp_volts = self.max_volt / self.rampup_time # to calculate how long it should take to reach max volts in given ramp up time
+        ramp_curr = self.max_curr/self.rampup_time
+        while v < self.max_volt and SoC < self.min_comfort:
+            v+=ramp_volts # increment voltage
+            i+=ramp_curr # increment current
+            v = min(v,self.max_volt)
+            i = min(i,self.max_curr)
+            p,soc = self.calculate_SoC(i,v) # calculate power, soc
+            SoC += soc
+            self.timer+=1
+            self.update_state(i,v,SoC,p)
+        return
+    def phase2(self):
+        v = self.max_volt
+        i = self.max_curr
+        SoC = self.SOC[-1]      
+        while SoC < self.min_comfort:
+            self.timer+=1
+            p,soc = self.calculate_SoC(i,v) # calculate power, soc
+            SoC += soc
+            self.update_state(i,v,SoC,p)
+        return
+    def phase3(self):
+        v = self.max_volt
+        i = self.max_curr
+        SoC = self.SOC[-1]
+        j = 0
+        min_cur = 0.001 * i
+        while SoC < self.max_comfort and i > min_cur:
+            i = decay(self.decay_rate/100,i,self.time[-1],0)
+            i = max(i,min_cur)
+            p,soc = self.calculate_SoC(i,v) # calculate power, soc
+            SoC += soc
+            self.timer+=1
+            self.update_state(i,v,SoC,p)
+        return
 
-def phase3():
+    def charge(self,init_SoC=.0,fname='plot'):
+        print('Charging...\n')
+        time_slots = []
+        self.delay(init_SoC) #<=== to add ramp up delay
+        time_slots.append(self.time[-1])
+        self.phase1(init_SoC)
+        time_slots.append(self.time[-1])
+        self.phase2()
+        time_slots.append(self.time[-1])
+        self.phase3()
+        time_slots.append(self.time[-1])
+        ys = [(self.SOC,'SOC (%)'),(self.power,'power (W)'),(self.currs,'current (A)'),(self.volts,'voltage (V)')] # super gross
+        self.subplot(self.time,ys,vlines=time_slots,fname=f'{fname}')
+        return self.SOC
 
+    def subplot(self,xs,ys,x_name='Time',vlines = None,fname=None): # change to use member variables not args
+        num = len(ys)//2 # divide graphs by 2
+        (fig,axs) = plt.subplots(num,num) # create 4 graphs
+        i = 0
+        j = 0
+        for y,name in ys:
+            if i >= num:
+                i = 0
+                j+=1
+            axs[i,j].plot(xs,y)
+            if not vlines == None:
+                for v in vlines:
+                    axs[i,j].axvline(v,linestyle='dotted',color='r')
+            axs[i,j].set_title(f'{name} vs {x_name}')
+            axs[i,j].set(xlabel=x_name,ylabel=name)
+            i+=1
+        plt.tight_layout()
+        if not fname==None:
+            plt.savefig(f'figs/{fname}.png')
+        else:
+            plt.show()
+        return
+    def plot(self,xs,ys,x_name='Time',vlines = None,show=False): # change to use member variables not args
+        ys,y_name = ys
+        plt.plot(xs,ys)
+        plt.xlabel(x_name)
+        plt.ylabel(y_name)
+        print(x_name,xs)
+        print(y_name,ys)
+        plt.savefig(f'figs/{x_name}_v_{y_name}.png')
+        if show:
+            plt.show()
+        return
+    def shed(self):
+        self.min_comfort = self.min_shed
+        self.max_comfort = self.max_shed
+        return
+    def endshed(self):
+        self.min_comfort,self.max_comfort = self.user_comfort
+        # print(f'new min: {self.min_comfort} new max: {self.max_comfort}')
+        return
+    def discharge(self,time,rate):
+        '''
+            Discharges/decreases the battery/SoC based on the given rate for the given time
+        '''
+        print('Dischargining...')
+        if len(self.SOC) == 0:
+            print('Discharging an empty battery!\n')
+            return
+        soc = self.SOC[-1]
+        v = self.volts[-1]
+        i = self.currs[-1]
+        p = self.power[-1]
+        for t in range(time):
+            self.timer+=1
+            soc -= rate*soc
+            self.update_state(i,v,soc,p)
+        return soc
 
-
-
-def update(c,v,soc,p,t):
-    ts.append(t)
-    ps.append(p)
-    SOCs.append(soc)
-    volts.append(v)
-    currs.append(c)
-    return
+            
+            
 
 
 # https://batteryuniversity.com/learn/article/electric_vehicle_ev
@@ -168,9 +278,9 @@ def model(rampup_time=5,rampup_delay = 3,cutoff_soc=0.75,max_cap = 40,max_volt =
 
 
 parser = argparse.ArgumentParser(description='Process program args.')
-parser.add_argument('-rd', type=int, help='ramp-up delay (sec)',default=3) # in secs
+parser.add_argument('-rd', type=int, help='ramp-up delay (sec)',default=0) # in secs
 
-parser.add_argument('-rt', type=int, help='ramp-up time (sec)',default=5) # in secs
+parser.add_argument('-rt', type=int, help='ramp-up time (sec)',default=1) # in secs (min = 1 as we divide by rt in the first phase)
 parser.add_argument('-o', type=str, help='output file name',default='plot') # png
 parser.add_argument('-soc', type=float, help='current SOC (%)',default=0.) # in %
 
@@ -179,10 +289,13 @@ parser.add_argument('-cutoff_soc', type=float, help='transition SOC (%)',default
 parser.add_argument('-cap', type=int, help='max capacity (kWh)',default=40) # in kwh
 parser.add_argument('-v', type=int, help='voltage (V)',default=240) 
 parser.add_argument('-c', type=int, help='current (Amp)',default=15) 
-parser.add_argument('-dr', type=float, help='decay rate (%)',default=.12)
+parser.add_argument('-dr', type=float, help='decay rate (%)',default=1.)
 parser.add_argument('-mc', type=float, help='max capacity (%)',default=1.)
+parser.add_argument('-verb', type=bool, help='verbose',default=False)
 
+parser.add_argument('-min', type=float, help='minimum user comfort',default=.95)
 
+parser.add_argument('-max', type=float, help='maximum user comfort',default=1.)
 
 
 args = parser.parse_args()
@@ -196,7 +309,24 @@ v = args.v
 c = args.c
 dr = args.dr
 mc = args.mc
+verb = args.verb
+max_com = args.max
+min_com = args.min
 
-model(rt,rd,cs,cap,v,c,dr,out,soc,mc)
+# model(rt,rd,cs,cap,v,c,dr,out,soc,mc)
+c = charger(v,c,cap,min_comfort=min_com,max_comfort=max_com,rampup_time = rt,decay_rate=dr,rampup_delay=rd,verbose=verb) #self,max_volt,max_curr,max_cap,min_comfort,max_comfort
+# c.shed()
+soc = 0
+for i in range(4):
+    socs = c.charge(soc,fname=out+str(i))
+    soc = c.discharge(10,0.03)
+    # c.endshed()
+    # print('1-------->',socs[-20:-10])
+    c.shed()
+    socs = c.charge(soc,fname=out+str(i))
+    soc = c.discharge(10,0.03)
+    # print('2-------->',socs[-20:-10])
+    
+    # c.endshed()
 # print(args.accumulate(args.integers))
 
