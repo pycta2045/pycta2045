@@ -40,41 +40,18 @@ class SCPI:
             sends a command through the socket
         '''
         self.soc.send(f"{cmd}\n".encode())
-        #self.soc.send(b"SYST:RWL\n")
         if recv:
             ret = self.soc.recv(buf_sz).decode()
         else:
             ret = True
         return ret
-
-    # ================= common commands functions ================
-    # def lock_screen(self):
-    #     '''
-    #         params:
-    #             None
-    #         return:
-    #             * servers response to scpi command
-    #     '''
-    #     # lock screen
-    #     return self.send_command(self.commands['common']['lock screen'])
-    # =================
-    # def clear_status(self):
-    #     return self.send_command(self.commands['common']['clear status'])
-    # # =================
-    # def event_status_enable(self):
-    #     return self.send_command(self.commands['common']['event status enable'])
-    # # =================
-    # def event_status_register(self):
-    #     return self.send_command(self.commands['common']['clear status'])
-    # # =================
-    # def clear_status(self):
-    #     return self.send_command(self.commands['common']['clear status'])
-    def send(self,cmd,recv=False):
+    def send(self,cmd,args=None,recv=False):
         status = False
         try:
             cmd = self.commands['common'][cmd]
+            if not args is None:
+                cmd = f"{cmd} {" ".join(args)}"
             res = self.send_command(cmd,recv) # send command 
-            # self.send_command('QUIT')
             status = True
         except Exception as e:
             res = e
