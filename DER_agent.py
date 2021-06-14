@@ -28,6 +28,7 @@ parser.add_argument('-m', type=bool, help='mode {True: listen, False: send}',def
 
 
 
+'''
 args = parser.parse_args()
 port = args.p
 # cmd = args.c
@@ -47,3 +48,13 @@ else:
     com.send(shed)
     print(f'sent: {shed}')
     # r = com.recv()
+
+'''
+
+scpi = SCPI()
+(s,r) = scpi.send("lock screen",recv=True)
+print(r)
+(s,r) = scpi.send("identify",recv=True)
+print(r)
+r = scpi.send_command("SYST:LOC\n")
+print(r)

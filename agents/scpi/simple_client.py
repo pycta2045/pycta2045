@@ -1,17 +1,25 @@
 import socket
 
-s = socket.sockeet(socket.AF_INET,socket.SOCK_STREAM)
+ip = "192.168.0.153"
+port = 5025
+
+s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 s.settimeout(1)
-s.connect(("192.168.0.3",5025))
 
-s.send("SYST:RWL\n")
+print(f"connecting to {ip}:{port} ...")
+s.connect((ip,port))
+
+s.send(b"SYST:RWL\n")
+print(s.recv(1024))
 
 
-s.send("*IDN?\n")
 
-prnt(s.recv(1024))
+s.send(b"*IDN?\n")
 
-s.send("SYST:LOC\n")
+print(s.recv(1024))
+
+s.send(b"SYST:LOC\n")
+print(s.recv(1024))
 
 
 s.close()

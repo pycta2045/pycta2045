@@ -4,7 +4,7 @@
 		"clear status":"*CLS",
 		"event status enable":"*ESE",
 		"event status register":"*ESR",
-		"identify":"*IDN",
+		"identify":"*IDN?",
 		"operation complete":"*OPC",
 		"reset":"*RST",
 		"service request enable":"*SRE",
