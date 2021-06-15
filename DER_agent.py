@@ -4,6 +4,7 @@ import argparse
 from agents.gen_agent import generic_agent
 from agents.cta2045.handler import command_handler
 from agents.com.handler import COM
+from agents.charger.charger import charger
 
 
 
@@ -18,7 +19,8 @@ from agents.com.handler import COM
 # print(DER_agent.get_state())
 
 # print(f'shed: {shed}')
-# # DER_agent.charge()
+# DER_agent.charge()
+
 
 parser = argparse.ArgumentParser(description='Process program args.')
 parser.add_argument('-p', type=str, help='port to use',default='/dev/ttyS5')
@@ -49,12 +51,25 @@ else:
     print(f'sent: {shed}')
     # r = com.recv()
 
-'''
-
 scpi = SCPI()
 (s,r) = scpi.send("lock screen",recv=True)
 print(r)
 (s,r) = scpi.send("identify",recv=True)
+
+curr = 0.75
+r= scpi.send("set current",args=[str(curr)])
+print(r)
+(s,r) = scpi.send("get current",recv=True)
+print(f"did current change? {r}")
+
+
 print(r)
 r = scpi.send_command("SYST:LOC\n")
 print(r)
+'''
+charger = charger(max_volt=30,max_curr=20,max_cap=240,min_comfort=0.85,max_comfort=0.95,decay_rate=1.1,rampup_delay=1)
+charger.shed()
+ret = charger.charge(fname='plot')
+ret = charger.charge(init_SoC=ret[-1],fname='plot1')
+print(len(ret))
+

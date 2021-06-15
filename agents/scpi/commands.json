@@ -18,13 +18,14 @@
 		"preset enable registers":"STATus:PRESet", 
 		"questionable status value latched":"STATus:QUEStionable[:EVENt]?",
 		"questionable condition value":"STATus:QUEStionable:CONDition?",
-		"questionable enable value":"STATus:QUEStionable:ENABle"
+		"questionable enable value":"STATus:QUEStionable:ENABle",
+		"set current": "CURR",
+		"set voltage":"VOLT",
+        "get current":"CURR?"
 	},
 	"status": {
 		"error status": "SYSTem:ERRor?"
 	},
 	"configure":{
-		"cmd1":"somethin",
-		"cmd2":"something"
 	}
 }

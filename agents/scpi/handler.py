@@ -50,7 +50,7 @@ class SCPI:
         try:
             cmd = self.commands['common'][cmd]
             if not args is None:
-                cmd = f"{cmd} {" ".join(args)}"
+                cmd = f"{cmd} {' '.join(args)}"
             res = self.send_command(cmd,recv) # send command 
             status = True
         except Exception as e:

@@ -1,4 +1,5 @@
-
+import numpy as np
+import matplotlib.pyplot as plt
 def decay(x,m,t,b):
     i = m * np.exp(-t*x)+b
     # print(f'x: {x}, m :{m}, t: {t}, b: {b} exp: {np.exp(-t*x)}= {i}')
