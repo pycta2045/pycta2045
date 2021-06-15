@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 def decay(x,m,t,b):
     i = m * np.exp(-t*x)+b
@@ -121,7 +122,9 @@ class charger:
             # self.subplot(self.time,ys,vlines=time_slots,fname=f'{fname}')
             self.plot(self.time,ys[0])
             self.plot(self.time,ys[1])
-        return self.SOC
+        d = {'power':self.power,'soc':self.SOC,'current':self.currs,'voltage':self.volts}
+        df = pd.DataFrame(d)
+        return df
 
     def subplot(self,xs,ys,x_name='Time',vlines = None,fname=None): # change to use member variables not args
         num = len(ys)//2 # divide graphs by 2
