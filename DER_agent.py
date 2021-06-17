@@ -53,28 +53,20 @@ else:
 
 '''
 
-scpi = SCPI(addr='192.168.0.149')
-(s,r) = scpi.send("lock screen",recv=True)
-print(r)
-(s,r) = scpi.send("identify",recv=True)
 
-curr = 0.75
-r= scpi.send("set current",args=[str(curr)])
-print(r)
-(s,r) = scpi.send("get current",recv=True)
-print(f"did current change? {r}")
-
-'''
-
-print(r)
-r = scpi.send_command("SYST:LOC\n")
-print(r)
-charger = charger(max_volt=30,max_curr=0,max_cap=240,min_comfort=0.85,max_comfort=0.95,rampup_time=1, decay_rate=.9)
+charger = charger(max_volt=240,max_curr=30,max_cap=240,min_comfort=0.85,max_comfort=0.95)
 charger.shed()
 ret = charger.charge()
-#for i in range(100):
-    #ret = charger.charge(init_SoC=ret['soc'].iloc[-1])
-ret = charger.charge(init_SoC=ret['soc'].iloc[-1],fname='plot1')
-print(len(ret))
-'''
 
+scpi = SCPI()
+
+(s,r) = scpi.send("lock screen")
+for i in ret.iloc:
+    c = i['current']
+    (s,r)= scpi.send("current",args=[str(c)])
+    res = scpi.send("current",cmd_type=1)
+    print(f'cmd: curr {c}  --  query: {res}')
+
+
+(s,r) = scpi.send("unlock screen")
+print(r)

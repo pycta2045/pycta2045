@@ -25,11 +25,12 @@ class SCPI:
         with open(commands_file,'r') as f:
             commands = json.load(f)
         self.commands = commands
+        self.type = {0: 'command',1: 'query',2: 'configure'}
         self.log_file = log_file+'.csv'
         return
     def log(self,l):
         l['time'] = int(time.time()) 
-        print(l)
+        #print(l)
         df = pd.DataFrame(l)
         df.set_index('time',inplace=True)
         df.to_csv(self.log_file,mode='a',header=False)
@@ -37,22 +38,49 @@ class SCPI:
 
     def send_command(self,cmd,recv=False):
         '''
-            sends a command through the socket
+            * Purpose: sends a command through the socket
+            * Args:
+                * cmd: desired command
+            * Return:
+                * returns received value from simulator if recv is true (expect a value in return)
+                * returns status (True/False) of sent message
         '''
-        self.soc.send(f"{cmd}\n".encode())
+        r = self.soc.send(f"{cmd}\n".encode())
         if recv:
             ret = self.soc.recv(buf_sz).decode()
+            ret = ret.split('\n')[0]
         else:
             ret = True
         return ret
-    def send(self,cmd,args=None,recv=False):
+
+    def send(self,cmd,cmd_type=0,args=None):
+        '''
+            * Purpose: wrapper for send_command
+            * Args:
+                * cmd: desired command
+                * cmd_type: [ 0: command | 1: query | 2: configure]
+                        - commands returns None
+                        * queries return values (str) 
+                        - configure returns None
+                * args: argument for command/query
+            * Return:
+                * returns received value from simulator if cmd_type is query
+                * returns status (True/False) value from simulator if cmd_type is command/configure
+        '''
         status = False
         try:
-            cmd = self.commands['common'][cmd]
+            t = self.type[cmd_type]
+            # find command in commands dict
+            cmd = self.commands[t][cmd]
+            # consider args for command
             if not args is None:
                 cmd = f"{cmd} {' '.join(args)}"
+            # check if we expect to receive something back ( check if cmd_type is query )
+            recv = t == 'query'
+            # send command
             res = self.send_command(cmd,recv) # send command 
             status = True
+
         except Exception as e:
             res = e
         self.log({'command':[cmd],'response':[res],'status':[status]})
