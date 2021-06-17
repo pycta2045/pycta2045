@@ -7,7 +7,32 @@ def decay(x,m,t,b):
     return i
 
 class charger:
-    def __init__(self,max_volt,max_curr,max_cap,min_comfort,max_comfort,decay_rate,rampup_delay,rampup_time=5,verbose=False):
+    def __init__(self,max_volt,max_curr,max_cap,min_comfort,max_comfort,decay_rate=.9,rampup_delay=1,rampup_time=5,verbose=False):
+        '''
+        Purpose:
+            initializes the model with the given parameters for charging
+        Args:
+            * max_volt: maximum voltage value (volts)
+            * max_curr: maximum current value (Amps)
+            * min_comfort: minimum user comfort level for SoC (%)
+            * max_comfort: maximum user comfort level for SoC (%)
+            * decay_rate: rate by which the current decays in constant voltage (CV) phase
+            * rampup_delay: rate by which the current decays in constant voltage (CV) phase (time units)
+            * rampup_time: time it takes to reach CV phase (time units)
+
+            * verbose: print log messages
+        Return: 
+            * None
+        NOTES:
+            * decay rate: affects the upper half of the graph's concavity (Time v. SoC)
+                * larger values >=1 result in a sharper edges when charging reaches max SoC
+                * smaller values <1 result in smother edges
+                * recommend: default value (0.9)
+            * rampup_time: affects the lower half of the graph's concavity (Time v. SoC)
+                * larger values >=1 result in more concavity
+                * smaller values <1 result in less concavity
+                * recommend: default value (1)
+        '''
         self.SOC = []
         self.time = []
         self.power = []
@@ -27,8 +52,8 @@ class charger:
         self.decay_rate = decay_rate
         self.rampup_delay = rampup_delay
         self.t_inc = 1
-        print(f'min_com: {self.min_comfort}  max: {self.max_comfort} shed: {self.min_shed,self.max_shed}')# soc: {SoC}')
-
+        if verbose:
+            print(f'min_com: {self.min_comfort}  max: {self.max_comfort} shed: {self.min_shed,self.max_shed}')
         return
    
     def calculate_SoC(self,current,voltage): # returns (power, SoC)
@@ -91,7 +116,8 @@ class charger:
         SoC = self.SOC[-1]
         j = 0
         min_cur = 0.05 * i
-        print(f'PHASE3 SoC: {SoC} max: {self.max_comfort} SoC < max : {SoC < self.max_comfort}')
+        if self.verbose:
+            print(f'PHASE3 SoC: {SoC} max: {self.max_comfort} SoC < max : {SoC < self.max_comfort}')
         while SoC < self.max_comfort:
             i = decay(self.decay_rate/1000,i,self.time[-1],self.decay_rate)
             i = min(self.max_curr,max(i,min_cur))
@@ -101,17 +127,23 @@ class charger:
             self.update_state(i,v,SoC,p)
         return
     def charge(self,init_SoC=.0,fname=None):
-        print('Charging...\n')
+        v = self.verbose
         time_slots = []
         self.delay(init_SoC) #<=== to add ramp up delay
 
+        if v:
+            print('Charging...')
+            print('PHASE 1: init SoC: {init_SoC}\n')
         time_slots.append(self.time[-1])
         self.phase1(init_SoC)
 
+        if v:
+            print('PHASE 2: SoC: {self.SOC[-1]}\n')
         time_slots.append(self.time[-1])
         self.phase2()
 
-
+        if v:
+            print('PHASE 3: SoC: {self.SOC[-1]}\n')
         time_slots.append(self.time[-1])
         self.phase3()
 
@@ -172,7 +204,8 @@ class charger:
         '''
             Discharges/decreases the battery/SoC based on the given rate for the given time
         '''
-        print('Dischargining...')
+        if self.verbose:
+            print('Dischargining...')
         if len(self.SOC) == 0:
             print('Discharging an empty battery!\n')
             return

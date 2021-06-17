@@ -51,7 +51,9 @@ else:
     print(f'sent: {shed}')
     # r = com.recv()
 
-scpi = SCPI()
+'''
+
+scpi = SCPI(addr='192.168.0.149')
 (s,r) = scpi.send("lock screen",recv=True)
 print(r)
 (s,r) = scpi.send("identify",recv=True)
@@ -62,14 +64,17 @@ print(r)
 (s,r) = scpi.send("get current",recv=True)
 print(f"did current change? {r}")
 
+'''
 
 print(r)
 r = scpi.send_command("SYST:LOC\n")
 print(r)
-'''
-charger = charger(max_volt=30,max_curr=20,max_cap=240,min_comfort=0.85,max_comfort=0.95,decay_rate=1.1,rampup_delay=1)
+charger = charger(max_volt=30,max_curr=0,max_cap=240,min_comfort=0.85,max_comfort=0.95,rampup_time=1, decay_rate=.9)
 charger.shed()
-ret = charger.charge(fname='plot')
-ret = charger.charge(init_SoC=ret[-1],fname='plot1')
+ret = charger.charge()
+#for i in range(100):
+    #ret = charger.charge(init_SoC=ret['soc'].iloc[-1])
+ret = charger.charge(init_SoC=ret['soc'].iloc[-1],fname='plot1')
 print(len(ret))
+'''
 
