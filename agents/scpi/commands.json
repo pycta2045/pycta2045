@@ -1,30 +1,32 @@
 {
-	"common":{
+	"command":{
 		"lock screen":"SYST:RWL",
+		"unlock screen":"SYST:LOC",
 		"clear status":"*CLS",
 		"event status enable":"*ESE",
 		"event status register":"*ESR",
-		"identify":"*IDN?",
 		"operation complete":"*OPC",
 		"reset":"*RST",
 		"service request enable":"*SRE",
-		"status byte register":"*STB?",
 		"trigger":"*TRG",
 		"selftest":"*TST",
 		"wait":"*WAI",
-		"operation event value latched":"STATus:OPERation[:EVENt]?",
 		"operation condition value":"*STATus:OPERation:CONDition",
 		"operation enable value":"STATus:OPERation:ENABle",
 		"preset enable registers":"STATus:PRESet", 
-		"questionable status value latched":"STATus:QUEStionable[:EVENt]?",
-		"questionable condition value":"STATus:QUEStionable:CONDition?",
 		"questionable enable value":"STATus:QUEStionable:ENABle",
-		"set current": "CURR",
-		"set voltage":"VOLT",
-        "get current":"CURR?"
+		"current": "CURR",
+		"voltage":"VOLT"
 	},
-	"status": {
-		"error status": "SYSTem:ERRor?"
+	"query": {
+		"identify":"*IDN?",
+		"questionable condition value":"STATus:QUEStionable:CONDition?",
+		"operation event value latched":"STATus:OPERation[:EVENt]?",
+		"questionable status value latched":"STATus:QUEStionable[:EVENt]?",
+		"status byte register":"*STB?",
+		"error status": "SYSTem:ERRor?",
+        "current":"CURR?",
+		"voltage":"VOLT?"
 	},
 	"configure":{
 	}
