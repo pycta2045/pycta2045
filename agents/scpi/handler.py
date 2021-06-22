@@ -2,12 +2,15 @@ import socket
 import time
 import pandas as pd
 import json
+import os
+
+
 timeout = 1 # timeout len used in connection
 port = 5025 # port used for connection
 buf_sz = 1024 # size of buffer used in recv
 
 class SCPI:
-    def __init__(self,addr = "192.168.0.153",commands_file='agents/scpi/commands.json',log_file='log'):
+    def __init__(self,addr = "192.168.0.153",commands_file='commands.json',log_file='log'):
         '''
             params:
                 * addr: address of server to connect to
@@ -17,12 +20,13 @@ class SCPI:
                 None
         '''
         self.addr = addr
+        path = os.path.dirname(__file__)
         print(f"connecting to {addr}:{port}...")
         self.soc = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         self.soc.settimeout(timeout) # time out in secs
         self.soc.connect((addr,port))
         print("connected!")
-        with open(commands_file,'r') as f:
+        with open(f'{path}/{commands_file}','r') as f:
             commands = json.load(f)
         self.commands = commands
         self.log_file = log_file+'.csv'
