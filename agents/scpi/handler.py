@@ -10,7 +10,7 @@ port = 5025 # port used for connection
 buf_sz = 1024 # size of buffer used in recv
 
 class SCPI:
-    def __init__(self,addr = "192.168.0.153",commands_file='commands.json',log_file='log'):
+    def __init__(self,addr = "192.168.0.153",commands_file='commands.json',log_file='log',logging=False):
         '''
             params:
                 * addr: address of server to connect to
@@ -22,15 +22,23 @@ class SCPI:
         self.addr = addr
         path = os.path.dirname(__file__)
         print(f"connecting to {addr}:{port}...")
-        self.soc = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-        self.soc.settimeout(timeout) # time out in secs
-        self.soc.connect((addr,port))
-        print("connected!")
-        with open(f'{path}/{commands_file}','r') as f:
-            commands = json.load(f)
-        self.commands = commands
-        self.type = {0: 'command',1: 'query',2: 'configure'}
-        self.log_file = log_file+'.csv'
+        try:
+            self.soc = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+            self.soc.settimeout(timeout) # time out in secs
+            self.soc.connect((addr,port))
+            print("connected!")
+            with open(f'{path}/{commands_file}','r') as f:
+                commands = json.load(f)
+            self.commands = commands
+            self.type = {0: 'command',1: 'query',2: 'configure'}
+            self.log_file = log_file+'.csv'
+            self.logging=logging
+        except Exception as e:
+            # close socket
+            # if self.SOC 
+            self.soc.close()
+            raise Exception(f"failed to open socket on {addr}:{port}")
+
         return
     def log(self,l):
         l['time'] = int(time.time()) 
@@ -87,8 +95,8 @@ class SCPI:
 
         except Exception as e:
             res = e
-        self.log({'command':[cmd],'response':[res],'status':[status]})
+        if self.logging:
+            self.log({'command':[cmd],'response':[res],'status':[status]})
         return (status,res)
-    # ================= other commands functions ================
 
 print(__name__)

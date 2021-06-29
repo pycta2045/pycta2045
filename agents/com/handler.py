@@ -4,7 +4,12 @@ from serial.tools.list_ports_linux import SysFS
 import glob
 # import io
 
+
+
 class COM:
+    '''
+        Note: This module is not well-tested due to missing equipments for now. 
+    '''
     def __init__(self, port="/dev/ttyS6"):
         self.port = port
         if not self.verify_port():
