@@ -1,13 +1,12 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-def decay(x,m,t,b):
-    i = m * np.exp(-t*x)+b
-    # print(f'x: {x}, m :{m}, t: {t}, b: {b} exp: {np.exp(-t*x)}= {i}')
-    return i
+import time
+
+power_rating=12.0
 
 class charger:
-    def __init__(self,max_volt,max_curr,max_cap,min_comfort,max_comfort,decay_rate=.9,rampup_delay=1,rampup_time=5,verbose=False):
+    def __init__(self,max_volt=240,max_curr=30,max_cap=40,min_comfort=.9,max_comfort=1.,decay_rate=.3,rampup_delay=1,rampup_time=5,verbose=False):
         '''
         Purpose:
             initializes the model with the given parameters for charging
@@ -49,8 +48,13 @@ class charger:
         self.max_shed = max_comfort - 0.1 # drop by 10% 
         self.verbose = verbose
         self.rampup_time = rampup_time
+        self.max_time = max_cap/power_rating # kWh/kW = hrs
+        self.max_time *= 60 * 60  # convert to secs 
+        self.t_start = time.time()
+        self.t_end = int(self.t_start+self.max_time) # calculate when charging should end
         self.decay_rate = decay_rate
         self.rampup_delay = rampup_delay
+        # self.t_inc = self.max_curr/self.max_time
         self.t_inc = 1
         if verbose:
             print(f'min_com: {self.min_comfort}  max: {self.max_comfort} shed: {self.min_shed,self.max_shed}')
@@ -59,10 +63,12 @@ class charger:
     def calculate_SoC(self,current,voltage): # returns (power, SoC)
         p = current * voltage
         q = current * self.timer
+        # print(self.timer)
         soc = q/self.max_cap
         # print(f'i: {current} p: {p} q: {q} soc: {soc}')
         return (p,soc)
-
+    def current_decay(self,rate,i):
+        return i * np.exp(-rate)
     def update_state(self,c,v,soc,p):
         self.time.append(self.timer)
         self.power.append(p)
@@ -114,12 +120,11 @@ class charger:
         v = self.max_volt
         i = self.max_curr
         SoC = self.SOC[-1]
-        j = 0
         min_cur = 0.05 * i
         if self.verbose:
             print(f'PHASE3 SoC: {SoC} max: {self.max_comfort} SoC < max : {SoC < self.max_comfort}')
         while SoC < self.max_comfort:
-            i = decay(self.decay_rate/1000,i,self.time[-1],self.decay_rate)
+            i = self.current_decay(self.decay_rate,self.currs[-1])
             i = min(self.max_curr,max(i,min_cur))
             p,soc = self.calculate_SoC(i,v) # calculate power, soc
             SoC += soc
@@ -133,31 +138,69 @@ class charger:
 
         if v:
             print('Charging...')
-            print('PHASE 1: init SoC: {init_SoC}\n')
+            print(f'PHASE 1: init SoC: {round(init_SoC,3)}\n')
         time_slots.append(self.time[-1])
         self.phase1(init_SoC)
 
         if v:
-            print('PHASE 2: SoC: {self.SOC[-1]}\n')
+            print(f'PHASE 2: SoC: {round(self.SOC[-1],3)}\n')
         time_slots.append(self.time[-1])
         self.phase2()
 
         if v:
-            print('PHASE 3: SoC: {self.SOC[-1]}\n')
+            print(f'PHASE 3: SoC: {round(self.SOC[-1],3)}\n')
         time_slots.append(self.time[-1])
         self.phase3()
 
 
+        
+        
+        # calculate the ratio of time / copies
+        self.t_ratio = self.max_time//len(self.power)
+        
+
         time_slots.append(self.time[-1])
+        self.time = self.generate_time_stamps()
+        # self.time 
         ys = [(self.SOC,'SOC (%)'),(self.power,'power (W)'),(self.currs,'current (A)'),(self.volts,'voltage (V)')] # super gross
         if fname != None:
             # self.subplot(self.time,ys,vlines=time_slots,fname=f'{fname}')
             self.plot(self.time,ys[0])
             self.plot(self.time,ys[1])
-        d = {'power':self.power,'soc':self.SOC,'current':self.currs,'voltage':self.volts}
-        df = pd.DataFrame(d)
-        return df
+        
+        d = {'time':self.time,'power':self.power,'soc':self.SOC,'current':self.currs,'voltage':self.volts}
 
+        df = pd.DataFrame(d)
+        df.set_index('time',inplace=True)
+        return df
+    def generate_time_stamps(self):
+        i = self.t_start
+        ts = []
+        for i in range(int(self.t_start),int(self.t_end),int(self.t_ratio)):
+            ts.append(pd.Timestamp(i,unit='s'))
+        return ts[:-1]
+    def get_soc(self,time):
+        '''
+            Purpose: returns the SoC at the given Epoch timestamp 
+            Args:
+                * time: unix Epoch timestamp
+            Returns: associated SoC
+            Notes: Returns None if charging has not started (not plugged-in)
+        '''
+        try:
+            if time >=self.t_end:
+                return self.SOC[-1] # could be 100% or max_comfort (if in shed mode)
+            if time <= self.t_start:
+                return self.SOC[0]
+            
+            # subtract time from the starting time of the charge
+            time -= self.t_start
+
+            i = int(time/self.t_ratio) 
+            soc = self.SOC[i]
+        except Exception as e:
+            soc = None
+        return soc
     def subplot(self,xs,ys,x_name='Time',vlines = None,fname=None): # change to use member variables not args
         num = len(ys)//2 # divide graphs by 2
         (fig,axs) = plt.subplots(num,num) # create 4 graphs
