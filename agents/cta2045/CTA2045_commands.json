@@ -12,6 +12,9 @@
         "msgs":{
             "shed": "0x01 D C C",
             "endshed": "0x02 D C C",
+            "ack": "0x03 A C C",
+            "nak": "0x02 R C C",
+            "Outside Comm Connection Status":"0x0E CS C C",
             "operating status": "0x12 0x0 C C",
             "loadup": "0x17 D C C"
         }

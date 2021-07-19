@@ -3,11 +3,15 @@
     "shed": "0x08 0x01 0x00 0x02 0x01 D C C",
     "endshed": "0x08 0x01 0x00 0x2 0x02 D C C",
     "loadup": "0x08 0x01 0x00 0x02 0x17 D C C",
+    "outside comm connection status":"0x08 0x01 0x00 0x02 0x0E CS C C",
     "max payload query": "0x08 0x03 0x00 0x02 0x18 0x00 C C",
     "max payload response":"0x08 0x03 0x00 0x02 0x19 M C C",
     "intermediate MTSQ": "0x08 0x02 0x00 0x00 C C",
     "data-link MTSQ": "0x08 0x03 0x00 0x00 C C",
-    "operating status": "0x08 0x01 0x00 0x02 0x12 0x00 C C",
+    "operating status query": "0x08 0x01 0x00 0x02 0x12 0x00 C C",
+    "operating status response": "0x08 0x01 0x00 0x02 0x13 OC C C",
+    "app ack":"0x08 0x01 0x00 0x02 0x03 LO C C",
+    "app nak":"0x08 0x01 0x00 0x02 0x04 AR C C",
     "commodity read":"0x08 0x02 X X",
     "nak":"0x15 R",
     "ack":"0x06 0x00",
@@ -19,6 +23,27 @@
             "timeout":"0x05",
             "unsupported":"0x06",
             "unsupported request":"0x07"
+    },
+    "app nak reasons":{
+        "no reason":"0x00",
+        "opcode not supported":"0x01",
+        "opcode invalid":"0x02",
+        "busy":"0x03",
+        "length invalid":"0x04",
+        "customer override":"0x05"  
+    },
+    "connect status code":{
+        "no":"0x00",
+        "found":"0x01",
+        "poor":"0x02"
+    },
+    "op state code":{
+        "idle normal":"0x00",
+        "run normal":"0x01",
+        "run curtailed":"0x02",
+        "run heightened":"0x03",
+        "idle curtailed":"0x04",
+        "idle heightened":"0x06"
     },
     "max payload lengths":{
         "2":"0x00",
@@ -35,5 +60,22 @@
         "1500": "0x0B",
         "2048": "0x0C",
         "4096": "0x0D"
+    },
+    "commodity code":{
+        "not supported":"0x02"
+    },
+
+
+
+
+
+    "codes":{
+        "R":"nak reasons",
+        "OC":"op state code",
+        "CS":"connect status code",
+        "AR":"app nak reasons",
+        "LO":"last opcode",
+        "CC":"commodity code",
+        "":""
     }
 }
