@@ -18,3 +18,9 @@ phases:
 1. use `socat -d -d pty,raw,echo=0 pty,raw,echo=0` to create two virtual ports
 2. use one of the virtual ports as the DCMs end & other as the agent's end
 3. start DCM/mock on one while the agent on the other via `python3 com.py /dev/pts/#given_by_socat`
+
+
+## tests:
+run all tests with `python -m unittest tests/all.py`
+
+run a specific test with `python -m unittest tests/test.py`

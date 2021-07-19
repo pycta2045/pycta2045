@@ -1,4 +1,12 @@
 {
+    "commands":{
+        "shed":"basic",
+        "endshed":"basic",
+        "loadup":"basic",
+        "operating status":"basic",
+        "commodity read":"intermediate",
+        "max payload":"data-link"
+    },
     "basic":{
         "MsgType": "0x08 0x01 0x0 0x2",
         "msgs":{
@@ -35,5 +43,21 @@
             "unsupported request":"0x07"
             }
         },
-    "ack":"0x06 0x00"
+    "ack":"0x06 0x00",
+    "max payload lengths":{
+        "2":"0x00",
+        "4": "0x01",
+        "8": "0x02",
+        "16": "0x03",
+        "32": "0x04",
+        "64": "0x05",
+        "128": "0x06",
+        "256": "0x07",
+        "512": "0x08",
+        "1024": "0x09",
+        "1280": "0x0A",
+        "1500": "0x0B",
+        "2048": "0x0C",
+        "4096": "0x0D"
+    }
 }
