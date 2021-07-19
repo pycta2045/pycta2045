@@ -1,0 +1,33 @@
+{
+	"command":{
+		"lock screen":"SYST:RWL",
+		"unlock screen":"SYST:LOC",
+		"clear status":"*CLS",
+		"event status enable":"*ESE",
+		"event status register":"*ESR",
+		"operation complete":"*OPC",
+		"reset":"*RST",
+		"service request enable":"*SRE",
+		"trigger":"*TRG",
+		"selftest":"*TST",
+		"wait":"*WAI",
+		"operation condition value":"*STATus:OPERation:CONDition",
+		"operation enable value":"STATus:OPERation:ENABle",
+		"preset enable registers":"STATus:PRESet", 
+		"questionable enable value":"STATus:QUEStionable:ENABle",
+		"current": "CURR",
+		"voltage":"VOLT"
+	},
+	"query": {
+		"identify":"*IDN?",
+		"questionable condition value":"STATus:QUEStionable:CONDition?",
+		"operation event value latched":"STATus:OPERation[:EVENt]?",
+		"questionable status value latched":"STATus:QUEStionable[:EVENt]?",
+		"status byte register":"*STB?",
+		"error status": "SYSTem:ERRor?",
+        "current":"CURR?",
+		"voltage":"VOLT?"
+	},
+	"configure":{
+	}
+}
