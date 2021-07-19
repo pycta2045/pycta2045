@@ -19,7 +19,7 @@ class command_handler:
         return
     def dump_commands(self):
         return self.cmds
-    def to_cta(self,cmd,*args):
+    def to_cta(self,cmd,**args):
         # TODO: 
         # 1. query MsgType from dict
         # 2. query msg from dict
@@ -27,20 +27,36 @@ class command_handler:
         v = '0x{:02x}'.format(0)
         try:
             res = self.cmds[f'{cmd}']
-            if ' D ' in res: # duration (default to unknwon duration)
-                duration = args[0] if len(args) >=1 else "0x00"
-                res = res.replace(' D ',f' {duration} ')
-            elif 'M' in res: # default to max payload
-                res = res.replace('M',self.cmds['max payload lengths'][f'{max_payload}'])
-            elif 'R' in res:
-                reason = "none"
-                if len(args) >=1 and args[0] in self.cmds['nak reasons']:
-                    reason = self.cmds['nak reasons'][args[0]]
-                res = res.replace('R',reason)
+            for byte in res.split(' '):
+                if byte.isalpha():
+                    k = byte
+                    if k in args:
+                        rep = args[k]
+                    elif k== 'C':
+                        continue
+                    else:
+                        code = self.cmds[f'codes'][f'{k}']
+                        rep = list(self.cmds[f'{code}'].values())[0]
+                    res = res.replace(k,rep)
             v = res
             if 'C C' in res:
                 res = res.split(' C C')[0]
-                v = f"{self.checksum(res)}" 
+                v = f"{self.checksum(res)}"             
+
+            # if ' D ' in res: # duration (default to unknwon duration)
+            #     duration = args[0] if len(args) >=1 else "0x00"
+            #     res = res.replace(' D ',f' {duration} ')
+            # elif 'M' in res: # default to max payload
+            #     res = res.replace('M',self.cmds['max payload lengths'][f'{max_payload}'])
+            # elif 'R' in res:
+            #     reason = "none"
+            #     if len(args) >=1 and args[0] in self.cmds['nak reasons']:
+            #         reason = self.cmds['nak reasons'][args[0]]
+            #     res = res.replace('R',reason)
+            # v = res
+            # if 'C C' in res:
+            #     res = res.split(' C C')[0]
+            #     v = f"{self.checksum(res)}" 
                 # v = 0
         except Exception as e:
             print(e)

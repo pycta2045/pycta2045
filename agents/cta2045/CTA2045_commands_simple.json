@@ -1,5 +1,4 @@
 {
-
     "shed": "0x08 0x01 0x00 0x02 0x01 D C C",
     "endshed": "0x08 0x01 0x00 0x2 0x02 D C C",
     "loadup": "0x08 0x01 0x00 0x02 0x17 D C C",
@@ -12,7 +11,9 @@
     "operating status response": "0x08 0x01 0x00 0x02 0x13 OC C C",
     "app ack":"0x08 0x01 0x00 0x02 0x03 LO C C",
     "app nak":"0x08 0x01 0x00 0x02 0x04 AR C C",
-    "commodity read":"0x08 0x02 X X",
+    "commodity read response":"0x08 0x02 X X",
+    "commodity read request":"0x08 0x02 0x00 0x02 0x06 0x00 C C",
+    "device info request":"0x08 0x02 0x00 0x02 0x01 0x01 C C",
     "nak":"0x15 R",
     "ack":"0x06 0x00",
     "nak reasons":{
@@ -64,18 +65,37 @@
     "commodity code":{
         "not supported":"0x02"
     },
-
-
-
-
-
+    "device type":{
+        "water heater - gas":"0x0001",
+        "water heater - electric":"0x0002",
+        "water heater -  heat pump":"0x0003",
+        "water heater - heat pump variable":"0x001b",
+        "water heater - phase change material":"0x001c",
+        "other":"0x8000"
+    },
+    "cta version":{
+        "b":"0x42 0x00"
+    },
+    "vendor id":{
+        "":""
+    },
+    "duration":{
+        "unknown":"0x00"
+    },
+    "":{
+        "need to support commodity code 0 (energy consumed) & 7 (energy take)":""
+    },
     "codes":{
         "R":"nak reasons",
         "OC":"op state code",
         "CS":"connect status code",
         "AR":"app nak reasons",
         "LO":"last opcode",
+        "D":"duration",
         "CC":"commodity code",
-        "":""
+        "DT":"device type",
+        "CV":"cta version", 
+        "DR":"device revision",
+        "CB":"capability bitmap"
     }
 }
