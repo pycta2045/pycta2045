@@ -1,53 +1,145 @@
 {
-    "commands":{
-        "shed":"basic",
-        "endshed":"basic",
-        "loadup":"basic",
-        "operating status":"basic",
-        "commodity read":"intermediate",
-        "max payload":"data-link"
-    },
-    "basic":{
-        "MsgType": "0x08 0x01 0x0 0x2",
-        "msgs":{
-            "shed": "0x01 D C C",
-            "endshed": "0x02 D C C",
-            "ack": "0x03 A C C",
-            "nak": "0x02 R C C",
-            "Outside Comm Connection Status":"0x0E CS C C",
-            "operating status": "0x12 0x0 C C",
-            "loadup": "0x17 D C C"
+    "commands": {
+        "shed": {
+            "type":"0x08 0x01",
+            "format":"0x08 0x01 0x00 # 0x01 D H",
+            "op1":"0x01",
+            "op2":"D"
+        },
+        "endshed": {
+            "type":"0x08 0x01",
+            "format":"0x08 0x01 0x00 # 0x02 D H",
+            "op1":"0x02",
+            "op2":"D"
+        },
+        "loadup": {
+            "type":"0x08 0x01",
+            "format":"0x08 0x01 0x00 # 0x17 D H",
+            "op1":"0x17",
+            "op2":"D"
+        },
+        "outside comm connection status":{
+            "type":"0x08 0x01",
+            "format":"0x08 0x01 0x00 # 0x0E CS H",
+            "op1":"0x0E",
+            "op2":"CS"
+        },
+        "max payload request": {
+            "type":"0x08 0x03",
+            "format":"0x08 0x03 0x00 # 0x18 0x00 H",
+            "op1":"0x18",
+            "op2":"0x00"
+        },
+        "max payload response":{
+            "type":"0x08 0x03",
+            "format":"0x08 0x03 0x00 # 0x19 M H",
+            "op1":"0x19",
+            "op2":"M"
+        },
+        "operating status request": {
+            "type":"0x08 0x01",
+            "format":"0x08 0x01 0x00 # 0x12 0x00 H",
+            "op1":"0x12",
+            "op2":"0x00"
+        },
+        "operating status response": {
+            "type":"0x08 0x01",
+            "format":"0x08 0x01 0x00 # 0x13 OC H",
+            "op1":"0x13",
+            "op2":"OC"
+        },
+        "app ack":{
+            "type":"0x08 0x01",
+            "format":"0x08 0x01 0x00 # 0x03 LO H",
+            "op1":"0x03",
+            "op2":"LO"
+        },
+        "app nak":{
+            "type":"0x08 0x01",
+            "format":"0x08 0x01 0x00 # 0x04 ANR H",
+            "op1":"0x04",
+            "op2":"ANR"
+        },
+        "commodity read response":{
+            "type":"0x08 0x02",
+            "format":"0x08 0x02 0x00 # 0x06 0x80 IRC CC IR CR H",
+            "op1":"0x06",
+            "op2":"0x80"
+        },
+        "commodity read request":{
+            "type":"0x08 0x02",
+            "format":"0x08 0x02 0x00 # 0x06 0x00 H",
+            "op1":"0x06",
+            "op2":"0x00"
+        },
+        "device info request":{
+            "type":"0x08 0x02",
+            "format":"0x08 0x02 0x00 # 0x01 0x01 H",
+            "op1":"0x01",
+            "op2":"0x01"
+        },
+        "device info response":{
+            "type":"0x08 0x02",
+            "format":"0x08 0x02 0x00 # 0x01 0x81 0x00 CV VI DT DR CB H",
+            "op1":"0x01",
+            "op2":"0x81"
+        },
+        "intermediate MTSQ": {
+            "type":"0x08 0x02",
+            "format":"0x08 0x02 0x00 # H",
+            "op1":"None",
+            "op2": "None"
+        },
+        "data-link MTSQ": {
+            "type":"0x08 0x03",
+            "format":"0x08 0x03 0x00 # H",
+            "op1":"None",
+            "op2":"None"
+        },
+        "nak":{
+            "type":"0x15 R",
+            "format":"0x15 R",
+            "op1":"None",
+            "op2":"None"
+        },
+        "ack":{
+            "type":"0x06 0x00",
+            "format":"0x06 0x00",
+            "op1":"None",
+            "op2":"None"
         }
     },
-    "intermediate":{
-        "MsgType":"0x08 0x02",
-        "msgs":{
-            "commodity read":""
-        }
-    },
-    "data-link":{
-        "MsgType":"0x08 0x03 0x00 0x02",
-        "msgs":{
-            "max payload query": "0x18 0x0 C C",
-            "max payload response":"0x19 M C C"
-        }
-    },
-    "intermediate MTSQ": "0x8 0x2 0x0 0x0 C C",
-    "data-link MTSQ": "0x8 0x3 0x0 0x0 C C",
-    "nak":{
-        "op":"0x15",
-        "reasons":{
+    "nak_reason":{
             "none":"0x00",
-            "byte":"0x1",
+            "byte":"0x01",
             "length":"0x02",
             "checksum ":"0x03",
             "timeout":"0x05",
             "unsupported":"0x06",
             "unsupported request":"0x07"
-            }
-        },
-    "ack":"0x06 0x00",
-    "max payload lengths":{
+    },
+    "app_nak_reason":{
+        "no reason":"0x00",
+        "opcode not supported":"0x01",
+        "opcode invalid":"0x02",
+        "busy":"0x03",
+        "length invalid":"0x04",
+        "customer override":"0x05"  
+    },
+    "connect_status_code":{
+        "no":"0x00",
+        "found":"0x01",
+        "poor":"0x02"
+    },
+    "op_state_code":{
+        "idle normal":"0x00",
+        "run normal":"0x01",
+        "run curtailed":"0x02",
+        "run heightened":"0x03",
+        "idle curtailed":"0x04",
+        "idle heightened":"0x06"
+    },
+    "max_payload_length":{
         "2":"0x00",
         "4": "0x01",
         "8": "0x02",
@@ -63,9 +155,77 @@
         "2048": "0x0C",
         "4096": "0x0D"
     },
-    "connect status code":{
-        "no":"0x00",
-        "found":"0x01",
-        "poor":"0x02"
+    "commodity_code":{
+        "electricity consumed":"0x00",
+        "electricity produced":"0x01",
+        "natural gas - ft":"0x02",
+        "water - gal":"0x03",
+        "natural gas - m":"0x04",
+        "water - l":"0x05",
+        "total energy":"0x06",
+        "present energy":"0x07"
+    },
+    "device_type":{
+        "water heater - gas":"0x0001",
+        "water heater - electric":"0x0002",
+        "water heater -  heat pump":"0x0003",
+        "water heater - heat pump variable":"0x001b",
+        "water heater - phase change material":"0x001c",
+        "other":"0x8000"
+    },
+    "cta_version":{
+        "b":"0x42 0x00"
+    },
+    "vendor_id":{
+        "electric vehicle":"0x1000",
+        "unspecified":"0x0000"
+    },
+    "duration":{
+        "unknown":"0x00"
+    },
+    "instantaneous_rate":{
+        "default":"0x00"
+    },
+    "cumulative_amount":{
+        "default":"0x00"
+    },
+    "capability_bitmap":{
+        "cycling":"0x00"
+    },
+    "intermediate_response_code":{
+        "success":"0x00",
+        "command not implemented":"0x01",
+        "bad value":"0x02",
+        "command length error":"0x03",
+        "response length error":"0x04",
+        "busy":"0x05",
+        "other error":"0x06",
+        "customer override":"0x07",
+        "command not enabled":"0x08"
+    },
+    "device_revision":{
+        "not supported":"0x00 0x00"
+    },
+    "last_opcode":{
+        "default":"0x00"
+    },
+    "codes":{
+        "R":"nak_reason",
+        "D":"duration",
+        "H":"hash",
+        "M":"max_payload_length",
+        "OC":"op_state_code",
+        "CS":"connect_status_code",
+        "IRC":"intermediate_response_code",
+        "ANR":"app_nak_reason",
+        "LO":"last_opcode",
+        "CC":"commodity_code",
+        "DT":"device_type",
+        "CV":"cta_version", 
+        "DR":"device_revision",
+        "CB":"capability_bitmap",
+        "VI":"vendor_id",
+        "CR":"cumulative_amount",
+        "IR":"instantaneous_rate"
     }
 }

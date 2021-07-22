@@ -1,14 +1,8 @@
 import json
 import os
 
-
-# @TEST:
-# 1. create basic message & test length against combined length given from dict
-# 2. create data-link message & test length against combined length given from dict
-# 3. acks/naks should be 2 bytes only
-
 class command_handler:
-    def __init__(self,fname="CTA2045_commands_simple.json",max_payload=4096):
+    def __init__(self,fname="CTA2045_commands.json"):
         self.cmds = {}
         path = os.path.dirname(__file__)
         try:
@@ -18,68 +12,114 @@ class command_handler:
             print(e)
         return
     def dump_commands(self):
-        return self.cmds
+        '''(helper function)
+            Purpose: dumps all supported CTA2045 commands (helper function).
+            Args: 
+                * None
+            Return: dictionary of supported commands.
+        '''
+        return self.cmds['commands']
+    def hexify(self,val):
+        '''(helper function)
+            Purpose: Returns the hex representation of given integer (helper function).
+            Args: 
+                * val: Integer in decimal representation.
+            Return: hex representation.
+        '''
+        return '0x{:02x}'.format(val)
     def to_cta(self,cmd,**args):
-        # TODO: 
-        # 1. query MsgType from dict
-        # 2. query msg from dict
-        # 3. call checksum on msg
-        v = '0x{:02x}'.format(0)
+        '''
+            Purpose: Translates natural language commands like shed, endshed, commodity read, etc.  to corresponding hex value representation as specified by CTA2045-B.
+            Args: 
+                * cmd: command (shed,endshed,....).
+                * args: dictionary to arguments the command take. For example, shed, endshed and loadup take duration as a an argument.
+            Return: hex representation ready to be used (sent to SGD or UCM).
+            Notes: 
+                * if no arguments are passed, the function uses the defaults.
+                    * first value in the corresponding key within CTA2045_commands.json.
+                * it uses Fletcher’s 16-bit 1’s complement as a hashing function as specified by CTA2045-B.
+                    * This DOES NOT provide security. In fact, CTA2045-B does not address security measures at all.
+        '''
+        v = self.hexify(0)
         try:
-            res = self.cmds[f'{cmd}']
+            res = self.cmds['commands'][f'{cmd}']['format']
             for byte in res.split(' '):
                 if byte.isalpha():
-                    k = byte
+                    k = self.cmds['codes'][f'{byte}']
+                    if k== 'hash':
+                        continue
                     if k in args:
                         rep = args[k]
-                    elif k== 'C':
-                        continue
                     else:
-                        code = self.cmds[f'codes'][f'{k}']
-                        rep = list(self.cmds[f'{code}'].values())[0]
-                    res = res.replace(k,rep)
+                        rep = list(self.cmds[f'{k}'].values())[0]
+                    res = res.replace(byte,rep)
             v = res
-            if 'C C' in res:
-                res = res.split(' C C')[0]
-                v = f"{self.checksum(res)}"             
-
-            # if ' D ' in res: # duration (default to unknwon duration)
-            #     duration = args[0] if len(args) >=1 else "0x00"
-            #     res = res.replace(' D ',f' {duration} ')
-            # elif 'M' in res: # default to max payload
-            #     res = res.replace('M',self.cmds['max payload lengths'][f'{max_payload}'])
-            # elif 'R' in res:
-            #     reason = "none"
-            #     if len(args) >=1 and args[0] in self.cmds['nak reasons']:
-            #         reason = self.cmds['nak reasons'][args[0]]
-            #     res = res.replace('R',reason)
-            # v = res
-            # if 'C C' in res:
-            #     res = res.split(' C C')[0]
-            #     v = f"{self.checksum(res)}" 
-                # v = 0
+            if '#' in res:
+                payload = res.split(' # ')[-1]
+                payload_length = len(payload.split(' ')) - 1 # account for hash checksum (ignore it)
+                res = res.replace('#',self.hexify(payload_length))
+            if ' H' in res:
+                res = res.split(' H')[0]
+                v = f"{self.checksum(res)}"
         except Exception as e:
             print(e)
         return v
-    
-
     def checksum(self,val):
+        '''
+            Purpose: Hashes the passed argument using Fletcher’s checksum algorithm
+            Args: 
+                * val: a hex representation of a CTA2045 command
+            Return: hex representation with checksum appended at the end (last 2 bytes)    
+        '''
         c1 = int("0xaa",16)
         c2 = int("0x00",16)
         for byte in val.split(' '):
-            # convert to int
-            # print(byte)
             i = int(byte.strip(),16)
             c1 = (c1 + i) % 255
             c2 = (c1 + c2) % 255
         msb = 255 - ((c1 + c2) % 255)
         lsb = 255 - ((c1 + msb) % 255) 
-        val = f"{val} {'0x{:02x}'.format(msb)} {'0x{:02x}'.format(lsb)}"
-        print(val)
-        return val
-    def from_cta(self,hex):
+        val = f"{val} {self.hexify(msb)} {self.hexify(lsb)}"
+        return val    
+    def from_cta(self,val):
+        '''
+            Purpose: Translates hex representation of CTA2045 commands (0x06 0x00) to natural language representation (link-layer ack)
+            Args: 
+                * val: a hex representation of a CTA2045 command
+            Return: String of what the command represents.
+            Notes:
+                * This function uses CTA2045_commands.json. So it is limited to only supported commands in the JSON file.
+                * If the command is not supported, it returns None as an output.
+        '''
         key = None
-        for k,v in self.cmds.items():
-            if v == val:
-                key = k
+        h = 0
+        val = val.split(' ')
+        l = len(val)
+        for k,v in self.cmds['commands'].items():
+            t = v['type']
+            op1 = v['op1']
+            op2 = v['op2']
+            if l <=2: 
+                # only check 1st part of type
+                t1,t2 = t.split(' ')
+                if t2.isalpha():
+                    t2 = val[-1]
+                
+                if ' '.join([t1,t2]) == ' '.join(val[:2]):
+                    key = k
+                    break
+            elif l<=6: 
+                # only check type (could be MTSQ)
+                if t in ' '.join(val) and op1 == 'None' and op2 == 'None':
+                    key = k
+                    break
+            else: 
+                # check type & opcodes
+                vop1 = val[4]
+                vop2 = val[5]
+                if op2.isalpha():
+                    op2 = vop2
+                if ' '.join(val[:2]) == t and op1 == vop1 and op2 == vop2:
+                    key = k
+                    break
         return key
