@@ -101,4 +101,3 @@ class SCPI:
             self.log({'command':[cmd],'response':[res],'status':[status]})
         return (status,res)
 
-print(__name__)

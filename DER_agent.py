@@ -21,6 +21,7 @@ from multiprocessing.connection import Listener # used for local communication
 # print(f'shed: {shed}')
 # DER_agent.charge()
 
+'''
 def process_command(cmd,cta2045_cmds):
     # cmd: cta2045 command
     cmd = cmd.split(' ')
@@ -68,6 +69,7 @@ def main():
         # com = COM(port)
         return
     return
+'''
 
 '''
 cta = command_handler(fname="agents/cta2045/CTA2045_commands.json")
@@ -104,8 +106,12 @@ charger.shed()
 ret = charger.charge(fname='plot')
 ret = charger.charge(init_SoC=ret[-1],fname='plot1')
 print(len(ret))
-'''
+
 if __name__=="__main__":
     main()
     exit()
 # main()
+'''
+com = COM()
+print(help(com))
+

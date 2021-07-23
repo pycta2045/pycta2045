@@ -74,7 +74,6 @@ class TestSCPI(unittest.TestCase):
             handler.send('QUIT')
         except Exception as e:
             msg = e.args[0]
-        print('msig: ',msg)
         self.assertTrue(handler != None)
         self.assertTrue(msg == None)
         return

@@ -1,5 +1,6 @@
 import unittest
 import agents.com.handler as COM
+import serial.tools.list_ports as lp
 
 
 class TestCOM(unittest.TestCase):
@@ -14,14 +15,15 @@ class TestCOM(unittest.TestCase):
         self.assertTrue('not found' in msg)
         self.assertEqual(c,None)
     def testPortExistSuccess(self):
-        port = 'tty0'
+        port = list(lp.comports())[0]
+        port=port.name
         msg = ''
         c = None
         try:
             c = COM.COM(port=port)
         except Exception as e:
             msg = e.args[0]
-        self.assertFalse(c != None)
-        self.assertFalse(msg == '')
+        self.assertTrue(c != None)
+        self.assertTrue(msg == '')
 if __name__=="__main__":
     unittest.main()
