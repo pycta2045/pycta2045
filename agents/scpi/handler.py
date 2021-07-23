@@ -10,7 +10,7 @@ port = 5025 # port used for connection
 buf_sz = 1024 # size of buffer used in recv
 
 class SCPI:
-    def __init__(self,addr = "192.168.0.153",commands_file='commands.json',log_file='log',logging=False):
+    def __init__(self,addr = "192.168.0.153",port=port,commands_file='commands.json',log_file='log',logging=False):
         '''
             params:
                 * addr: address of server to connect to
@@ -38,8 +38,10 @@ class SCPI:
             # if self.SOC 
             self.soc.close()
             raise Exception(f"failed to open socket on {addr}:{port}")
-
         return
+    def __del__(self):
+        # self.soc.shutdown(socket.SHUT_RD)
+        self.soc.close()
     def log(self,l):
         l['time'] = int(time.time()) 
         #print(l)

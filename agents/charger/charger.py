@@ -170,13 +170,14 @@ class charger:
         
         d = {'time':self.time,'power':self.power,'soc':self.SOC,'current':self.currs,'voltage':self.volts}
 
+        # print(f'time: {len(self.time)} power: {len(self.power)} SOC: {len(self.SOC)} currs: {len(self.currs)} volts: {len(self.volts)}')
         df = pd.DataFrame(d)
         df.set_index('time',inplace=True)
         return df
     def generate_time_stamps(self):
         i = self.t_start
         ts = []
-        for i in range(int(self.t_start),int(self.t_end),int(self.t_ratio)):
+        for i in range(int(self.t_start),int(self.t_end)+1,int(self.t_ratio)):
             ts.append(pd.Timestamp(i,unit='s'))
         return ts[:-1]
     def get_soc(self,time):
