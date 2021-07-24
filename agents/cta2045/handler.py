@@ -1,7 +1,7 @@
 import json
 import os
 
-class command_handler:
+class CTA2045:
     def __init__(self,fname="CTA2045_commands.json"):
         self.cmds = {}
         path = os.path.dirname(__file__)

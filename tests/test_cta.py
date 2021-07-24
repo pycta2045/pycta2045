@@ -1,5 +1,5 @@
 import unittest
-from agents.cta2045.handler import command_handler as CTA
+from agents.cta2045.handler import CTA2045 as CTA
 
 class TestCTA(unittest.TestCase):
     def test_checksum(self):
