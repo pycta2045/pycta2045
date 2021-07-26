@@ -2,7 +2,7 @@ from agents.scpi.handler import SCPI
 import sys
 import argparse
 from agents.gen_agent import generic_agent
-from agents.cta2045.handler import command_handler as cta_handler
+from agents.cta2045.handler import CTA2045
 from agents.com.handler import COM
 from agents.charger.charger import charger
 from multiprocessing.connection import Listener # used for local communication
