@@ -15,15 +15,17 @@ class TestCOM(unittest.TestCase):
         self.assertTrue('not found' in msg)
         self.assertEqual(c,None)
     def testPortExistSuccess(self):
-        port = list(lp.comports())[0]
-        port=port.name
-        msg = ''
-        c = None
-        try:
-            c = COM.COM(port=port)
-        except Exception as e:
-            msg = e.args[0]
-        self.assertTrue(c != None)
-        self.assertTrue(msg == '')
+        comports = list(lp.comports())
+        if len(comports)>0:
+            port = comports[0]
+            port=port.name
+            msg = ''
+            c = None
+            try:
+                c = COM.COM(port=port)
+            except Exception as e:
+                msg = e.args[0]
+            self.assertTrue(c != None)
+            self.assertTrue(msg == '')
 if __name__=="__main__":
     unittest.main()

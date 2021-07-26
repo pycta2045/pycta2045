@@ -1,6 +1,8 @@
 import unittest
 from agents.cta2045.handler import CTA2045 as CTA
 
+# @TODO:
+# device info response's hash is not captured in response['args]. Debug WHY that is.
 class TestCTA(unittest.TestCase):
     def test_checksum(self):
         print(f'{"-" * 5} to_cta test {"-" * 5}')
@@ -59,8 +61,10 @@ class TestCTA(unittest.TestCase):
             c = cta.to_cta(k)
             # go back to natural language
             res = cta.from_cta(c)
+            print(c)
+            cmd = res['command']
             # validate key and response
-            self.assertTrue(res==k)
+            self.assertTrue(cmd==k)
             print('SUCESS')
 if __name__=="__main__":
     unittest.main()

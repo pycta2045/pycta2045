@@ -91,6 +91,7 @@ class CTA2045:
                 * This function uses CTA2045_commands.json. So it is limited to only supported commands in the JSON file.
                 * If the command is not supported, it returns None as an output.
         '''
+        d = {}
         key = None
         h = 0
         val = val.split(' ')
@@ -122,4 +123,21 @@ class CTA2045:
                 if ' '.join(val[:2]) == t and op1 == vop1 and op2 == vop2:
                     key = k
                     break
-        return key
+        # get command name
+        d['command'] = key
+        d['args'] = {}
+        # get arguments
+        if key in self.cmds['commands']:
+            form = self.cmds['commands'][key]['format'].split()
+            i = j = 0
+            while i < len(form) and j < len(val):
+                if form[i].isalpha():
+                    arg = self.cmds['codes'][form[i]]
+                    length = int(self.cmds[arg]['length'])
+                    value = val[j:j+length]
+                    d['args'][arg] = value
+                    j += length - 1
+                i += 1
+                j += 1
+
+        return d
