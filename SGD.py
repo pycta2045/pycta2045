@@ -15,18 +15,61 @@ port = 'COM6'
 cta = CTA2045()
 com = COM(checksum=cta.checksum,transform=cta.hexify)
 
-#com.send(cta.to_cta('ack'))
+intermeidate = False
+data_link = False
+
+def recv():
+    res = com.recv()
+    ret = cta.from_cta(res)
+    return ret
+
+def send(cmd,**args):
+    print(f'sending {cmd}...')
+    c = cta.to_cta(cmd,args=args)
+    com.send(c)
+    if cmd == 'ack' or cmd == 'nak':
+        res = True
+    else:
+        res = recv()
+    if type(res) == dict:
+        print('\treceived: ',res['command'])
+        for k,v in res['args'].items():
+            print(f'\t{k}\t{v}')
+    return res
+
+def setup():
+    res = None
+    # iMTSQ
+    cmd = 'intermediate MTSQ'
+    res = send(cmd)
+    if res == 'ack':
+        intermediate = True
+
+    # dMTSQ
+    cmd = 'data-link MTSQ'
+    res = send(cmd)
+    if res == 'ack':
+        data_link = True
+
+    # MPQ
+    cmd = 'max payload request'
+    res = send(cmd)
+    if res == 'ack':
+        res = recv()
+        #print('\tpayload: ',res)
+        send('ack')
+
+    return
+
+# SET UP
+setup()
+x = send('operating status response',args={'op_state_code':'idle normal'})
+
+send('ack')
 
 '''
-packet = bytearray()
-data = cta.to_cta('ack').split(' ')
-data = list(map(lambda x:int(x,16),data))
-print(data)
-packet.extend(data)
-#packet.extend(hex(cta.to_cta('ack').split(' '))
-print(packet)
-'''
 while True:
+
     x = com.recv()
     cmd = cta.from_cta(x)
     print("received command: ",cmd)
@@ -36,3 +79,5 @@ while True:
     if not res == None:
         com.send(cta.to_cta(res))
         x = com.recv()
+'''
+

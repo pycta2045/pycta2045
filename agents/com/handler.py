@@ -46,7 +46,7 @@ class COM:
         packet.extend(data)
         res = self.ser.write(packet)
         #print('wrote= ',packet)
-        #time.sleep(self.tim)
+        time.sleep(self.tim)
         return res>=2
 
     def recv(self):
@@ -61,14 +61,11 @@ class COM:
                 if len(data) > 2:
                     unchecked_data = data[:-2]
                     checked_data = self.checksum(" ".join(unchecked_data)).split(" ")
-                    #print("unchecked: ",unchecked_data)
-                    #print("checked: ",checked_data)
-                    #print("orig:",data)
                     if data == checked_data:
                         return " ".join(data)
                 else:
                     return " ".join(data)
-            #time.sleep(self.ser.timeout)
+            time.sleep(self.ser.timeout)
 
 
         return buff
