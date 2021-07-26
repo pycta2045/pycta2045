@@ -7,14 +7,14 @@ class CTA2045:
         path = os.path.dirname(__file__)
         try:
             with open(f'{path}/{fname}','r') as f:
-                self.cmds = json.load(f)            
+                self.cmds = json.load(f)
         except Exception as e:
             print(e)
         return
     def dump_commands(self):
         '''(helper function)
             Purpose: dumps all supported CTA2045 commands (helper function).
-            Args: 
+            Args:
                 * None
             Return: dictionary of supported commands.
         '''
@@ -22,7 +22,7 @@ class CTA2045:
     def hexify(self,val):
         '''(helper function)
             Purpose: Returns the hex representation of given integer (helper function).
-            Args: 
+            Args:
                 * val: Integer in decimal representation.
             Return: hex representation.
         '''
@@ -30,11 +30,11 @@ class CTA2045:
     def to_cta(self,cmd,**args):
         '''
             Purpose: Translates natural language commands like shed, endshed, commodity read, etc.  to corresponding hex value representation as specified by CTA2045-B.
-            Args: 
+            Args:
                 * cmd: command (shed,endshed,....).
                 * args: dictionary to arguments the command take. For example, shed, endshed and loadup take duration as a an argument.
             Return: hex representation ready to be used (sent to SGD or UCM).
-            Notes: 
+            Notes:
                 * if no arguments are passed, the function uses the defaults.
                     * first value in the corresponding key within CTA2045_commands.json.
                 * it uses Fletcher’s 16-bit 1’s complement as a hashing function as specified by CTA2045-B.
@@ -67,9 +67,9 @@ class CTA2045:
     def checksum(self,val):
         '''
             Purpose: Hashes the passed argument using Fletcher’s checksum algorithm
-            Args: 
+            Args:
                 * val: a hex representation of a CTA2045 command
-            Return: hex representation with checksum appended at the end (last 2 bytes)    
+            Return: hex representation with checksum appended at the end (last 2 bytes)
         '''
         c1 = int("0xaa",16)
         c2 = int("0x00",16)
@@ -78,13 +78,13 @@ class CTA2045:
             c1 = (c1 + i) % 255
             c2 = (c1 + c2) % 255
         msb = 255 - ((c1 + c2) % 255)
-        lsb = 255 - ((c1 + msb) % 255) 
+        lsb = 255 - ((c1 + msb) % 255)
         val = f"{val} {self.hexify(msb)} {self.hexify(lsb)}"
-        return val    
+        return val
     def from_cta(self,val):
         '''
             Purpose: Translates hex representation of CTA2045 commands (0x06 0x00) to natural language representation (link-layer ack)
-            Args: 
+            Args:
                 * val: a hex representation of a CTA2045 command
             Return: String of what the command represents.
             Notes:
@@ -99,21 +99,21 @@ class CTA2045:
             t = v['type']
             op1 = v['op1']
             op2 = v['op2']
-            if l <=2: 
+            if l <=2:
                 # only check 1st part of type
                 t1,t2 = t.split(' ')
                 if t2.isalpha():
                     t2 = val[-1]
-                
+
                 if ' '.join([t1,t2]) == ' '.join(val[:2]):
                     key = k
                     break
-            elif l<=6: 
+            elif l<=6:
                 # only check type (could be MTSQ)
                 if t in ' '.join(val) and op1 == 'None' and op2 == 'None':
                     key = k
                     break
-            else: 
+            else:
                 # check type & opcodes
                 vop1 = val[4]
                 vop2 = val[5]
@@ -123,3 +123,14 @@ class CTA2045:
                     key = k
                     break
         return key
+    def complement(self,cmd):
+        '''
+            Purpose: returns the complement of passed command
+            Args:
+                * cmd (string): desired command to find complement of
+            Return: complement of passed command
+        '''
+        comd_complement  = None
+        if "request" in cmd:
+            cmd_complement = cmd.replace("request","response")
+        return cmd_complement
