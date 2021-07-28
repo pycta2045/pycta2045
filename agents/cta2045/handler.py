@@ -1,6 +1,16 @@
 import json
 import os
 
+
+class UnsupportedCommandException(Exception):
+    '''
+        Used to indicate that the given command is unsupported
+    '''
+    def __init__(self,msg):
+        self.message = msg
+        super().__init__(self.message)
+
+
 class CTA2045:
     def __init__(self,fname="CTA2045_commands.json"):
         self.cmds = {}
@@ -41,6 +51,8 @@ class CTA2045:
                     * This DOES NOT provide security. In fact, CTA2045-B does not address security measures at all.
         '''
         v = self.hexify(0)
+        if 'args' in args: # drop a level
+            args = args['args']
         try:
             res = self.cmds['commands'][f'{cmd}']['format']
             for byte in res.split(' '):
@@ -48,8 +60,10 @@ class CTA2045:
                     k = self.cmds['codes'][f'{byte}']
                     if k== 'hash':
                         continue
-                    if k in args:
+                    if k in args:                        
+                        #  = args[k]
                         rep = args[k]
+                        rep = self.cmds[k][rep]
                     else:
                         rep = list(self.cmds[f'{k}'].values())[0]
                     res = res.replace(byte,rep)
@@ -135,6 +149,7 @@ class CTA2045:
                     arg = self.cmds['codes'][form[i]]
                     length = int(self.cmds[arg]['length'])
                     value = val[j:j+length]
+                    # get associated key
                     d['args'][arg] = value
                     j += length - 1
                 i += 1
@@ -143,12 +158,15 @@ class CTA2045:
         return d
     def complement(self,cmd):
         '''
-            Purpose: returns the complement of passed command
+            Purpose: returns the complement of passed command (if supported only)
             Args:
                 * cmd (string): desired command to find complement of
             Return: complement of passed command
         '''
-        comd_complement  = None
-        if "request" in cmd:
-            cmd_complement = cmd.replace("request","response")
+        cmd_complement  = None
+        d = {"request":"response","response":"request"}
+        if cmd != None:
+            last = cmd.split()[-1]
+            if last in d and cmd.replace(last,d[last]) in self.cmds['commands'].keys():
+                cmd_complement = cmd.replace(last,d[last])
         return cmd_complement

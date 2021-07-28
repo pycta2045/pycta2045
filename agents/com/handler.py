@@ -5,6 +5,14 @@ import time
 import io
 
 
+class TimeoutException(Exception):
+    '''
+        This class is used to indicate waiting for a response from the other device has timed out.
+    '''
+    def __init__(self,msg="waiting for ack/nak"):
+        self.message = msg
+        super().__init__(self.message)
+
 
 class COM:
     '''
@@ -45,7 +53,6 @@ class COM:
         data = list(map(lambda x:int(x,16),data.split(' ')))
         packet.extend(data)
         res = self.ser.write(packet)
-        #print('wrote= ',packet)
         time.sleep(self.tim)
         return res>=2
 
@@ -58,6 +65,7 @@ class COM:
             if self.ser.inWaiting()>0:
                 buff = self.ser.read(self.ser.inWaiting())
                 data = list(map(lambda x: self.transform(int(hex(x),16)),buff))
+                time.sleep(self.tim)
                 if len(data) > 2:
                     unchecked_data = data[:-2]
                     checked_data = self.checksum(" ".join(unchecked_data)).split(" ")
@@ -65,8 +73,7 @@ class COM:
                         return " ".join(data)
                 else:
                     return " ".join(data)
-            time.sleep(self.ser.timeout)
-
+            if time.time() >= self.ser.timeout:
+                raise TimeoutException("waiting for ack/nak timeout!")
 
         return buff
-

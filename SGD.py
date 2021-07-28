@@ -1,83 +1,83 @@
 from agents.cta2045.handler import CTA2045
-from agents.com.handler import COM
-
-# @TODO:
-# 1. update recv function in com/handler.py
-# * make it use nonblocking recv
-# * pull 2 bytes at a time from serial com
-# * add argument (function type) :
-# *    use to deceide when to flush (function should be checksum)
-# *    use in_waiting buffer to decide when to call flush
-# 2. test new recv function behavior
+from agents.com.handler import COM,TimeoutException
 
 
-port = 'COM6'
-cta = CTA2045()
-com = COM(checksum=cta.checksum,transform=cta.hexify)
 
-intermeidate = False
-data_link = False
+class SGD:
+    port = 'COM6'
+    cta = CTA2045()
+    com = COM(checksum=cta.checksum,transform=cta.hexify)
+    def __init__(self):
+        # initialize the values
+        pass
+    
+        
+    def recv(self):
+        res = self.com.recv()
+        ret = self.cta.from_cta(res)
+        return ret
 
-def recv():
-    res = com.recv()
-    ret = cta.from_cta(res)
-    return ret
+    def send(self,cmd,**args):
+        res = None
+        print(f'sending {cmd}...')
+        if len(args) >0:
+            print('\t args: ',args)
+        c =  self.cta.to_cta(cmd,args= args)
+        self.com.send(c)
+        try:
+            if cmd == 'ack' or cmd == 'nak':
+                res = True
+            else:
+                res = self.recv()
+            if type(res) == dict:
+                print('\treceived: ',res['command'])
+                for k,v in res['args'].items():
+                    print(f'\t{k}\t{v}')
+        except Exception as e:
+            print(e)
+        return res
 
-def send(cmd,**args):
-    print(f'sending {cmd}...')
-    c = cta.to_cta(cmd,args=args)
-    com.send(c)
-    if cmd == 'ack' or cmd == 'nak':
-        res = True
-    else:
-        res = recv()
-    if type(res) == dict:
-        print('\treceived: ',res['command'])
-        for k,v in res['args'].items():
-            print(f'\t{k}\t{v}')
-    return res
+    def setup(self):
+        res = None
+        # iMTSQ
+        cmd = 'intermediate MTSQ'
+        res = self.send(cmd)
+        if res != None and 'command' in res and res['command'] == 'ack':
+            intermediate = True
 
-def setup():
-    res = None
-    # iMTSQ
-    cmd = 'intermediate MTSQ'
-    res = send(cmd)
-    if res == 'ack':
-        intermediate = True
+        # dMTSQ
+        cmd = 'data-link MTSQ'
+        res = self.send(cmd)
+        if res != None and 'command' in res and res['command'] == 'ack':
+            data_link = True
 
-    # dMTSQ
-    cmd = 'data-link MTSQ'
-    res = send(cmd)
-    if res == 'ack':
-        data_link = True
-
-    # MPQ
-    cmd = 'max payload request'
-    res = send(cmd)
-    if res == 'ack':
-        res = recv()
-        #print('\tpayload: ',res)
-        send('ack')
-
-    return
+        # MPQ
+        cmd = 'max payload request'
+        res = self.send(cmd)
+        return
+    def start(self):
+        # always on waiting mode
+        while True:
+            try:
+                res = self.recv()
+                print(res['command'])
+                for k,v in res['args'].items():
+                    print(f'\t{k} = {v}')
+                complement = self.cta.complement(res['command'])
+                if complement != None:
+                    self.send('ack')
+                    if not "request" in complement:
+                        self.send(complement)
+                else:
+                    self.send('nak', nak_reason='unsupported')
+            except TimeoutException as e:
+                # nothing was received from UCM
+                continue
+            except Exception as e:
+                print(e)
+                continue
 
 # SET UP
-setup()
-x = send('operating status response',args={'op_state_code':'idle normal'})
-
-send('ack')
-
-'''
-while True:
-
-    x = com.recv()
-    cmd = cta.from_cta(x)
-    print("received command: ",cmd)
-    print("sending ack...",com.send(cta.to_cta('ack')))
-    res = cta.complement(cmd)
-    print("sending complement...",res)
-    if not res == None:
-        com.send(cta.to_cta(res))
-        x = com.recv()
-'''
-
+sgd = SGD()
+sgd.setup()
+sgd.start()
