@@ -19,7 +19,7 @@ class COM:
     '''
     US = 'DER'
     THEM = 'DCM'
-    def __init__(self, checksum, transform, port="/dev/ttyS6",timeout=.02,verbose=True):
+    def __init__(self, checksum, transform, port="/dev/ttyS6",timeout=.02,verbose=False):
         '''
             * Note:
                 * timeout (defualt) is set to 500 ms as specified by CTA2045
