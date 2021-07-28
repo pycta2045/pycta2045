@@ -1,9 +1,8 @@
 import serial
 from serial.tools.list_ports import comports #from serial.tools.list_ports_linux import SysFS
-import serial.rs485
+# import serial.rs485
 import time
-import io
-
+import pandas
 
 class TimeoutException(Exception):
     '''
@@ -18,7 +17,9 @@ class COM:
     '''
         Note: This module is not well-tested due to missing equipments for now.
     '''
-    def __init__(self, checksum, transform, port="/dev/ttyS6",timeout=.02):
+    US = 'DER'
+    THEM = 'DCM'
+    def __init__(self, checksum, transform, port="/dev/ttyS6",timeout=.02,verbose=True):
         '''
             * Note:
                 * timeout (defualt) is set to 500 ms as specified by CTA2045
@@ -37,7 +38,6 @@ class COM:
             self.tim = .1 # 100 ms of MIN time after tansmission until the start of another (according to CTA2045)
             #self.ser.rs485_mode = serial.rs485.RS485Settings(delay_before_tx=tma,delay_before_rx=tim)
             self.ser.baudrate=19200 # according to CTA2045
-            #self.sio = io.TextIOWrapper(io.BufferedRWPair(self.ser,self.ser))
             self.ser.timeout=timeout
             self.ser.delay_before_tx = self.tma
             self.ser.delay_before_rx = self.tim
@@ -45,6 +45,8 @@ class COM:
             self.transform: callable = transform # function type
             self.ser.bytesize= serial.EIGHTBITS
             print('comport was created sucessfully')
+            self.msgs = pd.DataFrame(columns = ['time','src','dest','message'])
+            self.verbose = verbose
         except Exception as e:
             print(e)
         return
@@ -53,27 +55,48 @@ class COM:
         data = list(map(lambda x:int(x,16),data.split(' ')))
         packet.extend(data)
         res = self.ser.write(packet)
+        self.log({'src':US,'dest':THEM,'message':data})
         time.sleep(self.tim)
         return res>=2
-
     def recv(self):
         '''
-            This function takes a
+            TODO
         '''
-        buff = data = None
+        data = None
         while True:
             if self.ser.inWaiting()>0:
-                buff = self.ser.read(self.ser.inWaiting())
-                data = list(map(lambda x: self.transform(int(hex(x),16)),buff))
+                data = self.ser.read(self.ser.inWaiting())
+                data = list(map(lambda x: self.transform(int(hex(x),16)),data))
                 time.sleep(self.tim)
                 if len(data) > 2:
                     unchecked_data = data[:-2]
                     checked_data = self.checksum(" ".join(unchecked_data)).split(" ")
                     if data == checked_data:
-                        return " ".join(data)
+                        data = " ".join(data)
                 else:
-                    return " ".join(data)
+                    data = " ".join(data)
+                # log
+                self.log({'src':THEM,'dest':US,'message':data})
+                return data
             if time.time() >= self.ser.timeout:
                 raise TimeoutException("waiting for ack/nak timeout!")
-
-        return buff
+        return 
+    def log(self,context):
+        '''
+            Purpose: Logs input messages and outputs it into a file
+            Args: message (dict) contains:
+                * src: source of the message
+                * dest: destination of the message
+                * message: content of the message
+            Return: void
+        '''
+        self.msgs=self.msgs.append({'time':int(time.time()),'src': context['src'],'dest':context['dest'],'message':context['message']})
+        if self.verbose == True:
+            st = '<'*5 if context['dest'] == US else '>'*5
+            print(f"{st} FROM: {context['src']} TO: {context['dest']} MESSAGE: {context['message']}")
+        return
+    def dump_log(self,fname):
+        if fname != None:
+            self.msgs.to_csv(fname)
+            return True
+        return False

@@ -38,12 +38,10 @@ class TestCTA(unittest.TestCase):
         print("SUCCESS")
     
     def test_to_cta(self):
-        print(f'{"-" * 5} to_cta test {"-" * 5}')
         cta = CTA()
         cmds = cta.cmds['commands']
         for k,v in cmds.items():
             print(f'tesing {k}....',end='')
-
             c = cta.to_cta(k)
             # check length
             self.assertTrue(len(c) >= len(v))
@@ -52,7 +50,6 @@ class TestCTA(unittest.TestCase):
                 self.assertFalse(byte.isalpha())
             print('SUCESS')
     def test_from_cta(self):
-        print(f'{"-" * 5} from_cta test {"-" * 5}')
         cta = CTA()
         cmds = cta.cmds['commands']
         for k,v in cmds.items():
@@ -61,7 +58,6 @@ class TestCTA(unittest.TestCase):
             c = cta.to_cta(k)
             # go back to natural language
             res = cta.from_cta(c)
-            print(c)
             cmd = res['command']
             # validate key and response
             self.assertTrue(cmd==k)
