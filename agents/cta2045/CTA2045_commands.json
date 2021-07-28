@@ -1,109 +1,163 @@
 {
     "commands": {
         "shed": {
-            "type":"0x08 0x01",
+            "type": {
+                "hex":"0x08 0x01",
+                "str":"basic"
+            },
             "format":"0x08 0x01 0x00 # 0x01 D H",
             "op1":"0x01",
             "op2":"D"
         },
         "endshed": {
-            "type":"0x08 0x01",
+            "type":{
+                "hex":"0x08 0x01",
+                "str":"basic"
+            },
             "format":"0x08 0x01 0x00 # 0x02 D H",
             "op1":"0x02",
             "op2":"D"
         },
         "loadup": {
-            "type":"0x08 0x01",
+            "type": {
+                "hex":"0x08 0x01",
+                "str":"basic"
+            },
             "format":"0x08 0x01 0x00 # 0x17 D H",
             "op1":"0x17",
             "op2":"D"
         },
         "outside comm connection status":{
-            "type":"0x08 0x01",
-            "format":"0x08 0x01 0x00 # 0x0E CS H",
-            "op1":"0x0E",
+            "type":{
+                "hex":"0x08 0x01",
+                "str":"link"
+            },
+            "format":"0x08 0x01 0x00 # 0x0e CS H",
+            "op1":"0x0e",
             "op2":"CS"
         },
         "max payload request": {
-            "type":"0x08 0x03",
+            "type": {
+                "hex":"0x08 0x03",
+                "str":"link"
+            },
             "format":"0x08 0x03 0x00 # 0x18 0x00 H",
             "op1":"0x18",
             "op2":"0x00"
         },
         "max payload response":{
-            "type":"0x08 0x03",
+            "type": {
+                "hex":"0x08 0x03",
+                "str":"link"
+            },
             "format":"0x08 0x03 0x00 # 0x19 M H",
             "op1":"0x19",
             "op2":"M"
         },
         "operating status request": {
-            "type":"0x08 0x01",
+            "type": {
+                "hex":"0x08 0x01",
+                "str":"basic"
+            },
             "format":"0x08 0x01 0x00 # 0x12 0x00 H",
             "op1":"0x12",
             "op2":"0x00"
         },
         "operating status response": {
-            "type":"0x08 0x01",
+            "type": {
+                "hex":"0x08 0x01",
+                "str":"basic"
+            },
             "format":"0x08 0x01 0x00 # 0x13 OC H",
             "op1":"0x13",
             "op2":"OC"
         },
         "app ack":{
-            "type":"0x08 0x01",
+            "type": {
+                "hex":"0x08 0x01",
+                "str":"link"
+            },
             "format":"0x08 0x01 0x00 # 0x03 LO H",
             "op1":"0x03",
             "op2":"LO"
         },
         "app nak":{
-            "type":"0x08 0x01",
+            "type": {
+                "hex":"0x08 0x01",
+                "str":"link"
+            },
             "format":"0x08 0x01 0x00 # 0x04 ANR H",
             "op1":"0x04",
             "op2":"ANR"
         },
         "commodity read response":{
-            "type":"0x08 0x02",
+            "type": {
+                "hex":"0x08 0x02",
+                "str":"intermediate"
+            },
             "format":"0x08 0x02 0x00 # 0x06 0x80 IRC CC IR CR H",
             "op1":"0x06",
             "op2":"0x80"
         },
         "commodity read request":{
-            "type":"0x08 0x02",
+            "type": {
+                "hex":"0x08 0x02",
+                "str":"intermediate"
+            },
             "format":"0x08 0x02 0x00 # 0x06 0x00 H",
             "op1":"0x06",
             "op2":"0x00"
         },
         "device info request":{
-            "type":"0x08 0x02",
+            "type": {
+                "hex":"0x08 0x02",
+                "str":"intermediate"
+            },
             "format":"0x08 0x02 0x00 # 0x01 0x01 H",
             "op1":"0x01",
             "op2":"0x01"
         },
         "device info response":{
-            "type":"0x08 0x02",
-            "format":"0x08 0x02 0x00 # 0x01 0x81 0x00 CV VI DT DR CB H",
+            "type": {
+                "hex":"0x08 0x02",
+                "str":"intermediate"
+            },
+            "format":"0x08 0x02 0x00 # 0x01 0x81 0x00 CV VI DT DR CB 0x00 MN SN FY FM FD H",
             "op1":"0x01",
             "op2":"0x81"
         },
         "intermediate MTSQ": {
-            "type":"0x08 0x02",
+            "type": {
+                "hex":"0x08 0x02",
+                "str":"intermediate"
+            },
             "format":"0x08 0x02 0x00 # H",
             "op1":"None",
             "op2": "None"
         },
         "data-link MTSQ": {
-            "type":"0x08 0x03",
+            "type": {
+                "hex":"0x08 0x03",
+                "str":"link"
+            },
             "format":"0x08 0x03 0x00 # H",
             "op1":"None",
             "op2":"None"
         },
         "nak":{
-            "type":"0x15 R",
+            "type": {
+                "hex":"0x15 R",
+                "str":"link"
+            },
             "format":"0x15 R",
             "op1":"None",
             "op2":"None"
         },
         "ack":{
-            "type":"0x06 0x00",
+            "type": {
+                "hex":"0x06 0x00",
+                "str":"link"
+            },
             "format":"0x06 0x00",
             "op1":"None",
             "op2":"None"
@@ -147,6 +201,7 @@
         "length":"1"
     },
     "max_payload_length":{
+        "4096": "0x0d",
         "2":"0x00",
         "4": "0x01",
         "8": "0x02",
@@ -157,10 +212,9 @@
         "256": "0x07",
         "512": "0x08",
         "1024": "0x09",
-        "1280": "0x0A",
-        "1500": "0x0B",
-        "2048": "0x0C",
-        "4096": "0x0D",
+        "1280": "0x0a",
+        "1500": "0x0b",
+        "2048": "0x0c",
         "length":"1"
     },
     "commodity_code":{
@@ -175,12 +229,12 @@
         "length":"1"
     },
     "device_type":{
-        "water heater - gas":"0x0001",
-        "water heater - electric":"0x0002",
-        "water heater -  heat pump":"0x0003",
-        "water heater - heat pump variable":"0x001b",
-        "water heater - phase change material":"0x001c",
-        "other":"0x8000",
+        "water heater - electric":"0x00 0x02",
+        "water heater - gas":"0x00 0x01",
+        "water heater -  heat pump":"0x00 0x03",
+        "water heater - heat pump variable":"0x00 0x1b",
+        "water heater - phase change material":"0x00 0x1c",
+        "other":"0x80 0x00",
         "length":"2"
     },
     "cta_version":{
@@ -188,8 +242,8 @@
         "length":"2"
     },
     "vendor_id":{
-        "electric vehicle":"0x1000",
-        "unspecified":"0x0000",
+        "electric vehicle":"0x10 0x00",
+        "unspecified":"0x00 0x00",
         "length":"2"
     },
     "duration":{
@@ -228,6 +282,48 @@
         "default":"0x00",
         "length":"1"
     },
+    "model_number":{
+        "default": "0x00 0x00",
+        "length":"2"
+    },
+    "serial_number":{
+        "default":"0x00 0x00",
+        "length":"2"
+    },
+    "firmware_year":{
+        "21":"0x15",
+        "20":"0x14",
+        "19":"0x13",
+        "18":"0x12",
+        "17":"0x11",
+        "16":"0x10",
+        "15":"0x0f",
+        "14":"0x0e",
+        "13":"0x0d",
+        "12":"0x0c",
+        "11":"0x0b",
+        "10":"0x0a",
+        "length":"1"
+    },
+    "firmware_month":{
+        "january":"0x00",
+        "feb":"0x01",
+        "mar":"0x02",
+        "apr":"0x03",
+        "may":"0x04",
+        "june":"0x05",
+        "july":"0x06",
+        "aug":"0x07",
+        "sept":"0x08",
+        "oct":"0x09",
+        "nov":"0x0a",
+        "dec":"0x0b",
+        "length":"1"
+    },
+    "firmware_day":{
+        "default":"0x00",
+        "length":"1"
+    },
     "codes":{
         "R":"nak_reason",
         "D":"duration",
@@ -245,6 +341,11 @@
         "CB":"capability_bitmap",
         "VI":"vendor_id",
         "CR":"cumulative_amount",
-        "IR":"instantaneous_rate"
+        "IR":"instantaneous_rate",
+        "MN":"model_number",
+        "SN":"serial_number",
+        "FY":"firmware_year",
+        "FM":"firmware_month",
+        "FD":"firmware_day"
     }
 }

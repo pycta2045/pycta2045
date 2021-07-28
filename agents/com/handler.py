@@ -2,7 +2,7 @@ import serial
 from serial.tools.list_ports import comports #from serial.tools.list_ports_linux import SysFS
 # import serial.rs485
 import time
-import pandas
+import pandas as pd
 
 class TimeoutException(Exception):
     '''
@@ -52,10 +52,10 @@ class COM:
         return
     def send(self,data):
         packet = bytearray()
+        self.log({'src':self.US,'dest':self.THEM,'message':data})
         data = list(map(lambda x:int(x,16),data.split(' ')))
         packet.extend(data)
         res = self.ser.write(packet)
-        self.log({'src':US,'dest':THEM,'message':data})
         time.sleep(self.tim)
         return res>=2
     def recv(self):
@@ -76,11 +76,11 @@ class COM:
                 else:
                     data = " ".join(data)
                 # log
-                self.log({'src':THEM,'dest':US,'message':data})
+                self.log({'src':self.THEM,'dest':self.US,'message':data})
                 return data
             if time.time() >= self.ser.timeout:
                 raise TimeoutException("waiting for ack/nak timeout!")
-        return 
+        return
     def log(self,context):
         '''
             Purpose: Logs input messages and outputs it into a file
@@ -90,9 +90,9 @@ class COM:
                 * message: content of the message
             Return: void
         '''
-        self.msgs=self.msgs.append({'time':int(time.time()),'src': context['src'],'dest':context['dest'],'message':context['message']})
+        self.msgs=self.msgs.append({'time':int(time.time()),'src': context['src'],'dest':context['dest'],'message':context['message']},ignore_index=True)
         if self.verbose == True:
-            st = '<'*5 if context['dest'] == US else '>'*5
+            st = '<'*5 if context['dest'] == self.US else '>'*5
             print(f"{st} FROM: {context['src']} TO: {context['dest']} MESSAGE: {context['message']}")
         return
     def dump_log(self,fname):

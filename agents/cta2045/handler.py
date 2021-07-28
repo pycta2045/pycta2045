@@ -60,10 +60,11 @@ class CTA2045:
                     k = self.cmds['codes'][f'{byte}']
                     if k== 'hash':
                         continue
-                    if k in args:                        
-                        #  = args[k]
+                    if k in args:
                         rep = args[k]
-                        rep = self.cmds[k][rep]
+                        # convert to approperiate value if it isn't
+                        if rep in self.cmds[k]:
+                            rep = self.cmds[k][rep]
                     else:
                         rep = list(self.cmds[f'{k}'].values())[0]
                     res = res.replace(byte,rep)
@@ -105,13 +106,13 @@ class CTA2045:
                 * This function uses CTA2045_commands.json. So it is limited to only supported commands in the JSON file.
                 * If the command is not supported, it returns None as an output.
         '''
-        d = {}
+        response = {}
         key = None
         h = 0
         val = val.split(' ')
         l = len(val)
         for k,v in self.cmds['commands'].items():
-            t = v['type']
+            t = v['type']['hex']
             op1 = v['op1']
             op2 = v['op2']
             if l <=2:
@@ -137,25 +138,35 @@ class CTA2045:
                 if ' '.join(val[:2]) == t and op1 == vop1 and op2 == vop2:
                     key = k
                     break
-        # get command name
-        d['command'] = key
-        d['args'] = {}
-        # get arguments
-        if key in self.cmds['commands']:
-            form = self.cmds['commands'][key]['format'].split()
-            i = j = 0
-            while i < len(form) and j < len(val):
-                if form[i].isalpha():
-                    arg = self.cmds['codes'][form[i]]
-                    length = int(self.cmds[arg]['length'])
-                    value = val[j:j+length]
-                    # get associated key
-                    d['args'][arg] = value
-                    j += length - 1
-                i += 1
-                j += 1
+        response = self.cmds['commands'][key]
+        response['command'] = key
+        response = self.extract_args(response,val)
+        return response
 
-        return d
+    def extract_args(self,cmd,val):
+        # get command name
+        key = cmd['command']
+        cmd['args'] = {}
+        # get arguments
+        #if key in self.cmds['commands']:
+        form = cmd['format'].split()
+        i = j = 0
+        while i < len(form) and j < len(val):
+            if form[i].isalpha() and form[i] != 'H':
+                arg = self.cmds['codes'][form[i]]
+                length = int(self.cmds[arg]['length'])
+                value = val[j:j+length]
+                # get associated key
+                value = " ".join(value)
+                try:
+                    value = next(k for k,v in self.cmds[arg].items() if v.upper() == value.upper())
+                except Exception as e:
+                    pass
+                cmd['args'][arg] = value
+                j += length - 1
+            i += 1
+            j += 1
+        return cmd
     def complement(self,cmd):
         '''
             Purpose: returns the complement of passed command (if supported only)
@@ -164,9 +175,10 @@ class CTA2045:
             Return: complement of passed command
         '''
         cmd_complement  = None
-        d = {"request":"response","response":"request"}
+        d = {"request":"response","response":"request","loadup":"shed","shed":"loadup","endshed":"endshed"}
         if cmd != None:
             last = cmd.split()[-1]
             if last in d and cmd.replace(last,d[last]) in self.cmds['commands'].keys():
                 cmd_complement = cmd.replace(last,d[last])
+
         return cmd_complement

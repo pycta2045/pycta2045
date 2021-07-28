@@ -20,10 +20,11 @@ class TestCOM(unittest.TestCase):
         if len(comports)>0:
             port = comports[0]
             port=port.name
+            print(f'using port: {port}')
             msg = ''
             c = None
             try:
-                c = COM.COM(port=port)
+                c = COM.COM(port=port,checksum=cta.checksum,transform=cta.hexify)
             except Exception as e:
                 msg = e.args[0]
             self.assertTrue(c != None)

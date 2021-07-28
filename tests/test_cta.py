@@ -36,7 +36,7 @@ class TestCTA(unittest.TestCase):
             self.assertEqual(i,j)
         self.assertEqual(res.upper(),device_info.upper())
         print("SUCCESS")
-    
+
     def test_to_cta(self):
         cta = CTA()
         cmds = cta.cmds['commands']
