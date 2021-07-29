@@ -5,43 +5,52 @@
                 "hex":"0x08 0x01",
                 "str":"basic"
             },
-            "format":"0x08 0x01 0x00 # 0x01 D H",
+            "format":"0x08 0x01 res # 0x01 d h",
             "op1":"0x01",
-            "op2":"D"
+            "op2":"d"
         },
         "endshed": {
             "type":{
                 "hex":"0x08 0x01",
                 "str":"basic"
             },
-            "format":"0x08 0x01 0x00 # 0x02 D H",
+            "format":"0x08 0x01 res # 0x02 d h",
             "op1":"0x02",
-            "op2":"D"
+            "op2":"d"
         },
         "loadup": {
             "type": {
                 "hex":"0x08 0x01",
                 "str":"basic"
             },
-            "format":"0x08 0x01 0x00 # 0x17 D H",
+            "format":"0x08 0x01 res # 0x17 d h",
             "op1":"0x17",
-            "op2":"D"
+            "op2":"d"
         },
+        "critical peak event": {
+            "type": {
+                "hex":"0x08 0x01",
+                "str":"basic"
+            },
+            "format":"0x08 0x01 res # 0x0a d h",
+            "op1":"0x0a",
+            "op2":"d"
+         },
         "outside comm connection status":{
             "type":{
                 "hex":"0x08 0x01",
                 "str":"link"
             },
-            "format":"0x08 0x01 0x00 # 0x0e CS H",
+            "format":"0x08 0x01 res # 0x0e cs h",
             "op1":"0x0e",
-            "op2":"CS"
+            "op2":"cs"
         },
         "max payload request": {
             "type": {
                 "hex":"0x08 0x03",
                 "str":"link"
             },
-            "format":"0x08 0x03 0x00 # 0x18 0x00 H",
+            "format":"0x08 0x03 res # 0x18 0x00 h",
             "op1":"0x18",
             "op2":"0x00"
         },
@@ -50,16 +59,16 @@
                 "hex":"0x08 0x03",
                 "str":"link"
             },
-            "format":"0x08 0x03 0x00 # 0x19 M H",
+            "format":"0x08 0x03 res # 0x19 m h",
             "op1":"0x19",
-            "op2":"M"
+            "op2":"m"
         },
         "operating status request": {
             "type": {
                 "hex":"0x08 0x01",
                 "str":"basic"
             },
-            "format":"0x08 0x01 0x00 # 0x12 0x00 H",
+            "format":"0x08 0x01 res # 0x12 0x00 h",
             "op1":"0x12",
             "op2":"0x00"
         },
@@ -68,34 +77,34 @@
                 "hex":"0x08 0x01",
                 "str":"basic"
             },
-            "format":"0x08 0x01 0x00 # 0x13 OC H",
+            "format":"0x08 0x01 res # 0x13 oc h",
             "op1":"0x13",
-            "op2":"OC"
+            "op2":"oc"
         },
         "app ack":{
             "type": {
                 "hex":"0x08 0x01",
                 "str":"link"
             },
-            "format":"0x08 0x01 0x00 # 0x03 LO H",
+            "format":"0x08 0x01 res # 0x03 lo h",
             "op1":"0x03",
-            "op2":"LO"
+            "op2":"lo"
         },
         "app nak":{
             "type": {
                 "hex":"0x08 0x01",
                 "str":"link"
             },
-            "format":"0x08 0x01 0x00 # 0x04 ANR H",
+            "format":"0x08 0x01 res # 0x04 anr h",
             "op1":"0x04",
-            "op2":"ANR"
+            "op2":"anr"
         },
         "commodity read response":{
             "type": {
                 "hex":"0x08 0x02",
                 "str":"intermediate"
             },
-            "format":"0x08 0x02 0x00 # 0x06 0x80 IRC CC IR CR H",
+            "format":"0x08 0x02 res # 0x06 0x80 irc cc ir ca h",
             "op1":"0x06",
             "op2":"0x80"
         },
@@ -104,7 +113,7 @@
                 "hex":"0x08 0x02",
                 "str":"intermediate"
             },
-            "format":"0x08 0x02 0x00 # 0x06 0x00 H",
+            "format":"0x08 0x02 res # 0x06 cc h",
             "op1":"0x06",
             "op2":"0x00"
         },
@@ -113,7 +122,7 @@
                 "hex":"0x08 0x02",
                 "str":"intermediate"
             },
-            "format":"0x08 0x02 0x00 # 0x01 0x01 H",
+            "format":"0x08 0x02 res # 0x01 0x01 h",
             "op1":"0x01",
             "op2":"0x01"
         },
@@ -122,36 +131,36 @@
                 "hex":"0x08 0x02",
                 "str":"intermediate"
             },
-            "format":"0x08 0x02 0x00 # 0x01 0x81 0x00 CV VI DT DR CB 0x00 MN SN FY FM FD H",
+            "format":"0x08 0x02 res # 0x01 0x81 0x00 cv vi dt dr cb res mn sn fy fm fd h",
             "op1":"0x01",
             "op2":"0x81"
         },
-        "intermediate MTSQ": {
+        "intermediate mtsq": {
             "type": {
                 "hex":"0x08 0x02",
                 "str":"intermediate"
             },
-            "format":"0x08 0x02 0x00 # H",
-            "op1":"None",
-            "op2": "None"
+            "format":"0x08 0x02 res # h",
+            "op1":"none",
+            "op2": "none"
         },
-        "data-link MTSQ": {
+        "data-link mtsq": {
             "type": {
                 "hex":"0x08 0x03",
                 "str":"link"
             },
-            "format":"0x08 0x03 0x00 # H",
-            "op1":"None",
-            "op2":"None"
+            "format":"0x08 0x03 res # h",
+            "op1":"none",
+            "op2":"none"
         },
         "nak":{
             "type": {
-                "hex":"0x15 R",
+                "hex":"0x15 r",
                 "str":"link"
             },
-            "format":"0x15 R",
-            "op1":"None",
-            "op2":"None"
+            "format":"0x15 r",
+            "op1":"none",
+            "op2":"none"
         },
         "ack":{
             "type": {
@@ -159,8 +168,8 @@
                 "str":"link"
             },
             "format":"0x06 0x00",
-            "op1":"None",
-            "op2":"None"
+            "op1":"none",
+            "op2":"none"
         }
     },
     "hash":{
@@ -242,7 +251,6 @@
         "length":"2"
     },
     "vendor_id":{
-        "electric vehicle":"0x10 0x00",
         "unspecified":"0x00 0x00",
         "length":"2"
     },
@@ -251,12 +259,12 @@
         "length":"1"
     },
     "instantaneous_rate":{
-        "default":"0x00",
-        "length":"1"
+        "default":"0x00 0x00 0x00 0x00 0x00 0x00",
+        "length":"6"
     },
     "cumulative_amount":{
-        "default":"0x00",
-        "length":"1"
+        "default":"0x00 0x00 0x00 0x00 0x00 0x00",
+        "length":"6"
     },
     "capability_bitmap":{
         "cycling":"0x00",
@@ -324,6 +332,10 @@
         "default":"0x00",
         "length":"1"
     },
+    "reserved":{
+      "default":"0x00",
+      "length":"1"
+    },
     "codes":{
         "R":"nak_reason",
         "D":"duration",
@@ -340,12 +352,13 @@
         "DR":"device_revision",
         "CB":"capability_bitmap",
         "VI":"vendor_id",
-        "CR":"cumulative_amount",
+        "CA":"cumulative_amount",
         "IR":"instantaneous_rate",
         "MN":"model_number",
         "SN":"serial_number",
         "FY":"firmware_year",
         "FM":"firmware_month",
+        "RES":"reserved",
         "FD":"firmware_day"
     }
 }

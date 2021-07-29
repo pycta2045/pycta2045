@@ -42,7 +42,7 @@ class CTA2045:
             Purpose: Translates natural language commands like shed, endshed, commodity read, etc.  to corresponding hex value representation as specified by CTA2045-B.
             Args:
                 * cmd: command (shed,endshed,....).
-                * args: dictionary to arguments the command take. For example, shed, endshed and loadup take duration as a an argument.
+                * args: dictionary of arguments the command take. For example, shed, endshed and loadup take duration as a an argument.
             Return: hex representation ready to be used (sent to SGD or UCM).
             Notes:
                 * if no arguments are passed, the function uses the defaults.
@@ -142,9 +142,9 @@ class CTA2045:
             response['command'] = key
             response = self.extract_args(response,val)
         except Exception as e:
-            print(e)
+            # unable to translate msg (unsupported) -- return None
+            pass
         return response
-
     def extract_args(self,cmd,val):
         # get command name
         key = cmd['command']
@@ -191,6 +191,6 @@ class CTA2045:
                     if comp in self.cmds['commands'].keys():
                         cmd_complement.append(comp)
         except Exception as e:
-            print('here',e)
+            # command not found or unable to response -- send a nak
             cmd_complement = ['nak']
         return cmd_complement
