@@ -177,27 +177,20 @@ class CTA2045:
             Return: complement of passed command
         '''
         cmd_complement = []
-        d = {"request":"response"}#,"response":"request","loadup":"shed","shed":"loadup","endshed":"endshed"}
-        #if cmd != None:
         try:
-            #last = cmd.split()[-1]
-            cmd = self.cmds['commands'][command]
-            # find appropriate ack type
-            t = cmd['type']['str']
-            if t == 'basic' and not 'request' in command:
-                cmd_complement.append('app ack')
-            else:
+            if not 'ack' in command and not 'nak' in command:
+                cmd = self.cmds['commands'][command]
+                # find appropriate ack type
+                t = cmd['type']['str']
                 cmd_complement.append('ack')
-            # find complement
-            if 'request' in command:
-                comp = command.replace('request','response')
-                if comp in self.cmds['commands'].keys():
-                    cmd_complement.append(comp)
+                if t == 'basic' and not 'request' in command:
+                    cmd_complement.append('app ack')
+                # find complement
+                if 'request' in command:
+                    comp = command.replace('request','response')
+                    if comp in self.cmds['commands'].keys():
+                        cmd_complement.append(comp)
         except Exception as e:
             print('here',e)
             cmd_complement = ['nak']
-
-            #if last in d and cmd.replace(last,d[last]) in self.cmds['commands'].keys():
-                #cmd_complement = cmd.replace(last,d[last])
-
         return cmd_complement
