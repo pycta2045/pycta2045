@@ -1,7 +1,11 @@
 from agents.cta2045.handler import CTA2045
 from agents.com.handler import COM,TimeoutException
+import sys
 
 
+def print_error_info(e):
+    print(f"ERROR {e} on {sys.exec_info()[-1].tb_lineno}")
+    return
 
 class SGD:
     port = 'COM6'
@@ -34,7 +38,7 @@ class SGD:
                 for k,v in res['args'].items():
                     print(f'\t{k}\t{v}')
         except Exception as e:
-            print(e)
+            print_error_info(e)
         return res
 
     def setup(self):
@@ -61,11 +65,24 @@ class SGD:
         while True:
             try:
                 res = self.recv()
-                last_command = res['op1']
-                print(res['command'])
-                for k,v in res['args'].items():
-                    print(f'\t{k} = {v}')
-                complement = self.cta.complement(res['command'])
+                if res != None:
+                    last_command = res['op1']
+                    #print('-----> res',res)
+                    print(res['command'])
+                    for k,v in res['args'].items():
+                        print(f'\t{k} = {v}')
+                    res = res['command']
+                complement = self.cta.complement(res)
+                print('complements: ',complement)
+                for cmd in complement:
+                    if cmd == 'app ack':
+                        self.send(cmd, last_opcode=last_command)
+                    elif cmd == 'nak':
+                        self.send(cmd,nak_reason='unsupported')
+                    else:
+                        self.send(cmd)
+
+                '''
                 if complement != None:
                     self.send('ack')
                     if 'type' in res and res['type']['str'] == 'basic' and not "response" in complement:
@@ -76,11 +93,12 @@ class SGD:
                     pass
                 else:
                     self.send('nak', nak_reason='unsupported')
+                    '''
             except TimeoutException as e:
                 # nothing was received from UCM
                 continue
             except Exception as e:
-                print(e)
+                print_error_info(e)
                 continue
 
 # SET UP

@@ -106,41 +106,43 @@ class CTA2045:
                 * This function uses CTA2045_commands.json. So it is limited to only supported commands in the JSON file.
                 * If the command is not supported, it returns None as an output.
         '''
-        response = {}
+        response = None
         key = None
-        h = 0
-        val = val.split(' ')
-        l = len(val)
-        for k,v in self.cmds['commands'].items():
-            t = v['type']['hex']
-            op1 = v['op1']
-            op2 = v['op2']
-            if l <=2:
-                # only check 1st part of type
-                t1,t2 = t.split(' ')
-                if t2.isalpha():
-                    t2 = val[-1]
+        try:
+            val = val.split(' ')
+            l = len(val)
+            for k,v in self.cmds['commands'].items():
+                t = v['type']['hex']
+                op1 = v['op1']
+                op2 = v['op2']
+                if l <=2:
+                    # only check 1st part of type
+                    t1,t2 = t.split(' ')
+                    if t2.isalpha():
+                        t2 = val[-1]
 
-                if ' '.join([t1,t2]) == ' '.join(val[:2]):
-                    key = k
-                    break
-            elif l<=6:
-                # only check type (could be MTSQ)
-                if t in ' '.join(val) and op1 == 'None' and op2 == 'None':
-                    key = k
-                    break
-            else:
-                # check type & opcodes
-                vop1 = val[4]
-                vop2 = val[5]
-                if op2.isalpha():
-                    op2 = vop2
-                if ' '.join(val[:2]) == t and op1 == vop1 and op2 == vop2:
-                    key = k
-                    break
-        response = self.cmds['commands'][key]
-        response['command'] = key
-        response = self.extract_args(response,val)
+                    if ' '.join([t1,t2]) == ' '.join(val[:2]):
+                        key = k
+                        break
+                elif l<=6:
+                    # only check type (could be MTSQ)
+                    if t in ' '.join(val) and op1 == 'None' and op2 == 'None':
+                        key = k
+                        break
+                else:
+                    # check type & opcodes
+                    vop1 = val[4]
+                    vop2 = val[5]
+                    if op2.isalpha():
+                        op2 = vop2
+                    if ' '.join(val[:2]) == t and op1 == vop1 and op2 == vop2:
+                        key = k
+                        break
+            response = self.cmds['commands'][key]
+            response['command'] = key
+            response = self.extract_args(response,val)
+        except Exception as e:
+            print(e)
         return response
 
     def extract_args(self,cmd,val):
@@ -167,18 +169,35 @@ class CTA2045:
             i += 1
             j += 1
         return cmd
-    def complement(self,cmd):
+    def complement(self,command):
         '''
             Purpose: returns the complement of passed command (if supported only)
             Args:
                 * cmd (string): desired command to find complement of
             Return: complement of passed command
         '''
-        cmd_complement  = None
-        d = {"request":"response","response":"request","loadup":"shed","shed":"loadup","endshed":"endshed"}
-        if cmd != None:
-            last = cmd.split()[-1]
-            if last in d and cmd.replace(last,d[last]) in self.cmds['commands'].keys():
-                cmd_complement = cmd.replace(last,d[last])
+        cmd_complement = []
+        d = {"request":"response"}#,"response":"request","loadup":"shed","shed":"loadup","endshed":"endshed"}
+        #if cmd != None:
+        try:
+            #last = cmd.split()[-1]
+            cmd = self.cmds['commands'][command]
+            # find appropriate ack type
+            t = cmd['type']['str']
+            if t == 'basic' and not 'request' in command:
+                cmd_complement.append('app ack')
+            else:
+                cmd_complement.append('ack')
+            # find complement
+            if 'request' in command:
+                comp = command.replace('request','response')
+                if comp in self.cmds['commands'].keys():
+                    cmd_complement.append(comp)
+        except Exception as e:
+            print('here',e)
+            cmd_complement = ['nak']
+
+            #if last in d and cmd.replace(last,d[last]) in self.cmds['commands'].keys():
+                #cmd_complement = cmd.replace(last,d[last])
 
         return cmd_complement
