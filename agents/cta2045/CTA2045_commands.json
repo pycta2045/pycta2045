@@ -5,45 +5,45 @@
                 "hex":"0x08 0x01",
                 "str":"basic"
             },
-            "format":"0x08 0x01 RES # 0x01 d H",
+            "format":"0x08 0x01 RES # 0x01 D H",
             "op1":"0x01",
-            "op2":"d"
+            "op2":"D"
         },
         "endshed": {
             "type":{
                 "hex":"0x08 0x01",
                 "str":"basic"
             },
-            "format":"0x08 0x01 RES # 0x02 d H",
+            "format":"0x08 0x01 RES # 0x02 D H",
             "op1":"0x02",
-            "op2":"d"
+            "op2":"D"
         },
         "loadup": {
             "type": {
                 "hex":"0x08 0x01",
                 "str":"basic"
             },
-            "format":"0x08 0x01 RES # 0x17 d H",
+            "format":"0x08 0x01 RES # 0x17 D H",
             "op1":"0x17",
-            "op2":"d"
+            "op2":"D"
         },
         "critical peak event": {
             "type": {
                 "hex":"0x08 0x01",
                 "str":"basic"
             },
-            "format":"0x08 0x01 RES # 0x0a d H",
+            "format":"0x08 0x01 RES # 0x0a D H",
             "op1":"0x0a",
-            "op2":"d"
+            "op2":"D"
          },
         "outside comm connection status":{
             "type":{
                 "hex":"0x08 0x01",
                 "str":"link"
             },
-            "format":"0x08 0x01 RES # 0x0e cs H",
+            "format":"0x08 0x01 RES # 0x0e CS H",
             "op1":"0x0e",
-            "op2":"cs"
+            "op2":"CS"
         },
         "max payload request": {
             "type": {
@@ -59,9 +59,9 @@
                 "hex":"0x08 0x03",
                 "str":"link"
             },
-            "format":"0x08 0x03 RES # 0x19 m H",
+            "format":"0x08 0x03 RES # 0x19 M H",
             "op1":"0x19",
-            "op2":"m"
+            "op2":"M"
         },
         "operating status request": {
             "type": {
@@ -77,34 +77,34 @@
                 "hex":"0x08 0x01",
                 "str":"basic"
             },
-            "format":"0x08 0x01 RES # 0x13 oc H",
+            "format":"0x08 0x01 RES # 0x13 OC H",
             "op1":"0x13",
-            "op2":"oc"
+            "op2":"OC"
         },
         "app ack":{
             "type": {
                 "hex":"0x08 0x01",
                 "str":"link"
             },
-            "format":"0x08 0x01 RES # 0x03 lo H",
+            "format":"0x08 0x01 RES # 0x03 LO H",
             "op1":"0x03",
-            "op2":"lo"
+            "op2":"LO"
         },
         "app nak":{
             "type": {
                 "hex":"0x08 0x01",
                 "str":"link"
             },
-            "format":"0x08 0x01 RES # 0x04 anr H",
+            "format":"0x08 0x01 RES # 0x04 ANR H",
             "op1":"0x04",
-            "op2":"anr"
+            "op2":"ANR"
         },
         "commodity read response":{
             "type": {
                 "hex":"0x08 0x02",
                 "str":"intermediate"
             },
-            "format":"0x08 0x02 RES # 0x06 0x80 irc cc ir ca H",
+            "format":"0x08 0x02 RES # 0x06 0x80 IRC CC IR CA H",
             "op1":"0x06",
             "op2":"0x80"
         },
@@ -113,7 +113,7 @@
                 "hex":"0x08 0x02",
                 "str":"intermediate"
             },
-            "format":"0x08 0x02 RES # 0x06 cc H",
+            "format":"0x08 0x02 RES # 0x06 CC H",
             "op1":"0x06",
             "op2":"0x00"
         },
@@ -131,7 +131,7 @@
                 "hex":"0x08 0x02",
                 "str":"intermediate"
             },
-            "format":"0x08 0x02 RES # 0x01 0x81 0x00 cv vi dt dr cb RES mn sn fy fm fd H",
+            "format":"0x08 0x02 RES # 0x01 0x81 0x00 CV VI DT DR CB RES MN SN FY FM FD H",
             "op1":"0x01",
             "op2":"0x81"
         },
@@ -155,10 +155,10 @@
         },
         "nak":{
             "type": {
-                "hex":"0x15 r",
+                "hex":"0x15 R",
                 "str":"link"
             },
-            "format":"0x15 r",
+            "format":"0x15 R",
             "op1":"none",
             "op2":"none"
         },
