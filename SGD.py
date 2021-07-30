@@ -17,7 +17,6 @@ class SGD:
     def send(self,cmd,**args):
         res = None
         c =  self.cta.to_cta(cmd,args= args)
-        print(f'sending... {c}')
         self.com.send(c)
         print(f'=-> sent {cmd}')
         if len(args) >0:

@@ -62,6 +62,7 @@ class COM:
             TODO
         '''
         data = None
+        timeout = time.time()+self.ser.timeout
         while True:
             if self.ser.inWaiting()>0:
                 data = self.ser.read(self.ser.inWaiting())
@@ -76,8 +77,8 @@ class COM:
                     data = " ".join(data)
                 # log
                 self.__log({'src':self.THEM,'dest':self.US,'message':data})
-                #return data
-            if time.time() >= self.ser.timeout:
+                return data
+            if time.time() >= timeout:
                 raise TimeoutException("waiting for ack/nak timeout!")
         return data
     def __log(self,context):
