@@ -37,13 +37,13 @@ class SGD:
     def setup(self):
         res = None
         # iMTSQ
-        cmd = 'intermediate MTSQ'
+        cmd = 'intermediate mtsq'
         res = self.send(cmd)
         if res != None and 'command' in res and res['command'] == 'ack':
             intermediate = True
 
         # dMTSQ
-        cmd = 'data-link MTSQ'
+        cmd = 'data-link mtsq'
         res = self.send(cmd)
         if res != None and 'command' in res and res['command'] == 'ack':
             data_link = True
