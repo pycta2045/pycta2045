@@ -3,7 +3,6 @@ from agents.com.handler import COM,TimeoutException
 import sys
 
 class SGD:
-    port = 'COM6'
     cta = CTA2045()
     com = COM(checksum=cta.checksum,transform=cta.hexify)
     def __init__(self):
@@ -18,6 +17,7 @@ class SGD:
     def send(self,cmd,**args):
         res = None
         c =  self.cta.to_cta(cmd,args= args)
+        print(f'sending... {c}')
         self.com.send(c)
         print(f'=-> sent {cmd}')
         if len(args) >0:
@@ -60,7 +60,6 @@ class SGD:
                 res = self.recv()
                 if res != None:
                     last_command = res['op1']
-                    print('here loop')
                     print(res['command'])
                     for k,v in res['args'].items():
                         print(f'\t{k} = {v}')
@@ -77,7 +76,6 @@ class SGD:
                 # nothing was received from UCM
                 continue
             except Exception as e:
-                print('exception start')
                 print(e)
                 continue
 

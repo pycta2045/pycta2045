@@ -5,7 +5,7 @@
                 "hex":"0x08 0x01",
                 "str":"basic"
             },
-            "format":"0x08 0x01 res # 0x01 d h",
+            "format":"0x08 0x01 RES # 0x01 d H",
             "op1":"0x01",
             "op2":"d"
         },
@@ -14,7 +14,7 @@
                 "hex":"0x08 0x01",
                 "str":"basic"
             },
-            "format":"0x08 0x01 res # 0x02 d h",
+            "format":"0x08 0x01 RES # 0x02 d H",
             "op1":"0x02",
             "op2":"d"
         },
@@ -23,7 +23,7 @@
                 "hex":"0x08 0x01",
                 "str":"basic"
             },
-            "format":"0x08 0x01 res # 0x17 d h",
+            "format":"0x08 0x01 RES # 0x17 d H",
             "op1":"0x17",
             "op2":"d"
         },
@@ -32,7 +32,7 @@
                 "hex":"0x08 0x01",
                 "str":"basic"
             },
-            "format":"0x08 0x01 res # 0x0a d h",
+            "format":"0x08 0x01 RES # 0x0a d H",
             "op1":"0x0a",
             "op2":"d"
          },
@@ -41,7 +41,7 @@
                 "hex":"0x08 0x01",
                 "str":"link"
             },
-            "format":"0x08 0x01 res # 0x0e cs h",
+            "format":"0x08 0x01 RES # 0x0e cs H",
             "op1":"0x0e",
             "op2":"cs"
         },
@@ -50,7 +50,7 @@
                 "hex":"0x08 0x03",
                 "str":"link"
             },
-            "format":"0x08 0x03 res # 0x18 0x00 h",
+            "format":"0x08 0x03 RES # 0x18 0x00 H",
             "op1":"0x18",
             "op2":"0x00"
         },
@@ -59,7 +59,7 @@
                 "hex":"0x08 0x03",
                 "str":"link"
             },
-            "format":"0x08 0x03 res # 0x19 m h",
+            "format":"0x08 0x03 RES # 0x19 m H",
             "op1":"0x19",
             "op2":"m"
         },
@@ -68,7 +68,7 @@
                 "hex":"0x08 0x01",
                 "str":"basic"
             },
-            "format":"0x08 0x01 res # 0x12 0x00 h",
+            "format":"0x08 0x01 RES # 0x12 0x00 H",
             "op1":"0x12",
             "op2":"0x00"
         },
@@ -77,7 +77,7 @@
                 "hex":"0x08 0x01",
                 "str":"basic"
             },
-            "format":"0x08 0x01 res # 0x13 oc h",
+            "format":"0x08 0x01 RES # 0x13 oc H",
             "op1":"0x13",
             "op2":"oc"
         },
@@ -86,7 +86,7 @@
                 "hex":"0x08 0x01",
                 "str":"link"
             },
-            "format":"0x08 0x01 res # 0x03 lo h",
+            "format":"0x08 0x01 RES # 0x03 lo H",
             "op1":"0x03",
             "op2":"lo"
         },
@@ -95,7 +95,7 @@
                 "hex":"0x08 0x01",
                 "str":"link"
             },
-            "format":"0x08 0x01 res # 0x04 anr h",
+            "format":"0x08 0x01 RES # 0x04 anr H",
             "op1":"0x04",
             "op2":"anr"
         },
@@ -104,7 +104,7 @@
                 "hex":"0x08 0x02",
                 "str":"intermediate"
             },
-            "format":"0x08 0x02 res # 0x06 0x80 irc cc ir ca h",
+            "format":"0x08 0x02 RES # 0x06 0x80 irc cc ir ca H",
             "op1":"0x06",
             "op2":"0x80"
         },
@@ -113,7 +113,7 @@
                 "hex":"0x08 0x02",
                 "str":"intermediate"
             },
-            "format":"0x08 0x02 res # 0x06 cc h",
+            "format":"0x08 0x02 RES # 0x06 cc H",
             "op1":"0x06",
             "op2":"0x00"
         },
@@ -122,7 +122,7 @@
                 "hex":"0x08 0x02",
                 "str":"intermediate"
             },
-            "format":"0x08 0x02 res # 0x01 0x01 h",
+            "format":"0x08 0x02 RES # 0x01 0x01 H",
             "op1":"0x01",
             "op2":"0x01"
         },
@@ -131,7 +131,7 @@
                 "hex":"0x08 0x02",
                 "str":"intermediate"
             },
-            "format":"0x08 0x02 res # 0x01 0x81 0x00 cv vi dt dr cb res mn sn fy fm fd h",
+            "format":"0x08 0x02 RES # 0x01 0x81 0x00 cv vi dt dr cb RES mn sn fy fm fd H",
             "op1":"0x01",
             "op2":"0x81"
         },
@@ -140,7 +140,7 @@
                 "hex":"0x08 0x02",
                 "str":"intermediate"
             },
-            "format":"0x08 0x02 res # h",
+            "format":"0x08 0x02 RES # H",
             "op1":"none",
             "op2": "none"
         },
@@ -149,7 +149,7 @@
                 "hex":"0x08 0x03",
                 "str":"link"
             },
-            "format":"0x08 0x03 res # h",
+            "format":"0x08 0x03 RES # H",
             "op1":"none",
             "op2":"none"
         },

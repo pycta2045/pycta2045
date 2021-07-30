@@ -12,7 +12,6 @@ class TimeoutException(Exception):
         self.message = msg
         super().__init__(self.message)
 
-
 class COM:
     '''
         Note: This module is not well-tested due to missing equipments for now.
@@ -45,14 +44,14 @@ class COM:
             self.transform: callable = transform # function type
             self.ser.bytesize= serial.EIGHTBITS
             print('comport was created sucessfully')
-            self.msgs = pd.DataFrame(columns = ['time','src','dest','message'])
+            self.__msgs = pd.DataFrame(columns = ['time','src','dest','message'])
             self.verbose = verbose
         except Exception as e:
             print(e)
         return
     def send(self,data):
         packet = bytearray()
-        self.log({'src':self.US,'dest':self.THEM,'message':data})
+        self.__log({'src':self.US,'dest':self.THEM,'message':data})
         data = list(map(lambda x:int(x,16),data.split(' ')))
         packet.extend(data)
         res = self.ser.write(packet)
@@ -76,12 +75,12 @@ class COM:
                 else:
                     data = " ".join(data)
                 # log
-                self.log({'src':self.THEM,'dest':self.US,'message':data})
-                return data
+                self.__log({'src':self.THEM,'dest':self.US,'message':data})
+                #return data
             if time.time() >= self.ser.timeout:
                 raise TimeoutException("waiting for ack/nak timeout!")
-        return
-    def log(self,context):
+        return data
+    def __log(self,context):
         '''
             Purpose: Logs input messages and outputs it into a file
             Args: message (dict) contains:
@@ -90,13 +89,13 @@ class COM:
                 * message: content of the message
             Return: void
         '''
-        self.msgs=self.msgs.append({'time':int(time.time()),'src': context['src'],'dest':context['dest'],'message':context['message']},ignore_index=True)
+        self.__msgs=self.__msgs.append({'time':int(time.time()),'src': context['src'],'dest':context['dest'],'message':context['message']},ignore_index=True)
         if self.verbose == True:
             st = '<'*5 if context['dest'] == self.US else '>'*5
             print(f"{st} FROM: {context['src']} TO: {context['dest']} MESSAGE: {context['message']}")
         return
     def dump_log(self,fname):
         if fname != None:
-            self.msgs.to_csv(fname)
+            self.__msgs.to_csv(fname)
             return True
         return False
