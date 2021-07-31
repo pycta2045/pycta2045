@@ -109,12 +109,13 @@ class CTA2045:
         response = None
         key = None
         try:
+            val=val.lower()
             val = val.split(' ')
             l = len(val)
             for k,v in self.cmds['commands'].items():
-                t = v['type']['hex']
-                op1 = v['op1']
-                op2 = v['op2']
+                t = v['type']['hex'].lower()
+                op1 = v['op1'].lower()
+                op2 = v['op2'].lower()
                 if l <=2:
                     # only check 1st part of type
                     t1,t2 = t.split(' ')
@@ -126,7 +127,7 @@ class CTA2045:
                         break
                 elif l<=6:
                     # only check type (could be MTSQ)
-                    if t in ' '.join(val) and op1 == 'None' and op2 == 'None':
+                    if t in ' '.join(val) and op1 == 'none' and op2 == 'none':
                         key = k
                         break
                 else:

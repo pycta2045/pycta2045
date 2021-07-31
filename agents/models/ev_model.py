@@ -2,10 +2,11 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import time
+from .model import CTA2045Model
 
 power_rating=12.0
 
-class charger:
+class EV(CTA2045Model):
     def __init__(self,max_volt=240,max_curr=30,max_cap=40,min_comfort=.9,max_comfort=1.,decay_rate=.3,rampup_delay=1,rampup_time=5,verbose=False):
         '''
         Purpose:
@@ -20,7 +21,7 @@ class charger:
             * rampup_time: time it takes to reach CV phase (time units)
 
             * verbose: print log messages
-        Return: 
+        Return:
             * None
         NOTES:
             * decay rate: affects the upper half of the graph's concavity (Time v. SoC)
@@ -45,11 +46,11 @@ class charger:
         self.max_comfort = max_comfort
         self.user_comfort = (min_comfort,max_comfort)
         self.min_shed = min_comfort - 0.2 # drop by 20%
-        self.max_shed = max_comfort - 0.1 # drop by 10% 
+        self.max_shed = max_comfort - 0.1 # drop by 10%
         self.verbose = verbose
         self.rampup_time = rampup_time
         self.max_time = max_cap/power_rating # kWh/kW = hrs
-        self.max_time *= 60 * 60  # convert to secs 
+        self.max_time *= 60 * 60  # convert to secs
         self.t_start = time.time()
         self.t_end = int(self.t_start+self.max_time) # calculate when charging should end
         self.decay_rate = decay_rate
@@ -59,7 +60,7 @@ class charger:
         if verbose:
             print(f'min_com: {self.min_comfort}  max: {self.max_comfort} shed: {self.min_shed,self.max_shed}')
         return
-   
+
     def calculate_SoC(self,current,voltage): # returns (power, SoC)
         p = current * voltage
         q = current * self.timer
@@ -109,7 +110,7 @@ class charger:
     def phase2(self):
         v = self.max_volt
         i = self.max_curr
-        SoC = self.SOC[-1]      
+        SoC = self.SOC[-1]
         while SoC < self.min_comfort and SoC < self.max_comfort:
             self.timer+=self.t_inc
             p,soc = self.calculate_SoC(i,v) # calculate power, soc
@@ -153,21 +154,21 @@ class charger:
         self.phase3()
 
 
-        
-        
+
+
         # calculate the ratio of time / copies
         self.t_ratio = self.max_time//len(self.power)
-        
+
 
         time_slots.append(self.time[-1])
         self.time = self.generate_time_stamps()
-        # self.time 
+        # self.time
         ys = [(self.SOC,'SOC (%)'),(self.power,'power (W)'),(self.currs,'current (A)'),(self.volts,'voltage (V)')] # super gross
         if fname != None:
             # self.subplot(self.time,ys,vlines=time_slots,fname=f'{fname}')
             self.plot(self.time,ys[0])
             self.plot(self.time,ys[1])
-        
+
         d = {'time':self.time,'power':self.power,'soc':self.SOC,'current':self.currs,'voltage':self.volts}
 
         # print(f'time: {len(self.time)} power: {len(self.power)} SOC: {len(self.SOC)} currs: {len(self.currs)} volts: {len(self.volts)}')
@@ -182,7 +183,7 @@ class charger:
         return ts[:-1]
     def get_soc(self,time):
         '''
-            Purpose: returns the SoC at the given Epoch timestamp 
+            Purpose: returns the SoC at the given Epoch timestamp
             Args:
                 * time: unix Epoch timestamp
             Returns: associated SoC
@@ -193,11 +194,11 @@ class charger:
                 return self.SOC[-1] # could be 100% or max_comfort (if in shed mode)
             if time <= self.t_start:
                 return self.SOC[0]
-            
+
             # subtract time from the starting time of the charge
             time -= self.t_start
 
-            i = int(time/self.t_ratio) 
+            i = int(time/self.t_ratio)
             soc = self.SOC[i]
         except Exception as e:
             soc = None
@@ -262,3 +263,14 @@ class charger:
             soc -= rate*soc
             self.update_state(i,v,soc,p)
         return soc
+    # ============================ CTA2045 functions =========================
+    def loadup(self):
+        pass
+    def operating_status(self):
+        pass
+    def shed(self):
+        pass
+    def enshded(self):
+        pass
+    def commodity_read(self,commodity_code):
+        pass

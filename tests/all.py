@@ -1,5 +1,5 @@
 import unittest
-from tests.test_charger import TestCharger
+from tests.test_ev import TestEV
 from tests.test_cta import TestCTA
 from tests.test_scpi import TestSCPI
 from tests.test_com import TestCOM
