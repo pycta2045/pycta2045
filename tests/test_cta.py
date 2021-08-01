@@ -63,15 +63,18 @@ class TestCTA(unittest.TestCase):
         cmds = cta.cmds['commands']
         for k,v in cmds.items():
             success=True
+            v = v['format']
             print(f'tesing {k}....',end='')
-            c = cta.to_cta(k)
-            # check length
-            if not self.assertTrue(len(c) >= len(v)):
+            res = cta.to_cta(k)
+            # check length -- should be greater because of the checksum bytes, which not included in the format
+            if not len(res) >= len(v):
                 success=False
+            self.assertTrue(len(res) >= len(v))
             # assert it doesn't have any alpha values
-            for byte in c.split(' '):
-                if not self.assertFalse(byte.isalpha()):
+            for byte in res.split(' '):
+                if byte.isalpha():
                     success=False
+                self.assertFalse(byte.isalpha())
             print_status(success)
     def test_from_cta(self):
         print(f'{"-" * 5} from_cta test {"-" * 5}')
