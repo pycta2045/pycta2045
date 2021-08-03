@@ -1,8 +1,8 @@
-from cta2045 import CTA2045
-from com import COM,TimeoutException
-import sys, os, traceback as tb, abc#, import threading
+from agents.cta2045 import CTA2045
+from agents.com import COM,TimeoutException
+import sys, os, traceback as tb#, import threading
 from multiprocessing import Process
-from models import model as AbstractModel
+from agents.models import CTA2045Model
 
 
 choices = {
@@ -26,7 +26,7 @@ class UnknownModeException(Exception):
 
 
 class CTA2045Device:
-    def __init__(self,mode=DCM,log_size=10,model=None):
+    def __init__(self,mode=DCM,log_size=10,model=None,comport='/dev/ttyS6'):
         self.mode = mode.__name__
         self.model = model
         self.log = []
@@ -35,7 +35,7 @@ class CTA2045Device:
         #self.screen_sz = 0
         #self.lock = threading.Lock()
         self.cta_mod = CTA2045()
-        self.com = COM(checksum=self.cta_mod.checksum,transform=self.cta_mod.hexify)
+        self.com = COM(checksum=self.cta_mod.checksum,transform=self.cta_mod.hexify,port=comport)
         # flags for minimum cta2045 support
         self.support_flags = {
             'intermediate':False,
@@ -83,7 +83,7 @@ class CTA2045Device:
         self.__write('',clear=True)
         return
 
-    def __recv(self):
+    def __recv(self,verbose=True):
         res = None
         try:
             res = self.com.recv()
@@ -93,7 +93,8 @@ class CTA2045Device:
                 for k,v in res['args'].items():
                     self.__write(f"\t{k} = {v}")
         except TimeoutException as e:
-            self.__write(f"<-== waiting for response timeout!",log=True)
+            if verbose:
+                self.__write(f"<-== waiting for response timeout!",log=True)
             raise TimeoutException # propagate exception
         except Exception as e:
             self.__write(e)
@@ -114,6 +115,7 @@ class CTA2045Device:
 
     def __setup(self):
         res = None
+        success=False
         cmds = [('intermediate mtsq','intermediate'),
                 ('data-link mtsq','data-link'),
                 ('max payload request','max payload')
@@ -139,10 +141,12 @@ class CTA2045Device:
                 self.__write(e)
                 self.__write('in __setup')
         print(self.support_flags)
-        return
+        success = self.support_flags['intermediate'] and self.support_flags['data-link'] and self.support_flags['max payload'] > 0
+        return success
 
     def __run_dcm(self):
-        self.__setup()
+        if not self.__setup():
+            exit()
         while 1:
             c = self.__get_input()
             self.__clear()
@@ -163,20 +167,22 @@ class CTA2045Device:
             except Exception as e:
                 self.__write(e)
                 self.__write("in __run_dcm")
+                exit()
         return
     def __run_der(self):
         last_command = '0x00'
+        args = {}
         self.__setup()
         while 1:
             try:
-                res = self.__recv() # always waiting for commands
+                res = self.__recv(verbose=False) # always waiting for commands
                 if res != None:
                     last_command = res['op1']
-                    res = res['command']
+                    cmd = res['command']
                     # invoke model with request command -- if supported
                     if cmd in self.FDT:
                         self.FDT[cmd]()
-                complement = self.cta.complement(res)
+                complement = self.cta_mod.complement(cmd)
                 for cmd in complement:
                     if cmd == 'app ack':
                         self.__send(cmd, last_opcode=last_command)
@@ -186,14 +192,16 @@ class CTA2045Device:
                         self.__send(cmd)
             except TimeoutException as e:
                 # nothing was received from UCM
-                continue
+                pass
             except Exception as e:
-                print(e)
+                self.__write(e)
+                self.__write("in __run_der")
+                exit()
         pass
     def run(self):
         if self.mode == 'DER':
             # validate model in DER mode
-            assert(abc.issubclass(AbstractModel,self.model))
+            assert(isinstance(self.model,CTA2045Model))
             self.FDT = {
                 'shed':self.model.shed,
                 'endshed':self.model.endshed,
@@ -207,8 +215,3 @@ class CTA2045Device:
         else:
             raise UnknownModeException(f'Unknown Mode: {self.mode}')
         return
-
-
-
-c = CTA2045Device()
-c.run()

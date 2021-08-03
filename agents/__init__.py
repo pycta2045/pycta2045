@@ -3,4 +3,5 @@
 #from scpi.handler import handler
 #from models.model import model
 #from models.ev_model import ev_model
-#print(f'invoking __init__.py for {__name__}')
+from .cta2045device import *
+print(f'invoking __init__.py for {__name__}')

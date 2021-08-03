@@ -5,6 +5,11 @@ import time
 from .model import CTA2045Model
 
 power_rating=12.0
+operating_status = {
+    'endshed':'idle normal',
+    'shed':'idle curtailed',
+    'loadup':'idle normal',
+}
 
 class EV(CTA2045Model):
     def __init__(self,max_volt=240,max_curr=30,max_cap=40,min_comfort=.9,max_comfort=1.,decay_rate=.3,rampup_delay=1,rampup_time=5,verbose=False):
@@ -55,6 +60,7 @@ class EV(CTA2045Model):
         self.t_end = int(self.t_start+self.max_time) # calculate when charging should end
         self.decay_rate = decay_rate
         self.rampup_delay = rampup_delay
+        self.state = operating_status['endshed']
         # self.t_inc = self.max_curr/self.max_time
         self.t_inc = 1
         if verbose:
@@ -237,14 +243,6 @@ class EV(CTA2045Model):
         if show:
             plt.show()
         return
-    def shed(self):
-        self.min_comfort = self.min_shed
-        self.max_comfort = self.max_shed
-        return
-    def endshed(self):
-        self.min_comfort,self.max_comfort = self.user_comfort
-        # print(f'new min: {self.min_comfort} new max: {self.max_comfort}')
-        return
     def discharge(self,time,rate):
         '''
             Discharges/decreases the battery/SoC based on the given rate for the given time
@@ -264,13 +262,25 @@ class EV(CTA2045Model):
             self.update_state(i,v,soc,p)
         return soc
     # ============================ CTA2045 functions =========================
+    def shed(self):
+        self.min_comfort = self.min_shed
+        self.max_comfort = self.max_shed
+        self.state = operating_status['shed']
+        print('shedding...')
+        return
+    def endshed(self):
+        self.min_comfort,self.max_comfort = self.user_comfort
+        self.state = operating_status['endshed']
+        #print(f'new min: {self.min_comfort} new max: {self.max_comfort}')
+        print('endshed...')
+        return
     def loadup(self):
+        self.state = operating_status['loadup']
+        print('loading up...')
+        self.charge()
         pass
     def operating_status(self):
-        pass
-    def shed(self):
-        pass
-    def enshded(self):
-        pass
+        return self.state
     def commodity_read(self,commodity_code):
+        print('commidty read')
         pass
