@@ -9,8 +9,10 @@ choices = {
     1:"shed",
     2:"endshed",
     3:"loadup",
-    4:"operating status request",
-    5:"quit"
+    4: "critical peak event",
+    5:"grid emergency",
+    6:"operating status request",
+    7:"quit"
 }
 
 class DCM:
@@ -100,14 +102,21 @@ class CTA2045Device:
             self.__write(e)
             self.__write("in __recv")
         return res
-    def __send(self,cmd,**args):
+    def __send(self,cmd,args={}):
         ret = False
         c = self.cta_mod.to_cta(cmd,args=args)
         self.com.send(c)
         try:
             self.__write(f'==-> sent {cmd}',log=True)
+            '''
             if len(args) > 0:
-                self.__write('\twith args: ',args)
+                #self.__write('\twith args:')
+                for k,v in args.items():
+                    if not v[0].isalpha():
+                        v = v.replace(' 0x','')
+                        v = int(v,16)
+                    self.__write(f'\t{k}: {v}')
+            '''
             ret = True
         except Exception as e:
             self.__write(e)
@@ -139,7 +148,9 @@ class CTA2045Device:
                 pass
             except Exception as e:
                 self.__write(e)
+
                 self.__write('in __setup')
+
         print(self.support_flags)
         success = self.support_flags['intermediate'] and self.support_flags['data-link'] and self.support_flags['max payload'] > 0
         return success
@@ -171,9 +182,9 @@ class CTA2045Device:
         return
     def __run_der(self):
         last_command = '0x00'
-        args = {}
         self.__setup()
         while 1:
+            args = {}
             try:
                 res = self.__recv(verbose=False) # always waiting for commands
                 if res != None:
@@ -181,15 +192,18 @@ class CTA2045Device:
                     cmd = res['command']
                     # invoke model with request command -- if supported
                     if cmd in self.FDT:
-                        self.FDT[cmd]()
+                        args = res['args']
+                        args = self.FDT[cmd](payload=args)
+                else:
+                    cmd = None
                 complement = self.cta_mod.complement(cmd)
                 for cmd in complement:
                     if cmd == 'app ack':
-                        self.__send(cmd, last_opcode=last_command)
+                        self.__send(cmd, {'last_opcode':last_command})
                     elif cmd == 'nak':
-                        self.__send(cmd,nak_reason='unsupported')
+                        self.__send(cmd,{'nak_reason':'unsupported'})
                     else:
-                        self.__send(cmd)
+                        self.__send(cmd,args)
             except TimeoutException as e:
                 # nothing was received from UCM
                 pass
@@ -206,8 +220,10 @@ class CTA2045Device:
                 'shed':self.model.shed,
                 'endshed':self.model.endshed,
                 'loadup':self.model.loadup,
-                'operating_status':self.model.operating_status,
-                'commodity_read':self.model.commodity_read,
+                'operating status request':self.model.operating_status,
+                'commodity read request':self.model.commodity_read,
+                'grid emergency':self.model.grid_emergency,
+                'critical peak event':self.model.critical_peak_event
             }
             self.__run_der()
         elif self.mode=='DCM':

@@ -36,6 +36,15 @@
             "op1":"0x0a",
             "op2":"D"
          },
+        "grid emergency": {
+            "type": {
+                "hex":"0x08 0x01",
+                "str":"basic"
+            },
+            "format":"0x08 0x01 RES # 0x0b D H",
+            "op1":"0x0b",
+            "op2":"D"
+         },
         "outside comm connection status":{
             "type":{
                 "hex":"0x08 0x01",

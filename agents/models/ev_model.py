@@ -250,7 +250,8 @@ class EV(CTA2045Model):
         if self.verbose:
             print('Dischargining...')
         if len(self.SOC) == 0:
-            print('Discharging an empty battery!\n')
+            if self.verbose:
+                print('Discharging an empty battery!\n')
             return
         soc = self.SOC[-1]
         v = self.volts[-1]
@@ -262,25 +263,98 @@ class EV(CTA2045Model):
             self.update_state(i,v,soc,p)
         return soc
     # ============================ CTA2045 functions =========================
-    def shed(self):
+    def shed(self,payload:dict):
+        '''
+            Purpose: modifies the setpoint
+            Args:
+                * payload: dict of arguments passed to the function
+            Return:
+                * val: dict containing return values used for CTA2045
+        '''
+        print('shedding...')
+        val = {}
         self.min_comfort = self.min_shed
         self.max_comfort = self.max_shed
         self.state = operating_status['shed']
-        print('shedding...')
-        return
-    def endshed(self):
+        return val
+    def endshed(self,payload:dict):
+        '''
+            Purpose: resets the setpoint
+            Args:
+                * payload: dict of arguments passed to the function
+            Return:
+                * val: dict containing return values used for CTA2045
+        '''
+        print('endshed...')
+        val = {}
         self.min_comfort,self.max_comfort = self.user_comfort
         self.state = operating_status['endshed']
         #print(f'new min: {self.min_comfort} new max: {self.max_comfort}')
-        print('endshed...')
-        return
-    def loadup(self):
-        self.state = operating_status['loadup']
+        return val
+    def loadup(self,payload:dict):
+        '''
+            Purpose: calls the charge function
+            Args:
+                * payload: dict of arguments passed to the function
+            Return:
+                * val: dict containing return values used for CTA2045
+        '''
         print('loading up...')
+        val = {}
+        self.state = operating_status['loadup']
         self.charge()
-        pass
-    def operating_status(self):
-        return self.state
-    def commodity_read(self,commodity_code):
-        print('commidty read')
-        pass
+        return val
+    def operating_status(self,payload:dict):
+        '''
+            Purpose: obtain the CTA2045 operating status from the model
+            Args:
+                * payload: dict of arguments passed to the function
+            Return:
+                * val: dict containing return values used for CTA2045
+        '''
+        print('OpStatus...')
+        val = {}
+        val['op_state_code'] = self.state
+        return val
+    def commodity_read(self,payload:dict):
+        '''
+            Purpose: modifies the setpoint
+            Args:
+                * payload: dict of arguments passed to the function
+            Return:
+                * val: dict containing return values used for CTA2045
+        '''
+        #print('CommodityRead...')
+        val = {}
+        IR = 0
+        CA = 0
+        val['commodity_code'] = payload['commodity_code']
+        if val['commodity_code'] == 'electricity consumed': # calculate electricity consumed
+            pass
+        else: # calculate total energy
+            return None
+        val['instantaneous_rate'] = (f'{hex(0)} ' * 5) + hex(IR)
+        val['cumulative_amount'] = (f'{hex(0)} ' * 5) + hex(CA)
+        return val
+    def critical_peak_event(self,payload):
+        '''
+            Purpose: calls the discharge function. If the duration is unknown, the model continously discharge
+            Args:
+                * payload: dict of arguments passed to the function
+            Return:
+                * val: dict containing return values used for CTA2045
+        '''
+        val = {}
+        print('critical peak eventing...')
+        return val
+    def grid_emergency(self,payload):
+        '''
+            Purpose: calls the discharge function. If the duration is unknown, the model continously discharge
+            Args:
+                * payload: dict of arguments passed to the function
+            Return:
+                * val: dict containing return values used for CTA2045
+        '''
+        val = {}
+        print('grid emergencying...')
+        return val
