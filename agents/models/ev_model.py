@@ -187,7 +187,7 @@ class EV(CTA2045Model):
         i = self.t_start
         ts = []
         for i in range(int(self.t_start),int(self.t_end)+1,int(self.t_ratio)):
-            ts.append(pd.Timestamp(i,unit='s'))
+            ts.append(pd.Timestamp(time.ctime(i),unit='s'))
         return ts[:-1]
     def get_soc(self,time):
         '''
@@ -348,7 +348,7 @@ class EV(CTA2045Model):
         val['commodity_code'] = payload['commodity_code']
         if val['commodity_code'] == 'electricity consumed': # calculate electricity consumed
             t = time.time()
-            record = self.get_record(time)
+            record = self.get_record(t)
             if not record == None:
                 IR = record['power']
                 # fix hexify function !!
@@ -368,7 +368,6 @@ class EV(CTA2045Model):
         #return None
         val['instantaneous_rate'] = CTA2045.hexify(IR,length=6) # 6 bytes for the IR field
         val['cumulative_amount'] = CTA2045.hexify(CA,length=6) # 6 bytes for the CA field
-        print(val)
         return val
     def critical_peak_event(self,payload):
         '''
