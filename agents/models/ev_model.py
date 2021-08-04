@@ -352,9 +352,17 @@ class EV(CTA2045Model):
                 IR = record['power']
                 # fix hexify function !!
 
+                '''
+                    CA= max_cap(Kwh) * SoC (%)
+                    IR = power[time]
+                '''
 
             pass
         else: # calculate total energy
+                '''
+                    CA= max_cap(Kwh) * (1-SoC) (%)
+                    IR =  None  --> CTA2045 not used
+                '''
             return None
         val['instantaneous_rate'] = (f'{hex(0)} ' * 5) + hex(IR)
         val['cumulative_amount'] = (f'{hex(0)} ' * 5) + hex(CA)
