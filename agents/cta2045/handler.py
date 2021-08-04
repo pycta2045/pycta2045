@@ -38,14 +38,15 @@ class CTA2045:
                 * length: Number of bytes to pad with (ignored if length < resulting hex representation)
             Return: hex representation.
         '''
-        length *= 2 # 2 hex numbers = 1 byte
         value = hex(value)
         value = value[2:] if len(value)%2 == 0 else "0" + value[2:]
-        value = " ".join(value[i:i+2] for i in range(0,len(value),2))
-        # ensure len(value) >= length
+        value = [value[i:i+2] for i in range(0,len(value),2)]
+        # ensure that len(value) >= length
+        padded = value
         if len(value) < length:
-            value = ('00 ' * (length-len(value))) + value
-        value = " ".join(list(map(lambda x: '0x'+x,value.split(' '))))
+            padded = ['00'] * (length-len(value))
+            padded.extend(value)
+        value = " ".join(list(map(lambda x: '0x'+x,padded)))
         return value
     def to_cta(self,cmd,**args):
         '''

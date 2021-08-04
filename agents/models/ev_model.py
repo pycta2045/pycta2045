@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import time
 from .model import CTA2045Model
+from agents.cta2045 import CTA2045
 
 power_rating=12.0
 operating_status = {
@@ -346,7 +347,7 @@ class EV(CTA2045Model):
         CA = 0
         val['commodity_code'] = payload['commodity_code']
         if val['commodity_code'] == 'electricity consumed': # calculate electricity consumed
-            time = time.now()
+            t = time.time()
             record = self.get_record(time)
             if not record == None:
                 IR = record['power']
@@ -365,8 +366,9 @@ class EV(CTA2045Model):
                 '''
                 x = 0
         #return None
-        val['instantaneous_rate'] = (f'{hex(0)} ' * 5) + hex(IR)
-        val['cumulative_amount'] = (f'{hex(0)} ' * 5) + hex(CA)
+        val['instantaneous_rate'] = CTA2045.hexify(IR,length=6) # 6 bytes for the IR field
+        val['cumulative_amount'] = CTA2045.hexify(CA,length=6) # 6 bytes for the CA field
+        print(val)
         return val
     def critical_peak_event(self,payload):
         '''
