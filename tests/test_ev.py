@@ -21,15 +21,19 @@ class TestEV(unittest.TestCase):
         df_start = c.charge()
         # get soc at the start -- should be 0
         soc = c.get_soc(time=0)
+        soc = soc[-1]
         self.assertTrue(soc == 0)
         soc = c.get_soc(time=c.t_start)
+        soc = soc[-1]
         self.assertTrue(soc == 0) # should still be zero
 
         # test at the end -- should be 92%
         soc = c.get_soc(time=c.t_end)
+        soc = soc[-1]
         self.assertTrue(soc == max_comfort) # should still be max comfort
 
         soc = c.get_soc(time=c.t_end+(60*60)) # get soc 1 hr after end time
+        soc = soc[-1]
         self.assertTrue(soc == max_comfort) # should still be max comfort
 
         # change max comfort & charge
@@ -37,6 +41,7 @@ class TestEV(unittest.TestCase):
         c.max_comfort = max_comfort
         df_end = c.charge()
         soc = c.get_soc(time=c.t_end)
+        soc = soc[-1]
         self.assertTrue(soc == max_comfort) # should still be max comfort
         self.assertFalse(df_start.shape[0] >= df_end.shape[0])
 

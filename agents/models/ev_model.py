@@ -1,4 +1,4 @@
-vmport numpy as np
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import time
@@ -363,7 +363,8 @@ class EV(CTA2045Model):
                     CA= max_cap(Kwh) * (1-SoC) (%)
                     IR =  None  --> CTA2045 not used
                 '''
-            return None
+                x = 0
+        #return None
         val['instantaneous_rate'] = (f'{hex(0)} ' * 5) + hex(IR)
         val['cumulative_amount'] = (f'{hex(0)} ' * 5) + hex(CA)
         return val
