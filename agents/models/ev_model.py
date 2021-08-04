@@ -1,4 +1,4 @@
-import numpy as np
+vmport numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import time
@@ -24,7 +24,7 @@ class EV(CTA2045Model):
             * decay_rate: rate by which the current decays in constant voltage (CV) phase
             * rampup_delay: rate by which the current decays in constant voltage (CV) phase (time units)
             * rampup_time: time it takes to reach CV phase (time units)
-
+            * max_cap : Nameplate Rating -- Nissan Leaf (Kwh)
             * verbose: print log messages
         Return:
             * None
@@ -180,6 +180,7 @@ class EV(CTA2045Model):
         # print(f'time: {len(self.time)} power: {len(self.power)} SOC: {len(self.SOC)} currs: {len(self.currs)} volts: {len(self.volts)}')
         df = pd.DataFrame(d)
         df.set_index('time',inplace=True)
+        self.df = df
         return df
     def generate_time_stamps(self):
         i = self.t_start
@@ -196,19 +197,34 @@ class EV(CTA2045Model):
             Notes: Returns None if charging has not started (not plugged-in)
         '''
         try:
-            if time >=self.t_end:
-                return self.SOC[-1] # could be 100% or max_comfort (if in shed mode)
-            if time <= self.t_start:
-                return self.SOC[0]
-
-            # subtract time from the starting time of the charge
-            time -= self.t_start
-
-            i = int(time/self.t_ratio)
-            soc = self.SOC[i]
+            record = self.get_record(time)
+            soc = record['soc']
         except Exception as e:
+            print(e)
             soc = None
         return soc
+    def get_record(self,time):
+        '''
+            Purpose: returns the record at the given Epoch timestamp
+            Args:
+                * time: unix Epoch timestamp
+            Returns: associated record (time, power, soc, current, voltage)
+            Notes: Returns None if charging has not started (not plugged-in)
+        '''
+        record = None
+        try:
+            if time >=self.t_end:
+                record = self.df.tail(1) # could be 100% or max_comfort (if in shed mode)
+            elif time <= self.t_start:
+                record = self.df.head(1)
+            else:
+                # subtract time from the starting time of the charge
+                time -= self.t_start
+                i = int(time/self.t_ratio)
+                record = self.df.iloc[i]
+        except Exception as e:
+            pass # returns None as record
+        return record
     def subplot(self,xs,ys,x_name='Time',vlines = None,fname=None): # change to use member variables not args
         num = len(ys)//2 # divide graphs by 2
         (fig,axs) = plt.subplots(num,num) # create 4 graphs
@@ -330,6 +346,13 @@ class EV(CTA2045Model):
         CA = 0
         val['commodity_code'] = payload['commodity_code']
         if val['commodity_code'] == 'electricity consumed': # calculate electricity consumed
+            time = time.now()
+            record = self.get_record(time)
+            if not record == None:
+                IR = record['power']
+                # fix hexify function !!
+
+
             pass
         else: # calculate total energy
             return None
