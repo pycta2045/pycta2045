@@ -29,14 +29,24 @@ class CTA2045:
             Return: dictionary of supported commands.
         '''
         return self.cmds['commands']
-    def hexify(self,val):
+    @staticmethod
+    def hexify(value,length=1):
         '''(helper function)
             Purpose: Returns the hex representation of given integer (helper function).
             Args:
-                * val: Integer in decimal representation.
+                * value: Integer in decimal representation.
+                * length: Number of bytes to pad with (ignored if length < resulting hex representation)
             Return: hex representation.
         '''
-        return '0x{:02x}'.format(val)
+        length *= 2 # 2 hex numbers = 1 byte
+        value = hex(value)
+        value = value[2:] if len(value)%2 == 0 else "0" + value[2:]
+        value = " ".join(value[i:i+2] for i in range(0,len(value),2))
+        # ensure len(value) >= length
+        if len(value) < length:
+            value = ('00 ' * (length-len(value))) + value
+        value = " ".join(list(map(lambda x: '0x'+x,value.split(' '))))
+        return value
     def to_cta(self,cmd,**args):
         '''
             Purpose: Translates natural language commands like shed, endshed, commodity read, etc.  to corresponding hex value representation as specified by CTA2045-B.
