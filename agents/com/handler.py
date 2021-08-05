@@ -64,7 +64,8 @@ class COM:
         data = None
         timeout = time.time()+self.ser.timeout
         while True:
-            if self.ser.inWaiting()>0:
+            buff= self.ser.inWaiting()
+            if buff > 0 and (buff == 2 or buff >= 8):
                 data = self.ser.read(self.ser.inWaiting())
                 data = list(map(lambda x: self.transform(int(hex(x),16)),data))
                 time.sleep(self.tim)
