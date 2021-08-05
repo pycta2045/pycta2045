@@ -206,3 +206,25 @@ class CTA2045:
             # command not found or unable to response -- send a nak
             cmd_complement = ['nak']
         return cmd_complement
+    def get_code_value(self,key=None,code=None):
+        '''
+            Purpose: returns the value for the requested code.
+            Args:
+                * key (string): desired key code to search in.
+                * code (string): desired code field to find the value of
+            Return: value of the given code field
+            NOTE:
+                * returns 0 if code was not found
+                * example:
+                    * get_code_value('commodity_code','present energy') returns the 0x80 as 'present energy' value for commodity_code is 0x80
+        '''
+        value = self.hexify(0)
+        try:
+            codes = self.cmds['codes'].values()
+            key = next(v for v in codes if v.upper() == key.upper())
+            value = self.cmds[key][code.lower()]
+        except Exception:
+            # do nothing (value is still 0x00)
+            pass
+        return value
+

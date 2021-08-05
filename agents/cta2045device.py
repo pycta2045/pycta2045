@@ -105,6 +105,7 @@ class CTA2045Device:
     def __send(self,cmd,args={}):
         ret = False
         c = self.cta_mod.to_cta(cmd,args=args)
+        print('sending: ',c)
         self.com.send(c)
         try:
             self.__write(f'==-> sent {cmd}',log=True)
@@ -151,7 +152,7 @@ class CTA2045Device:
 
                 self.__write('in __setup')
 
-        print(self.support_flags)
+        #print(self.support_flags)
         success = self.support_flags['intermediate'] and self.support_flags['data-link'] and self.support_flags['max payload'] > 0
         return success
 

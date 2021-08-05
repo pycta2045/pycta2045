@@ -64,8 +64,10 @@ class EV(CTA2045Model):
         self.state = operating_status['endshed']
         # self.t_inc = self.max_curr/self.max_time
         self.t_inc = 1
+        self.cta = CTA2045()
         if verbose:
             print(f'min_com: {self.min_comfort}  max: {self.max_comfort} shed: {self.min_shed,self.max_shed}')
+        self.init_SoC = 0.0
         return
 
     def calculate_SoC(self,current,voltage): # returns (power, SoC)
@@ -91,6 +93,7 @@ class EV(CTA2045Model):
     def delay(self,init_SoC):
         times = list(range(self.rampup_delay+1))
         v = i = 0 # init to 0s
+        self.init_SoC = init_SoC
         SoC = init_SoC
         for t in times:
             self.timer +=self.t_inc
@@ -335,39 +338,58 @@ class EV(CTA2045Model):
         return val
     def commodity_read(self,payload:dict):
         '''
-            Purpose: modifies the setpoint
+            Purpose: obtain the state (power/SoC) from the model & convert it to commodity values before returning commodity value
             Args:
                 * payload: dict of arguments passed to the function
             Return:
                 * val: dict containing return values used for CTA2045
+            NOTE:
+                * a workaround to support multiple Commodity Codes (CC) is to tag CCs after IR values in a "chaining" manner
         '''
         #print('CommodityRead...')
         val = {}
         IR = 0
         CA = 0
-        val['commodity_code'] = payload['commodity_code']
-        if val['commodity_code'] == 'electricity consumed': # calculate electricity consumed
+        soc = 0
+        val['commodity_code'] = 'electricity consumed' # go with electricity consumed first
+        try:
             t = time.time()
             record = self.get_record(t)
-            if not record == None:
+            try:
+                soc = record['soc']
                 IR = record['power']
-                # fix hexify function !!
-
-                '''
-                    CA= max_cap(Kwh) * SoC (%)
-                    IR = power[time]
-                '''
-
-            pass
-        else: # calculate total energy
-                '''
-                    CA= max_cap(Kwh) * (1-SoC) (%)
-                    IR =  None  --> CTA2045 not used
-                '''
-                x = 0
+            except Exception:
+                pass # use soc 0%
+            # ---------------- calculate electricity consumed -----------------
+            '''
+                CA= max_cap(Kwh) * SoC (%)
+                IR = power[time]
+            '''
+            CA = self.max_cap * (soc - self.init_SoC)
+            IR = CTA2045.hexify(int(IR),length=6)
+            CA = CTA2045.hexify(int(CA),length=6)
+            # ---------------- calculate present energy (energy take) ---------
+            '''
+                CA= max_cap(Kwh) * (1-SoC) (%)
+                IR =  None  --> CTA2045 not used
+            '''
+            @TODO: fix issue with tagging cumulative amount
+            CC = self.cta.get_code_value('commodity_code','present energy')
+            IR2 = CTA2045.hexify(int(0),length=6)
+            CA2 = self.max_cap * (1-soc)
+            CA2 = CTA2045.hexify(int(CA2),length=6)
+            CA += f' {CC} {IR2} {CA2}'
+            val['instantaneous_rate'] = CTA2045.hexify(int(IR),length=6) # 6 bytes for the IR field
+            val['cumulative_amount'] = CTA2045.hexify(int(CA),length=6) # 6 bytes for the CA field
+            print(e)
+            pass # use default IR & CA values
+        except Exception as e:
+            IR = CA = 0
+            val['instantaneous_rate'] = CTA2045.hexify(int(IR),length=6) # 6 bytes for the IR field
+            val['cumulative_amount'] = CTA2045.hexify(int(CA),length=6) # 6 bytes for the CA field
+            print(e)
+            pass # use default IR & CA values
         #return None
-        val['instantaneous_rate'] = CTA2045.hexify(IR,length=6) # 6 bytes for the IR field
-        val['cumulative_amount'] = CTA2045.hexify(CA,length=6) # 6 bytes for the CA field
         return val
     def critical_peak_event(self,payload):
         '''

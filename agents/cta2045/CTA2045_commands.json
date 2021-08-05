@@ -237,13 +237,17 @@
     },
     "commodity_code":{
         "electricity consumed":"0x00",
+        "electricity consumed - estimated":"0x80",
         "electricity produced":"0x01",
+        "electricity produced - estimated":"0x81",
         "natural gas - ft":"0x02",
+        "natural gas - ft - estimated":"0x82",
         "water - gal":"0x03",
         "natural gas - m":"0x04",
         "water - l":"0x05",
         "total energy":"0x06",
         "present energy":"0x07",
+        "present energy - estimated":"0x87",
         "length":"1"
     },
     "device_type":{
