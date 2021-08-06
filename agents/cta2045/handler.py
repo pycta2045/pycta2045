@@ -238,20 +238,14 @@ class CTA2045:
                 * False: msg is not valid CTA2045 or not supported
         '''
         valid = False
-        '''
+        print('checking if: ',msg,' is valid')
         if len(msg) > 2:
             # checksum is valid?
             unchecked_data = msg[:-2]
             checked_data = self.checksum(" ".join(unchecked_data)).split(" ")
             if msg == checked_data:
-                # check if it supported
-                msg = " ".join(msg)
-                # check supported?
-                if self.from_cta(msg) != None:
-                    valid = True
-        else:
-        '''
-        if self.from_cta(msg) != None:
-            # could be link ack/nak (check it exist)
-            valid = True
-        return False
+                valid = True
+        else: # could be link ack/nak
+            if self.from_cta(msg) != None:
+                valid = True
+        return valid

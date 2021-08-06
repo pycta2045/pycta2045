@@ -1,6 +1,7 @@
 import serial
 from serial.tools.list_ports import comports #from serial.tools.list_ports_linux import SysFS
 # import serial.rs485
+from multiprocessing import Process, Lock
 import time
 import pandas as pd
 
@@ -27,6 +28,7 @@ class COM:
         ports = list(serial.tools.list_ports.comports())
         ports = list(map(lambda x: x.name,ports))
         port = self.port
+        self.ser = None
         if 'dev' in self.port:
             port = self.port.split('/')[-1]
         if not port in ports:
@@ -45,6 +47,8 @@ class COM:
             self.is_valid_cta: callable = is_valid # function type
             self.ser.bytesize= serial.EIGHTBITS
             self.buffer = []
+            self.lock = Lock()
+            self.process = None
             print('comport was created sucessfully')
             self.__msgs = pd.DataFrame(columns = ['time','src','dest','message'])
             self.verbose = verbose
@@ -59,13 +63,12 @@ class COM:
         res = self.ser.write(packet)
         time.sleep(self.tim)
         return res>=2
-    def recv(self):
+    def __recv(self):
         '''
             TODO
         '''
         data = None
         buff = []
-        timeout = time.time()+self.tim #self.ser.timeout
         while True:
             if self.ser.inWaiting() > 0:
                 data = self.ser.read(self.ser.inWaiting())
@@ -76,14 +79,14 @@ class COM:
                 print('after DATA: ',data)
                 if not self.is_valid_cta(data):
                     buff.extend(data)
-                    print("UPDATED buffer: ",buff)
                     continue
+                with self.lock:
+                    self.buffer.append((data,time.time()))
+                print("COMPLETE MSG received: ",data)
+                buff = []
                 # log
                 self.__log({'src':self.THEM,'dest':self.US,'message':data})
-                return data
-            if time.time() >= timeout:
-                raise TimeoutException("waiting for ack/nak timeout!")
-        return data
+        return
     def __log(self,context):
         '''
             Purpose: Logs input messages and outputs it into a file
@@ -98,6 +101,28 @@ class COM:
             st = '<'*5 if context['dest'] == self.US else '>'*5
             print(f"{st} FROM: {context['src']} TO: {context['dest']} MESSAGE: {context['message']}")
         return
+    def start(self):
+        '''
+            Purpose: starts listen on the given port. It creates a thread with __recv running in it.
+            Args: None
+            Returns: None
+
+        '''
+        if self.process == None and self.ser != None:
+            self.process = Process(target=self.__recv)
+            self.process.start() # starts a new thread to listen to packets
+        return
+    def get_next_msg(self):
+        msg = None
+        with self.lock:
+            print('buffer',self.buffer)
+            if len(self.buffer) > 0:
+                msg,t = self.buffer.pop(0)
+                if t >= time.time() + self.ser.timeout:
+                    raise TimeoutException("waiting for ack/nak timout!")
+            print('remaining',self.buffer)
+        return msg
+
     def dump_log(self,fname):
         if fname != None:
             self.__msgs.to_csv(fname)
