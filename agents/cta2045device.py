@@ -88,12 +88,13 @@ class CTA2045Device:
     def __recv(self,verbose=True):
         res = None
         try:
-            res = self.com.recv()
-            res = self.cta_mod.from_cta(res)
-            if type(res) == dict:
-                self.__write(f"<-== receved: {res['command']}",log=True)
-                for k,v in res['args'].items():
-                    self.__write(f"\t{k} = {v}")
+            res = self.com.get_next_msg()
+            if res != None:
+                res = self.cta_mod.from_cta(res)
+                if type(res) == dict:
+                    self.__write(f"<-== receved: {res['command']}",log=True)
+                    for k,v in res['args'].items():
+                        self.__write(f"\t{k} = {v}")
         except TimeoutException as e:
             if verbose:
                 self.__write(f"<-== waiting for response timeout!",log=True)
@@ -157,8 +158,8 @@ class CTA2045Device:
         return success
 
     def __run_dcm(self):
-        if not self.__setup():
-            exit()
+        #if not self.__setup():
+            #exit()
         while 1:
             c = self.__get_input()
             self.__clear()
@@ -183,11 +184,11 @@ class CTA2045Device:
         return
     def __run_der(self):
         last_command = '0x00'
-        self.__setup()
+        #self.__setup()
         while 1:
             args = {}
             try:
-                res = self.__recv(verbose=False) # always waiting for commands
+                res = self.__recv(verbose=True) # always waiting for commands
                 if res != None:
                     last_command = res['op1']
                     cmd = res['command']
@@ -214,6 +215,8 @@ class CTA2045Device:
                 exit()
         pass
     def run(self):
+        self.__setup()
+        self.com.start()
         if self.mode == 'DER':
             # validate model in DER mode
             assert(isinstance(self.model,CTA2045Model))
