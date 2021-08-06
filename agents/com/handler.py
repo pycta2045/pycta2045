@@ -18,7 +18,7 @@ class COM:
     '''
     US = 'DER'
     THEM = 'DCM'
-    def __init__(self, checksum, transform, port="/dev/ttyS6",timeout=.02,verbose=False):
+    def __init__(self, checksum, transform, is_valid, port="/dev/ttyS6",timeout=.02,verbose=False):
         '''
             * Note:
                 * timeout (defualt) is set to 500 ms as specified by CTA2045
@@ -42,7 +42,9 @@ class COM:
             self.ser.delay_before_rx = self.tim
             self.checksum: callable = checksum # function type
             self.transform: callable = transform # function type
+            self.is_valid_cta: callable = is_valid # function type
             self.ser.bytesize= serial.EIGHTBITS
+            self.buffer = []
             print('comport was created sucessfully')
             self.__msgs = pd.DataFrame(columns = ['time','src','dest','message'])
             self.verbose = verbose
@@ -62,20 +64,20 @@ class COM:
             TODO
         '''
         data = None
-        timeout = time.time()+self.ser.timeout
+        buff = []
+        timeout = time.time()+self.tim #self.ser.timeout
         while True:
-            buff= self.ser.inWaiting()
-            if buff > 0 and (buff == 2 or buff >= 8):
+            if self.ser.inWaiting() > 0:
                 data = self.ser.read(self.ser.inWaiting())
                 data = list(map(lambda x: self.transform(int(hex(x),16)),data))
-                time.sleep(self.tim)
-                if len(data) > 2:
-                    unchecked_data = data[:-2]
-                    checked_data = self.checksum(" ".join(unchecked_data)).split(" ")
-                    if data == checked_data:
-                        data = " ".join(data)
-                else:
-                    data = " ".join(data)
+                print('before DATA: ',data)
+                if len(buff) > 0:
+                    data = buff+data
+                print('after DATA: ',data)
+                if not self.is_valid_cta(data):
+                    buff.extend(data)
+                    print("UPDATED buffer: ",buff)
+                    continue
                 # log
                 self.__log({'src':self.THEM,'dest':self.US,'message':data})
                 return data

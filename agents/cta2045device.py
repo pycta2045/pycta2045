@@ -37,7 +37,7 @@ class CTA2045Device:
         #self.screen_sz = 0
         #self.lock = threading.Lock()
         self.cta_mod = CTA2045()
-        self.com = COM(checksum=self.cta_mod.checksum,transform=self.cta_mod.hexify,port=comport)
+        self.com = COM(checksum=self.cta_mod.checksum,transform=self.cta_mod.hexify,is_valid=self.cta_mod.is_valid,port=comport,verbose=True)
         # flags for minimum cta2045 support
         self.support_flags = {
             'intermediate':False,

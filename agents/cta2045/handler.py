@@ -228,3 +228,30 @@ class CTA2045:
             pass
         return value
 
+    def is_valid(self,msg):
+        '''
+            Purpose: checks if the passed message is a valid CTA msg (supported CTA2045 msgs only)
+            Args:
+                * msg (string): desired msg to check
+            Return:
+                * True: msg is a valid CTA2045 msg and supoorted
+                * False: msg is not valid CTA2045 or not supported
+        '''
+        valid = False
+        '''
+        if len(msg) > 2:
+            # checksum is valid?
+            unchecked_data = msg[:-2]
+            checked_data = self.checksum(" ".join(unchecked_data)).split(" ")
+            if msg == checked_data:
+                # check if it supported
+                msg = " ".join(msg)
+                # check supported?
+                if self.from_cta(msg) != None:
+                    valid = True
+        else:
+        '''
+        if self.from_cta(msg) != None:
+            # could be link ack/nak (check it exist)
+            valid = True
+        return False

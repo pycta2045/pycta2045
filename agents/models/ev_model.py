@@ -348,8 +348,8 @@ class EV(CTA2045Model):
         '''
         #print('CommodityRead...')
         val = {}
-        IR = 0
-        CA = 0
+        IR = 1000
+        CA = 1000
         soc = 0
         val['commodity_code'] = 'electricity consumed' # go with electricity consumed first
         try:
@@ -364,21 +364,22 @@ class EV(CTA2045Model):
             '''
                 CA= max_cap(Kwh) * SoC (%)
                 IR = power[time]
-            '''
             CA = self.max_cap * (soc - self.init_SoC)
             IR = CTA2045.hexify(int(IR),length=6)
             CA = CTA2045.hexify(int(CA),length=6)
+            '''
             # ---------------- calculate present energy (energy take) ---------
             '''
                 CA= max_cap(Kwh) * (1-SoC) (%)
                 IR =  None  --> CTA2045 not used
-            '''
-            @TODO: fix issue with tagging cumulative amount
+
+            #@TODO: fix issue with tagging cumulative amount
             CC = self.cta.get_code_value('commodity_code','present energy')
             IR2 = CTA2045.hexify(int(0),length=6)
             CA2 = self.max_cap * (1-soc)
             CA2 = CTA2045.hexify(int(CA2),length=6)
             CA += f' {CC} {IR2} {CA2}'
+            '''
             val['instantaneous_rate'] = CTA2045.hexify(int(IR),length=6) # 6 bytes for the IR field
             val['cumulative_amount'] = CTA2045.hexify(int(CA),length=6) # 6 bytes for the CA field
             print(e)
