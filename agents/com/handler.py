@@ -1,7 +1,8 @@
 import serial
 from serial.tools.list_ports import comports #from serial.tools.list_ports_linux import SysFS
 # import serial.rs485
-from multiprocessing import Process, Lock
+#from multiprocessing import Process, Lock, Queue
+from threading import Thread, Lock
 import time
 import pandas as pd
 
@@ -73,19 +74,20 @@ class COM:
             if self.ser.inWaiting() > 0:
                 data = self.ser.read(self.ser.inWaiting())
                 data = list(map(lambda x: self.transform(int(hex(x),16)),data))
-                print('before DATA: ',data)
-                if len(buff) > 0:
-                    data = buff+data
-                print('after DATA: ',data)
-                if not self.is_valid_cta(data):
-                    buff.extend(data)
-                    continue
-                with self.lock:
-                    self.buffer.append((data,time.time()))
-                print("COMPLETE MSG received: ",data)
-                buff = []
-                # log
-                self.__log({'src':self.THEM,'dest':self.US,'message':data})
+                # iterate over bytes in data and append each one onto the buffer
+                # each time you append to the buffer, check if that completes a cta2045 command
+
+                for i in data:
+                    buff.append(i)
+                    if self.is_valid_cta(buff):
+                        buff = " ".join(buff)
+                        self.lock.acquire()
+                        self.buffer.append((buff,time.time()))
+                        print(self.buffer)
+                        self.lock.release()
+                        # log
+                        self.__log({'src':self.THEM,'dest':self.US,'message':buff})
+                        buff = []
         return
     def __log(self,context):
         '''
@@ -109,20 +111,18 @@ class COM:
 
         '''
         if self.process == None and self.ser != None:
-            self.process = Process(target=self.__recv)
+            self.process = Thread(target=self.__recv)
             self.process.start() # starts a new thread to listen to packets
         return
     def get_next_msg(self):
         msg = None
-        with self.lock:
-            print('buffer',self.buffer)
-            if len(self.buffer) > 0:
-                msg,t = self.buffer.pop(0)
-                if t >= time.time() + self.ser.timeout:
-                    raise TimeoutException("waiting for ack/nak timout!")
-            print('remaining',self.buffer)
+        self.lock.acquire()
+        if len(self.buffer) > 0:
+            msg = self.buffer.pop(0)
+        self.lock.release()
+                #if t >= time.time() + self.ser.timeout:
+                    #raise TimeoutException("waiting for ack/nak timout!")
         return msg
-
     def dump_log(self,fname):
         if fname != None:
             self.__msgs.to_csv(fname)

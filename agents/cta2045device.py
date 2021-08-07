@@ -2,6 +2,7 @@ from agents.cta2045 import CTA2045
 from agents.com import COM,TimeoutException
 import sys, os, traceback as tb#, import threading
 from multiprocessing import Process
+import time
 from agents.models import CTA2045Model
 
 
@@ -37,7 +38,7 @@ class CTA2045Device:
         #self.screen_sz = 0
         #self.lock = threading.Lock()
         self.cta_mod = CTA2045()
-        self.com = COM(checksum=self.cta_mod.checksum,transform=self.cta_mod.hexify,is_valid=self.cta_mod.is_valid,port=comport,verbose=True)
+        self.com = COM(checksum=self.cta_mod.checksum,transform=self.cta_mod.hexify,is_valid=self.cta_mod.is_valid,port=comport)
         # flags for minimum cta2045 support
         self.support_flags = {
             'intermediate':False,
@@ -90,7 +91,10 @@ class CTA2045Device:
         try:
             res = self.com.get_next_msg()
             if res != None:
-                res = self.cta_mod.from_cta(res)
+                t_e = time.time()
+                msg,t = res
+                print('-' * 20, 'time it took from receiving the msg to process it', (t_e - t) * 1000, ' mS')
+                res = self.cta_mod.from_cta(msg)
                 if type(res) == dict:
                     self.__write(f"<-== receved: {res['command']}",log=True)
                     for k,v in res['args'].items():
@@ -188,7 +192,7 @@ class CTA2045Device:
         while 1:
             args = {}
             try:
-                res = self.__recv(verbose=True) # always waiting for commands
+                res = self.__recv(verbose=False) # always waiting for commands
                 if res != None:
                     last_command = res['op1']
                     cmd = res['command']
@@ -196,16 +200,14 @@ class CTA2045Device:
                     if cmd in self.FDT:
                         args = res['args']
                         args = self.FDT[cmd](payload=args)
-                else:
-                    cmd = None
-                complement = self.cta_mod.complement(cmd)
-                for cmd in complement:
-                    if cmd == 'app ack':
-                        self.__send(cmd, {'last_opcode':last_command})
-                    elif cmd == 'nak':
-                        self.__send(cmd,{'nak_reason':'unsupported'})
-                    else:
-                        self.__send(cmd,args)
+                    complement = self.cta_mod.complement(cmd)
+                    for cmd in complement:
+                        if cmd == 'app ack':
+                            self.__send(cmd, {'last_opcode':last_command})
+                        elif cmd == 'nak':
+                            self.__send(cmd,{'nak_reason':'unsupported'})
+                        else:
+                            self.__send(cmd,args)
             except TimeoutException as e:
                 # nothing was received from UCM
                 pass

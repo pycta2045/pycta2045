@@ -125,23 +125,23 @@ class CTA2045:
             l = len(val)
             for k,v in self.cmds['commands'].items():
                 t = v['type']['hex'].lower()
+                vlen = len(v['format'].split())
                 op1 = v['op1'].lower()
                 op2 = v['op2'].lower()
-                if l <=2:
+                if l ==2 and vlen == l:
                     # only check 1st part of type
                     t1,t2 = t.split(' ')
                     if t2.isalpha():
                         t2 = val[-1]
-
                     if ' '.join([t1,t2]) == ' '.join(val[:2]):
                         key = k
                         break
-                elif l<=6:
+                elif l>=4:
                     # only check type (could be MTSQ)
                     if t in ' '.join(val) and op1 == 'none' and op2 == 'none':
                         key = k
                         break
-                else:
+                elif l >= 6:
                     # check type & opcodes
                     vop1 = val[4]
                     vop2 = val[5]
@@ -238,7 +238,6 @@ class CTA2045:
                 * False: msg is not valid CTA2045 or not supported
         '''
         valid = False
-        print('checking if: ',msg,' is valid')
         if len(msg) > 2:
             # checksum is valid?
             unchecked_data = msg[:-2]
@@ -246,6 +245,6 @@ class CTA2045:
             if msg == checked_data:
                 valid = True
         else: # could be link ack/nak
-            if self.from_cta(msg) != None:
+            if self.from_cta(" ".join(msg)) != None:
                 valid = True
         return valid
