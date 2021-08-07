@@ -5,7 +5,7 @@ from serial.tools.list_ports import comports #from serial.tools.list_ports_linux
 from threading import Thread, Lock
 import time
 import pandas as pd
-from agents.cta2045 import CTA2045
+from agents.cta2045.handler import UnsupportedCommandException
 
 class TimeoutException(Exception):
     '''
@@ -39,7 +39,7 @@ class COM:
             self.ser = serial.Serial(self.port)
             #self.tma = .2 # 200 ms of MAX time after receiving a msg and BEFORE sending ack/nak (200 ms according to CTA2045)
             #self.tim = .1 # 100 ms of MIN time after tansmission until the start of another (according to CTA2045)
-            self.send_delay = .1 # 100 mS of delay between recveing & sending a message (refer to CTA2045 msg sync info on t_MA & t_IM)
+            self.send_delay = .1 # should be 100 mS of delay between recveing & sending a message (refer to CTA2045 msg sync info on t_MA & t_IM)
             #self.ser.rs485_mode = serial.rs485.RS485Settings(delay_before_tx=tma,delay_before_rx=tim)
             self.ser.baudrate=19200 # according to CTA2045
             self.ser.timeout=timeout
@@ -57,8 +57,6 @@ class COM:
             self.__msgs = pd.DataFrame(columns = ['time','src','dest','message'])
             self.verbose = verbose
 
-            self.cta = CTA2045()
-
         except Exception as e:
             print(e)
         return
@@ -68,8 +66,9 @@ class COM:
         data = list(map(lambda x:int(x,16),data.split(' ')))
         packet.extend(data)
         if time.time() - self.last_msg_timestamp < self.send_delay:
-            time.sleep(time.time() - self.last_msg_timestamp) # delay until you can send the next msg
+            time.sleep(self.send_delay) # delay until you can send the next msg
         res = self.ser.write(packet)
+        self.last_msg_timestamp = time.time()
         return res>=2
     def __recv(self):
         '''
@@ -86,17 +85,19 @@ class COM:
 
                 for i in data:
                     buff.append(i)
-                    if self.is_valid_cta(buff):
-                        buff = " ".join(buff)
-                        self.lock.acquire()
-                        self.buffer.append((buff,time.time()))
-                        print(self.buffer)
-                        trans = self.cta.from_cta(buff)
-                        self.last_msg_time_timestamp = time.time()
-                        self.lock.release()
-                        # log
-                        self.__log({'src':self.THEM,'dest':self.US,'message':buff})
-                        buff = []
+                    try:
+                        if self.is_valid_cta(buff):
+                            buff = " ".join(buff)
+                            self.lock.acquire()
+                            self.buffer.append((buff,time.time()))
+                            print(self.buffer)
+                            self.last_msg_time_timestamp = time.time()
+                            self.lock.release()
+                            # log
+                            self.__log({'src':self.THEM,'dest':self.US,'message':buff})
+                            buff = []
+                    except UnsupportedCommandException as e:
+                        continue
         return
     def __log(self,context):
         '''

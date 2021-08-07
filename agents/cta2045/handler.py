@@ -1,5 +1,6 @@
 import json
 import os
+import traceback as tb
 
 
 class UnsupportedCommandException(Exception):
@@ -153,8 +154,12 @@ class CTA2045:
             response = self.cmds['commands'][key]
             response['command'] = key
             response = self.extract_args(response,val)
+        except (KeyError,TypeError) as e:
+            raise UnsupportedCommandException(f'unsupported command: {val}')
+            pass
         except Exception as e:
             # unable to translate msg (unsupported) -- return None
+            print(tb.format_tb())
             pass
         return response
     def extract_args(self,cmd,val):

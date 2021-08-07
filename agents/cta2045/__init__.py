@@ -1,2 +1,2 @@
-from .handler import CTA2045
+from .handler import *
 print(f'invoking __init__.py for {__name__}')

@@ -1,4 +1,4 @@
-from agents.cta2045 import CTA2045
+from agents.cta2045 import CTA2045, UnsupportedCommandException
 from agents.com import COM,TimeoutException
 import sys, os, traceback as tb#, import threading
 from multiprocessing import Process
@@ -103,9 +103,6 @@ class CTA2045Device:
             if verbose:
                 self.__write(f"<-== waiting for response timeout!",log=True)
             raise TimeoutException # propagate exception
-        except Exception as e:
-            self.__write(e)
-            self.__write("in __recv")
         return res
     def __send(self,cmd,args={}):
         ret = False
@@ -181,10 +178,9 @@ class CTA2045Device:
             except TimeoutException as e:
                 # nothing was received from the
                 pass
-            except Exception as e:
-                self.__write(e)
-                self.__write("in __run_dcm")
-                exit()
+            except UnsupportedCommandException as e:
+                self.__send('nak',{'nak_reason':'unsupported'})
+                pass
         return
     def __run_der(self):
         last_command = '0x00'
@@ -201,7 +197,6 @@ class CTA2045Device:
                         args = res['args']
                         args = self.FDT[cmd](payload=args)
                     complement = self.cta_mod.complement(cmd)
-                    print('complements: ',complement)
                     for cmd in complement:
                         if cmd == 'app ack':
                             self.__send(cmd, {'last_opcode':last_command})
@@ -212,9 +207,13 @@ class CTA2045Device:
             except TimeoutException as e:
                 # nothing was received from UCM
                 pass
+            except UnsupportedCommandException as e:
+                self.__send('nak',{'nak_reason':'unsupported'})
+                pass
             except Exception as e:
+                print(tb.format_tb(e))
                 self.__write(e)
-                self.__write("in __run_der")
+                self.__write("cta2045device.in __run_der")
                 exit()
         pass
     def run(self):
