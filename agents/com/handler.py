@@ -5,6 +5,7 @@ from serial.tools.list_ports import comports #from serial.tools.list_ports_linux
 from threading import Thread, Lock
 import time
 import pandas as pd
+from agents.cta2045 import CTA2045
 
 class TimeoutException(Exception):
     '''
@@ -55,6 +56,9 @@ class COM:
             print('comport was created sucessfully')
             self.__msgs = pd.DataFrame(columns = ['time','src','dest','message'])
             self.verbose = verbose
+
+            self.cta = CTA2045()
+
         except Exception as e:
             print(e)
         return
@@ -66,7 +70,6 @@ class COM:
         if time.time() - self.last_msg_timestamp < self.send_delay:
             time.sleep(time.time() - self.last_msg_timestamp) # delay until you can send the next msg
         res = self.ser.write(packet)
-        time.sleep(self.tim)
         return res>=2
     def __recv(self):
         '''
@@ -88,6 +91,7 @@ class COM:
                         self.lock.acquire()
                         self.buffer.append((buff,time.time()))
                         print(self.buffer)
+                        trans = self.cta.from_cta(buff)
                         self.last_msg_time_timestamp = time.time()
                         self.lock.release()
                         # log

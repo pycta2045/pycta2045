@@ -201,6 +201,7 @@ class CTA2045Device:
                         args = res['args']
                         args = self.FDT[cmd](payload=args)
                     complement = self.cta_mod.complement(cmd)
+                    print('complements: ',complement)
                     for cmd in complement:
                         if cmd == 'app ack':
                             self.__send(cmd, {'last_opcode':last_command})

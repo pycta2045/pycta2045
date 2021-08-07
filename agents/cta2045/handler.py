@@ -136,12 +136,12 @@ class CTA2045:
                     if ' '.join([t1,t2]) == ' '.join(val[:2]):
                         key = k
                         break
-                elif l>=4:
+                elif l>=4 and l <=6:
                     # only check type (could be MTSQ)
                     if t in ' '.join(val) and op1 == 'none' and op2 == 'none':
                         key = k
                         break
-                elif l >= 6:
+                elif l > 6:
                     # check type & opcodes
                     vop1 = val[4]
                     vop2 = val[5]
