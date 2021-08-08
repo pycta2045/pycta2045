@@ -52,6 +52,7 @@ class COM:
             self.buffer = []
             self.lock = Lock()
             self.thread = None
+            self.stopped = True
             self.last_msg_timestamp =  0
             print('comport was created sucessfully')
             self.__msgs = pd.DataFrame(columns = ['time','src','dest','message'])
@@ -59,6 +60,10 @@ class COM:
 
         except Exception as e:
             print(e)
+            exit()
+        return
+    def __del__(self):
+        self.stopped = True
         return
     def send(self,data):
         packet = bytearray()
@@ -98,6 +103,8 @@ class COM:
                             buff = []
                     except UnsupportedCommandException as e:
                         continue
+            if self.stopped:
+                break
         return
     def __log(self,context):
         '''
@@ -122,7 +129,9 @@ class COM:
         '''
         if self.thread == None and self.ser != None:
             self.thread = Thread(target=self.__recv)
+            self.thread.daemon = True
             self.thread.start() # starts a new thread to listen to packets
+            self.stopped = False
         return
     def get_next_msg(self):
         msg = None

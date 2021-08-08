@@ -1,7 +1,6 @@
 from agents.cta2045 import CTA2045, UnsupportedCommandException
 from agents.com import COM,TimeoutException
 import sys, os, traceback as tb#, import threading
-from multiprocessing import Process
 import time
 from agents.models import CTA2045Model
 
@@ -78,8 +77,6 @@ class CTA2045Device:
             except (KeyError,ValueError):
                 self.__write(try_again)
                 pass
-            except Exception as e:
-                tb.print_tb(e)
         return choice
     def __clear(self):
         os.system('clear')
@@ -93,7 +90,6 @@ class CTA2045Device:
             if res != None:
                 t_e = time.time()
                 msg,t = res
-                print('-' * 20, 'time it took from receiving the msg to process it', (t_e - t) * 1000, ' mS')
                 res = self.cta_mod.from_cta(msg)
                 if type(res) == dict:
                     self.__write(f"<-== receved: {res['command']}",log=True)
@@ -107,22 +103,19 @@ class CTA2045Device:
     def __send(self,cmd,args={}):
         ret = False
         c = self.cta_mod.to_cta(cmd,args=args)
-        print('sending: ',c)
+        self.__write(f'sending: {c}')
         self.com.send(c)
-        try:
-            self.__write(f'==-> sent {cmd}',log=True)
-            '''
-            if len(args) > 0:
-                #self.__write('\twith args:')
-                for k,v in args.items():
-                    if not v[0].isalpha():
-                        v = v.replace(' 0x','')
-                        v = int(v,16)
-                    self.__write(f'\t{k}: {v}')
-            '''
-            ret = True
-        except Exception as e:
-            self.__write(e)
+        self.__write(f'==-> sent {cmd}',log=True)
+        '''
+        if len(args) > 0:
+            #self.__write('\twith args:')
+            for k,v in args.items():
+                if not v[0].isalpha():
+                    v = v.replace(' 0x','')
+                    v = int(v,16)
+                self.__write(f'\t{k}: {v}')
+        '''
+        ret = True
         return ret
 
     def __setup(self):
@@ -149,10 +142,6 @@ class CTA2045Device:
             except TimeoutException:
                 flag = False
                 pass
-            except Exception as e:
-                self.__write(e)
-
-                self.__write('in __setup')
 
         #print(self.support_flags)
         success = self.support_flags['intermediate'] and self.support_flags['data-link'] and self.support_flags['max payload'] > 0
@@ -162,19 +151,25 @@ class CTA2045Device:
         #if not self.__setup():
             #exit()
         while 1:
-            c = self.__get_input()
-            self.__clear()
-            if c == 'quit':
-                exit()
-            self.__send(c) # sent command
+            #c = self.__get_input()
+            #self.__clear()
+            #if c == 'quit':
+                #exit()
+            #self.__send(c) # sent command
             try:
                 response = self.__recv() # wait for link response
-                cmd = response['command']
-                if not 'nak' in cmd:
-                    response = self.__recv() # wait for app response
-                    response = response['command']
-                    if not 'nak' in response:
-                        self.__send('ack')
+                if response != None:
+                    cmd = response['command']
+                    complement = self.cta_mod.complement(cmd)
+                    for cmd in complement:
+                        self.__send(cmd)
+                    '''
+                    if not 'nak' in cmd:
+                        response = self.__recv() # wait for app response
+                        response = response['command'] if not response == None else []
+                        if not 'nak' in response:
+                            self.__send('ack')
+                    '''
             except TimeoutException as e:
                 # nothing was received from the
                 pass
@@ -210,11 +205,6 @@ class CTA2045Device:
             except UnsupportedCommandException as e:
                 self.__send('nak',{'nak_reason':'unsupported'})
                 pass
-            except Exception as e:
-                print(tb.format_tb(e))
-                self.__write(e)
-                self.__write("cta2045device.in __run_der")
-                exit()
         pass
     def run(self):
         self.__setup()
