@@ -95,7 +95,8 @@ class COM:
                             if self.is_valid_cta(buff):
                                 buff = " ".join(buff)
                                 self.buffer.put((buff,time.time())) # this is thread-safe queue -- no need to acquire lock
-                                print('BUFFER SIZE: ',self.buffer.qsize())
+                                if self.verbose:
+                                    print('BUFFER SIZE: ',self.buffer.qsize())
                                 self.last_msg_time_timestamp = time.time()
                                 self.sleep_until = time.time() + self.send_delay # send delay
                                 # log

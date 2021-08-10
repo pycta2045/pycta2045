@@ -10,7 +10,7 @@ class TestCOM(unittest.TestCase):
         msg = ''
         c = None
         try:
-            c = COM.COM(port=port,checksum=cta.checksum,transform=cta.hexify)
+            c = COM.COM(port=port,checksum=cta.checksum,transform=cta.hexify,is_valid=cta.is_valid)
         except Exception as e:
             msg = e.args[0]
         self.assertTrue('not found' in msg)
@@ -24,7 +24,7 @@ class TestCOM(unittest.TestCase):
             msg = ''
             c = None
             try:
-                c = COM.COM(port=port,checksum=cta.checksum,transform=cta.hexify)
+                c = COM.COM(port=f'/dev/{port}',checksum=cta.checksum,transform=cta.hexify,is_valid=cta.is_valid)
             except Exception as e:
                 msg = e.args[0]
             self.assertTrue(c != None)

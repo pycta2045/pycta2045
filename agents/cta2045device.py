@@ -36,7 +36,8 @@ class CTA2045Device:
         #self.screen_sz = 0
         #self.lock = threading.Lock()
         self.cta_mod = CTA2045()
-        self.com = COM(checksum=self.cta_mod.checksum,transform=self.cta_mod.hexify,is_valid=self.cta_mod.is_valid,port=comport,verbose=True)
+        self.com = COM(checksum=self.cta_mod.checksum,transform=self.cta_mod.hexify,is_valid=self.cta_mod.is_valid,port=comport)
+        self.last_command = '0x00'
         # flags for minimum cta2045 support
         self.support_flags = {
             'intermediate':False,
@@ -78,6 +79,8 @@ class CTA2045Device:
                     self.__write(f"<-== receved: {res['command']}",log=True)
                     for k,v in res['args'].items():
                         self.__write(f"\t{k} = {v}")
+                if 'op1' in res:
+                    self.last_command = res['op1']
         except TimeoutException as e:
             if verbose:
                 self.__write(f"<-== waiting for response timeout!",log=True)
@@ -173,13 +176,11 @@ class CTA2045Device:
                 self.__send('nak',{'nak_reason':'unsupported'})
         return
     def __run_der(self):
-        last_command = '0x00'
         while 1:
             args = {}
             try:
                 res = self.__recv() # always waiting for commands
                 if res != None:
-                    last_command = res['op1']
                     cmd = res['command']
                     # invoke model with request command -- if supported
                     if cmd in self.FDT:
@@ -188,7 +189,7 @@ class CTA2045Device:
                     complement = self.cta_mod.complement(cmd)
                     for cmd in complement:
                         if cmd == 'app ack':
-                            self.__send(cmd, {'last_opcode':last_command})
+                            self.__send(cmd, {'last_opcode':self.last_command})
                         elif cmd == 'nak':
                             self.__send(cmd,{'nak_reason':'unsupported'})
                         else:

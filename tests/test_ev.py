@@ -52,15 +52,15 @@ class TestEV(unittest.TestCase):
         ts = c.generate_time_stamps()
 
         # assert the start
-        self.assertTrue(ts[0].timestamp() == int(c.t_start))
+        self.assertTrue(ts[0].tz_localize('US/Pacific').timestamp() == int(c.t_start))
 
         j = int(c.t_start)
         for i in ts:
-            self.assertTrue(i.timestamp() == j)
+            self.assertTrue(i.tz_localize('US/Pacific').timestamp() == j)
             j += c.t_ratio
 
         # assert the end is within 300 seconds margin -- 5 mins
-        self.assertTrue(abs(c.t_end-ts[-1].timestamp())<=300)
+        self.assertTrue(abs(c.t_end-ts[-1].tz_localize('US/Pacific').timestamp())<=300)
         # print(c.max_time/(60*60))#)-ts[-1].timestamp())
         # self.assertTrue(abs(c.max_time-ts[-1].timestamp())<=300)
 

@@ -1,7 +1,5 @@
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import time
+import numpy as np, pandas as pd, matplotlib.pyplot as plt
+import time, traceback as tb
 from .model import CTA2045Model
 from agents.cta2045 import CTA2045
 
@@ -346,51 +344,46 @@ class EV(CTA2045Model):
             NOTE:
                 * a workaround to support multiple Commodity Codes (CC) is to tag CCs after IR values in a "chaining" manner
         '''
-        #print('CommodityRead...')
+        print('CommodityRead...')
         val = {}
-        IR = 1000
-        CA = 1000
-        soc = 0
+        IR = CA = CA2 = IR2 = soc = 0
         val['commodity_code'] = 'electricity consumed' # go with electricity consumed first
         try:
             t = time.time()
             record = self.get_record(t)
-            try:
-                soc = record['soc']
-                IR = record['power']
-                '''
-                # ---------------- calculate electricity consumed -----------------
-                    >> CA = max_cap(Kwh) * SoC (%)
-                    >> IR = power[time]
-                '''
-                CA = self.max_cap * (soc - self.init_SoC)
-                IR = CTA2045.hexify(int(IR),length=6)
-                CA = CTA2045.hexify(int(CA),length=6)
-            except Exception:
-                pass # use soc 0%
+            soc = record['soc']
+            IR = record['power']
+        except TypeError as e: # caused by Nonetype since get_record returns None if charging was not started
+            pass # use default IR & CA values
+        except Exception as e:
+            print(tb.format_tb(e))
+            pass
+            '''
+            # ---------------- calculate electricity consumed -----------------
+                >> CA = max_cap(Kwh) * SoC (%)
+                >> IR = power[time]
+            '''
+            CA = self.max_cap * (soc - self.init_SoC)
+            IR = CTA2045.hexify(int(IR),length=6)
+            CA = CTA2045.hexify(int(CA),length=6)
             '''
             # ---------------- calculate present energy (energy take) ---------
                 >> CA = max_cap(Kwh) * (1-SoC) (%)
                 >> IR =  None  --> CTA2045 not used
             '''
-
-            CC = self.cta.get_code_value('commodity_code','present energy')
-            IR2 = CTA2045.hexify(int(0),length=6)
             CA2 = self.max_cap * (1-soc)
-            CA2 = CTA2045.hexify(int(CA2),length=6)
-            print('^^^^^^')
-            CA = f' {CA} {CC} {IR2} {CA2}'
-            print(CA) #<<<<<<<<<<<<<<<< line of issue
-            print('vvvvvv')
-            val['instantaneous_rate'] = CTA2045.hexify(int(IR),length=6) # 6 bytes for the IR field
-            val['cumulative_amount'] = CTA2045.hexify(int(CA),length=6) # 6 bytes for the CA field
-            IR = CA = 0
-            val['instantaneous_rate'] = CTA2045.hexify(int(IR),length=6) # 6 bytes for the IR field
-            val['cumulative_amount'] = CTA2045.hexify(int(CA),length=6) # 6 bytes for the CA field
-        except Exception as e:
-            print(e)
-            pass # use default IR & CA values
-        #return None
+
+
+        val['instantaneous_rate'] = CTA2045.hexify(int(IR),length=6)
+        CA = CTA2045.hexify(int(CA),length=6)
+        CC2 = self.cta.get_code_value('commodity_code','present energy')
+        CA2 = CTA2045.hexify(int(CA2),length=6)
+        IR2 = CTA2045.hexify(int(IR2),length=6)
+        CA = f'{CA} {CC2} {CA2} {IR2}'
+        val['cumulative_amount'] = CA
+
+
+
         return val
     def critical_peak_event(self,payload):
         '''
