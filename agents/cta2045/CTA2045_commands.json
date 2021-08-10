@@ -93,7 +93,7 @@
         "app ack":{
             "type": {
                 "hex":"0x08 0x01",
-                "str":"link"
+                "str":"basic"
             },
             "format":"0x08 0x01 RES # 0x03 LO H",
             "op1":"0x03",
@@ -102,7 +102,7 @@
         "app nak":{
             "type": {
                 "hex":"0x08 0x01",
-                "str":"link"
+                "str":"basic"
             },
             "format":"0x08 0x01 RES # 0x04 ANR H",
             "op1":"0x04",
@@ -144,10 +144,19 @@
             "op1":"0x01",
             "op2":"0x81"
         },
+         "basic mtsq": {
+            "type": {
+                "hex":"0x08 0x01",
+                "str":"link"
+            },
+            "format":"0x08 0x01 RES # H",
+            "op1":"none",
+            "op2": "none"
+        },
         "intermediate mtsq": {
             "type": {
                 "hex":"0x08 0x02",
-                "str":"intermediate"
+                "str":"link"
             },
             "format":"0x08 0x02 RES # H",
             "op1":"none",

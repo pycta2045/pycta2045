@@ -1,10 +1,7 @@
 import serial
 from serial.tools.list_ports import comports #from serial.tools.list_ports_linux import SysFS
-# import serial.rs485
 from multiprocessing import Process, Lock, Queue
-#from threading import Thread, Lock
-import time
-import pandas as pd
+import time, pandas as pd, traceback as tb
 from agents.cta2045.handler import UnsupportedCommandException
 
 class TimeoutException(Exception):
@@ -21,7 +18,7 @@ class COM:
     '''
     US = 'DER'
     THEM = 'DCM'
-    def __init__(self, checksum, transform, is_valid, port="/dev/ttyS6",timeout=.2,verbose=False):
+    def __init__(self, checksum, transform, is_valid, port="/dev/ttyS6",timeout=.4,verbose=False):
         '''
             * Note:
                 * timeout (defualt) is set to 500 ms as specified by CTA2045
@@ -85,7 +82,6 @@ class COM:
         print('starting listener...')
         try:
             while True:
-                print('listening...')
                 if time.time() - self.last_msg_timestamp < self.sleep_until:
                     time.sleep(self.recv_delay)
                 if self.ser.inWaiting() > 0:
@@ -98,13 +94,10 @@ class COM:
                         try:
                             if self.is_valid_cta(buff):
                                 buff = " ".join(buff)
-                                self.lock.acquire()
-                                self.buffer.append((buff,time.time()))
-                                print(self.buffer)
-                                self.lock.release()
+                                self.buffer.put((buff,time.time())) # this is thread-safe queue -- no need to acquire lock
+                                print('BUFFER SIZE: ',self.buffer.qsize())
                                 self.last_msg_time_timestamp = time.time()
                                 self.sleep_until = time.time() + self.send_delay # send delay
-                                print('releasing lock')
                                 # log
                                 self.__log({'src':self.THEM,'dest':self.US,'message':buff})
                                 buff = []
@@ -144,6 +137,9 @@ class COM:
         if self.process == None and self.ser != None:
             self.process = Process(target=self.__recv)
             self.process.daemon = True
+            # flush the buffers
+            self.ser.reset_input_buffer()
+            self.ser.reset_output_buffer()
             self.stopped = False
             self.process.start() # starts a new thread to listen to packets
         return
@@ -152,12 +148,9 @@ class COM:
             blocking function that returns the next msg in the buffer
         '''
         msg = None
-        self.lock.acquire()
-        if not self.buffer.empty():
-            msg = self.buffer.pop(0)
-        self.lock.release()
-                #if t >= time.time() + self.ser.timeout:
-                    #raise TimeoutException("waiting for ack/nak timout!")
+        msg = self.buffer.get() # no need to acquire -- blocks by default
+            #if t >= time.time() + self.ser.timeout:
+                #raise TimeoutException("waiting for ack/nak timout!")
         return msg
     def dump_log(self,fname):
         if fname != None:

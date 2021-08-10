@@ -36,11 +36,12 @@ class CTA2045Device:
         #self.screen_sz = 0
         #self.lock = threading.Lock()
         self.cta_mod = CTA2045()
-        self.com = COM(checksum=self.cta_mod.checksum,transform=self.cta_mod.hexify,is_valid=self.cta_mod.is_valid,port=comport)
+        self.com = COM(checksum=self.cta_mod.checksum,transform=self.cta_mod.hexify,is_valid=self.cta_mod.is_valid,port=comport,verbose=True)
         # flags for minimum cta2045 support
         self.support_flags = {
             'intermediate':False,
             'data-link':False,
+            'basic':False,
             'max payload':0
         }
         return
@@ -80,7 +81,9 @@ class CTA2045Device:
         except TimeoutException as e:
             if verbose:
                 self.__write(f"<-== waiting for response timeout!",log=True)
-            raise TimeoutException # propagate exception
+            raise TimeoutException('Timeout!') # propagate exception
+        except UnsupportedCommandException as e:
+            raise UnsupportedCommandException(msg) # propagate exception
         return res
     def __send(self,cmd,args={},verbose=False):
         ret = False
@@ -103,7 +106,8 @@ class CTA2045Device:
         success=False
         cmds = [('intermediate mtsq','intermediate'),
                 ('data-link mtsq','data-link'),
-                ('max payload request','max payload')
+                ('max payload request','max payload'),
+                ('basic mtsq','basic')
                 ]
         for cmd,flag in cmds:
             try:
@@ -115,7 +119,7 @@ class CTA2045Device:
                     self.support_flags[flag] = True
                 if 'max' in cmd:
                     res = self.__recv() # capture max payload
-                    if res != None and 'args' in res:
+                    if res != None and 'args' in res and 'max' in res['command']:
                         self.__send('ack')
                         length = res['args']['max_payload_length']
                         self.support_flags[flag] = int(length)
@@ -194,10 +198,11 @@ class CTA2045Device:
                 pass
             except UnsupportedCommandException as e:
                 self.__send('nak',{'nak_reason':'unsupported'})
+                pass
         return
     def run(self):
         self.com.start()
-        #self.__setup()
+        self.__setup()
         if self.mode == 'DER':
             # validate model in DER mode
             assert(isinstance(self.model,CTA2045Model))
