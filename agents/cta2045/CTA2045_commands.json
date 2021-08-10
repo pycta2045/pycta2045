@@ -48,7 +48,7 @@
         "outside comm connection status":{
             "type":{
                 "hex":"0x08 0x01",
-                "str":"link"
+                "str":"basic"
             },
             "format":"0x08 0x01 RES # 0x0e CS H",
             "op1":"0x0e",

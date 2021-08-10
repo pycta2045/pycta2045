@@ -1,8 +1,8 @@
 import serial
 from serial.tools.list_ports import comports #from serial.tools.list_ports_linux import SysFS
 # import serial.rs485
-#from multiprocessing import Process, Lock, Queue
-from threading import Thread, Lock
+from multiprocessing import Process, Lock, Queue
+#from threading import Thread, Lock
 import time
 import pandas as pd
 from agents.cta2045.handler import UnsupportedCommandException
@@ -37,9 +37,9 @@ class COM:
             raise Exception(f"port {self.port} not found")
         try:
             self.ser = serial.Serial(self.port)
-            #self.tma = .2 # 200 ms of MAX time after receiving a msg and BEFORE sending ack/nak (200 ms according to CTA2045)
-            #self.tim = .1 # 100 ms of MIN time after tansmission until the start of another (according to CTA2045)
-            self.send_delay = .1 # should be 100 mS of delay between recveing & sending a message (refer to CTA2045 msg sync info on t_MA & t_IM)
+            self.send_delay = .08 # (send delay) 40 ms of MAX time after receiving a msg and BEFORE sending ack/nak (200 ms according to CTA2045)
+            self.recv_delay = .1 # (recv delay) 100 ms of MIN time after tansmission until the start of another (according to CTA2045)
+            self.sleep_until = 1 # should be 100 mS of delay between recveing & sending a message (refer to CTA2045 msg sync info on t_MA & t_IM)
             #self.ser.rs485_mode = serial.rs485.RS485Settings(delay_before_tx=tma,delay_before_rx=tim)
             self.ser.baudrate=19200 # according to CTA2045
             self.ser.timeout=timeout
@@ -49,9 +49,9 @@ class COM:
             self.transform: callable = transform # function type
             self.is_valid_cta: callable = is_valid # function type
             self.ser.bytesize= serial.EIGHTBITS
-            self.buffer = []
+            self.buffer = Queue()
             self.lock = Lock()
-            self.thread = None
+            self.process = None
             self.stopped = True
             self.last_msg_timestamp =  0
             print('comport was created sucessfully')
@@ -70,10 +70,11 @@ class COM:
         self.__log({'src':self.US,'dest':self.THEM,'message':data})
         data = list(map(lambda x:int(x,16),data.split(' ')))
         packet.extend(data)
-        if time.time() - self.last_msg_timestamp < self.send_delay:
+        if time.time() - self.last_msg_timestamp < self.sleep_until:
             time.sleep(self.send_delay) # delay until you can send the next msg
         res = self.ser.write(packet)
         self.last_msg_timestamp = time.time()
+        self.sleep_until = time.time() + self.recv_delay
         return res>=2
     def __recv(self):
         '''
@@ -81,30 +82,40 @@ class COM:
         '''
         data = None
         buff = []
-        while True:
-            if self.ser.inWaiting() > 0:
-                data = self.ser.read(self.ser.inWaiting())
-                data = list(map(lambda x: self.transform(int(hex(x),16)),data))
-                # iterate over bytes in data and append each one onto the buffer
-                # each time you append to the buffer, check if that completes a cta2045 command
+        print('starting listener...')
+        try:
+            while True:
+                print('listening...')
+                if time.time() - self.last_msg_timestamp < self.sleep_until:
+                    time.sleep(self.recv_delay)
+                if self.ser.inWaiting() > 0:
+                    data = self.ser.read(self.ser.inWaiting())
+                    data = list(map(lambda x: self.transform(int(hex(x),16)),data))
+                    # iterate over bytes in data and append each one onto the buffer
+                    # each time you append to the buffer, check if that completes a cta2045 command
+                    for i in data:
+                        buff.append(i)
+                        try:
+                            if self.is_valid_cta(buff):
+                                buff = " ".join(buff)
+                                self.lock.acquire()
+                                self.buffer.append((buff,time.time()))
+                                print(self.buffer)
+                                self.lock.release()
+                                self.last_msg_time_timestamp = time.time()
+                                self.sleep_until = time.time() + self.send_delay # send delay
+                                print('releasing lock')
+                                # log
+                                self.__log({'src':self.THEM,'dest':self.US,'message':buff})
+                                buff = []
+                        except UnsupportedCommandException as e:
+                            continue
+                if self.stopped:
+                    print('exiting...')
+                    break
+        except Exception as e:
+            print(tb.format_tb(e))
 
-                for i in data:
-                    buff.append(i)
-                    try:
-                        if self.is_valid_cta(buff):
-                            buff = " ".join(buff)
-                            self.lock.acquire()
-                            self.buffer.append((buff,time.time()))
-                            print(self.buffer)
-                            self.last_msg_time_timestamp = time.time()
-                            self.lock.release()
-                            # log
-                            self.__log({'src':self.THEM,'dest':self.US,'message':buff})
-                            buff = []
-                    except UnsupportedCommandException as e:
-                        continue
-            if self.stopped:
-                break
         return
     def __log(self,context):
         '''
@@ -122,21 +133,27 @@ class COM:
         return
     def start(self):
         '''
-            Purpose: starts listen on the given port. It creates a thread with __recv running in it.
+            Purpose: starts listen on the given port. It creates a process with __recv running in it.
             Args: None
             Returns: None
+            NOTES:
+                * After facing behavior problems introduced by the use of threading and GIL, I decided to go with multiprocessing instead.
+                * This is a workaround dealing with GIL
 
         '''
-        if self.thread == None and self.ser != None:
-            self.thread = Thread(target=self.__recv)
-            self.thread.daemon = True
-            self.thread.start() # starts a new thread to listen to packets
+        if self.process == None and self.ser != None:
+            self.process = Process(target=self.__recv)
+            self.process.daemon = True
             self.stopped = False
+            self.process.start() # starts a new thread to listen to packets
         return
     def get_next_msg(self):
+        '''
+            blocking function that returns the next msg in the buffer
+        '''
         msg = None
         self.lock.acquire()
-        if len(self.buffer) > 0:
+        if not self.buffer.empty():
             msg = self.buffer.pop(0)
         self.lock.release()
                 #if t >= time.time() + self.ser.timeout:

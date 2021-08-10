@@ -23,8 +23,7 @@ class UnknownModeException(Exception):
     def __init__(self,msg):
         self.msg = msg
         super().__init__(self.msg)
-        pass
-
+        return
 
 
 class CTA2045Device:
@@ -44,12 +43,12 @@ class CTA2045Device:
             'data-link':False,
             'max payload':0
         }
-        pass
+        return
     def __update_log(self,msg):
         self.log.append(msg)
         self.log = self.log[-self.log_sz:]
         return
-    def __write(self,msg,log=False,clear=False):
+    def __write(self,msg,log=False,clear=False,end='\n'):
         sz = 0
         #with self.lock:
             #sz=self.terminal.write("".join(self.log))
@@ -58,31 +57,14 @@ class CTA2045Device:
             print("\n".join(self.log))
             print('-'*20)
         else:
-            print(msg)
+            print(msg,end=end)
         if log:
                 self.__update_log(msg)
         return
-    def __get_input(self):
-        valid=False
-        try_again=f"{'-'*5}> INVALID. Try again!\n"
-        while not valid:
-            try:
-                msg = "select a command:\n"
-                for k,v in choices.items():
-                    msg += f"\t {k}: {v}\n"
-                self.__write(msg)
-                choice=input("nenter a choice: ")
-                choice = choices[int(choice)]
-                valid=True
-            except (KeyError,ValueError):
-                self.__write(try_again)
-                pass
-        return choice
     def __clear(self):
         os.system('clear')
         self.__write('',clear=True)
         return
-
     def __recv(self,verbose=True):
         res = None
         try:
@@ -100,22 +82,20 @@ class CTA2045Device:
                 self.__write(f"<-== waiting for response timeout!",log=True)
             raise TimeoutException # propagate exception
         return res
-    def __send(self,cmd,args={}):
+    def __send(self,cmd,args={},verbose=False):
         ret = False
         c = self.cta_mod.to_cta(cmd,args=args)
-        self.__write(f'sending: {c}')
         self.com.send(c)
         self.__write(f'==-> sent {cmd}',log=True)
-        '''
-        if len(args) > 0:
-            #self.__write('\twith args:')
-            for k,v in args.items():
-                if not v[0].isalpha():
-                    v = v.replace(' 0x','')
-                    v = int(v,16)
-                self.__write(f'\t{k}: {v}')
-        '''
-        ret = True
+        if verbose:
+            if len(args) > 0:
+                self.__write('\twith args:')
+                for k,v in args.items():
+                    if not v[0].isalpha():
+                        v = v.replace(' 0x','')
+                        v = int(v,16)
+                    self.__write(f'\t{k}: {v}')
+        ret = True # else an exception would be raised and this statement would be skipped when unwinding the stack
         return ret
 
     def __setup(self):
@@ -141,49 +121,59 @@ class CTA2045Device:
                         self.support_flags[flag] = int(length)
             except TimeoutException:
                 flag = False
-                pass
-
-        #print(self.support_flags)
+        self.__write(str(self.support_flags))
         success = self.support_flags['intermediate'] and self.support_flags['data-link'] and self.support_flags['max payload'] > 0
         return success
 
+    def __prompt(self,try_again=False):
+        '''
+            outputs a prompt message to the screen
+
+        '''
+        if try_again:
+            self.__write("{'-'*5}> INVALID. Try again!\n")
+        msg = "select a command:\n"
+        for k,v in choices.items():
+            msg += f"\t {k}: {v}\n"
+        self.__write(msg)
+        self.__write("enter a choice: ",end='')
+        return
     def __run_dcm(self):
-        #if not self.__setup():
-            #exit()
+        valid = True
+        choice = ''
         while 1:
-            #c = self.__get_input()
-            #self.__clear()
-            #if c == 'quit':
-                #exit()
-            #self.__send(c) # sent command
+            self.__prompt(valid)
+            if select.select([sys.stdin,],[],[]):
+                try:
+                    choice = sys.stdin.read(1) # read 1 char
+                    choice = int(choice) # try to cast it
+                    valid = choice in self.choices
+                    choice = '' if not valid else self.choices[choice]
+                except Exception as e:
+                    valid = False
+                    choice = ''
+            self.__clear()
+            if c == 'quit':
+                exit()
+            elif choice != '':
+                self.__send(choice) # sent command
             try:
                 response = self.__recv() # wait for link response
+                expected = self.cta_mod.complement(c)
                 if response != None:
                     cmd = response['command']
-                    complement = self.cta_mod.complement(cmd)
-                    for cmd in complement:
-                        self.__send(cmd)
-                    '''
-                    if not 'nak' in cmd:
-                        response = self.__recv() # wait for app response
-                        response = response['command'] if not response == None else []
-                        if not 'nak' in response:
-                            self.__send('ack')
-                    '''
             except TimeoutException as e:
                 # nothing was received from the
                 pass
             except UnsupportedCommandException as e:
                 self.__send('nak',{'nak_reason':'unsupported'})
-                pass
         return
     def __run_der(self):
         last_command = '0x00'
-        #self.__setup()
         while 1:
             args = {}
             try:
-                res = self.__recv(verbose=False) # always waiting for commands
+                res = self.__recv() # always waiting for commands
                 if res != None:
                     last_command = res['op1']
                     cmd = res['command']
@@ -204,11 +194,10 @@ class CTA2045Device:
                 pass
             except UnsupportedCommandException as e:
                 self.__send('nak',{'nak_reason':'unsupported'})
-                pass
-        pass
+        return
     def run(self):
-        self.__setup()
         self.com.start()
+        #self.__setup()
         if self.mode == 'DER':
             # validate model in DER mode
             assert(isinstance(self.model,CTA2045Model))
