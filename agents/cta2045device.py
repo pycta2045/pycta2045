@@ -1,7 +1,6 @@
 from agents.cta2045 import CTA2045, UnsupportedCommandException
 from agents.com import COM,TimeoutException
-import sys, os, traceback as tb#, import threading
-import time
+import sys, os, time,  select, traceback as tb#, import threading
 from agents.models import CTA2045Model
 
 
@@ -32,9 +31,6 @@ class CTA2045Device:
         self.model = model
         self.log = []
         self.log_sz = log_size if log_size > 0 else -(log_size-1)
-        #self.terminal = sys.stdout
-        #self.screen_sz = 0
-        #self.lock = threading.Lock()
         self.cta_mod = CTA2045()
         self.com = COM(checksum=self.cta_mod.checksum,transform=self.cta_mod.hexify,is_valid=self.cta_mod.is_valid,port=comport)
         self.last_command = '0x00'
@@ -45,6 +41,7 @@ class CTA2045Device:
             'basic':False,
             'max payload':0
         }
+        self.timeout = .4
         return
     def __update_log(self,msg):
         self.log.append(msg)
@@ -73,7 +70,10 @@ class CTA2045Device:
             res = self.com.get_next_msg()
             if res != None:
                 t_e = time.time()
-                msg,t = res
+                msg,t = res # check against timeout
+                if time.time() - t >= self.timeout:
+                    self.__write(f"<-== waiting for response timeout!",log=True)
+                    raise TimeoutException('Timeout!')
                 res = self.cta_mod.from_cta(msg)
                 if type(res) == dict:
                     self.__write(f"<-== receved: {res['command']}",log=True)
@@ -81,10 +81,6 @@ class CTA2045Device:
                         self.__write(f"\t{k} = {v}")
                 if 'op1' in res:
                     self.last_command = res['op1']
-        except TimeoutException as e:
-            if verbose:
-                self.__write(f"<-== waiting for response timeout!",log=True)
-            raise TimeoutException('Timeout!') # propagate exception
         except UnsupportedCommandException as e:
             raise UnsupportedCommandException(msg) # propagate exception
         return res
@@ -132,49 +128,59 @@ class CTA2045Device:
         success = self.support_flags['intermediate'] and self.support_flags['data-link'] and self.support_flags['max payload'] > 0
         return success
 
-    def __prompt(self,try_again=False):
+    def __prompt(self,valid=False):
         '''
             outputs a prompt message to the screen
 
         '''
-        if try_again:
-            self.__write("{'-'*5}> INVALID. Try again!\n")
+        if not valid:
+            self.__write(f"{'-'*5}> INVALID. Try again!\n")
         msg = "select a command:\n"
         for k,v in choices.items():
-            msg += f"\t {k}: {v}\n"
+            msg += f"{k}: {v}\n"
         self.__write(msg)
-        self.__write("enter a choice: ",end='')
+        self.__write("enter a choice: ")
         return
+
+    # ------------------------- DCM Control Loop ----------------------------------
+    # -----------------------------------------------------------------------------
     def __run_dcm(self):
         valid = True
         choice = ''
         while 1:
+            print('here')
+            #self.__clear()
             self.__prompt(valid)
-            if select.select([sys.stdin,],[],[]):
+            if select.select([sys.stdin],[],[],0): # 0=> disables blocking mode
                 try:
                     choice = sys.stdin.read(1) # read 1 char
                     choice = int(choice) # try to cast it
-                    valid = choice in self.choices
-                    choice = '' if not valid else self.choices[choice]
-                except Exception as e:
+                    valid = choice in choices
+                    choice = '' if not valid else choices[choice]
+                except (KeyError,ValueError) as e:
                     valid = False
                     choice = ''
-            self.__clear()
-            if c == 'quit':
-                exit()
+                    continue
+            if choice == 'quit':
+                return
             elif choice != '':
                 self.__send(choice) # sent command
             try:
                 response = self.__recv() # wait for link response
-                expected = self.cta_mod.complement(c)
                 if response != None:
                     cmd = response['command']
+                else:
+                    cmd = None
+                expected = self.cta_mod.complement(cmd)
+                print('expecting: ',expected)
             except TimeoutException as e:
                 # nothing was received from the
                 pass
             except UnsupportedCommandException as e:
                 self.__send('nak',{'nak_reason':'unsupported'})
         return
+    # ------------------------- DER Control Loop ----------------------------------
+    # -----------------------------------------------------------------------------
     def __run_der(self):
         while 1:
             args = {}
