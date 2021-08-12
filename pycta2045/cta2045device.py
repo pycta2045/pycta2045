@@ -41,7 +41,7 @@ class CTA2045Device:
             'basic':False,
             'max payload':0
         }
-        self.timeout = .4
+        self.timeout = .6
         return
     def __update_log(self,msg):
         self.log.append(msg)
@@ -49,9 +49,6 @@ class CTA2045Device:
         return
     def __write(self,msg,log=False,clear=False,end='\n'):
         sz = 0
-        #with self.lock:
-            #sz=self.terminal.write("".join(self.log))
-            #sz+=self.terminal.write(msg)
         if clear == True:
             print("\n".join(self.log))
             print('-'*20)
@@ -61,8 +58,10 @@ class CTA2045Device:
                 self.__update_log(msg)
         return
     def __clear(self):
-        os.system('clear')
-        self.__write('',clear=True)
+        # os.system('clear')
+        # self.__write('',clear=True)
+        if self.mode == "DCM":
+            self.__prompt(True)
         return
     def __recv(self,verbose=True):
         res = None
@@ -72,28 +71,28 @@ class CTA2045Device:
                 t_e = time.time()
                 msg,t = res # check against timeout
                 if time.time() - t >= self.timeout:
-                    self.__write(f"<-== waiting for response timeout!",log=True)
+                    self.__write(f"<<<<<< waiting for response timeout!",log=True)
                     raise TimeoutException('Timeout!')
                 res = self.cta_mod.from_cta(msg)
                 if type(res) == dict:
-                    self.__write(f"<-== received: {res['command']}",log=True)
+                    self.__write(f"<<<<<< received: {res['command']}",log=True)
                     if verbose:
                         for k,v in res['args'].items():
                             self.__write(f"\t{k} = {v}")
                 if 'op1' in res:
                     self.last_command = res['op1']
         except UnsupportedCommandException as e:
-            self.__write(f"<-== Unsupported command received: {e.message}",log=True)
+            self.__write(f"<<<<<< Unsupported command received: {e.message}",log=True)
             raise UnsupportedCommandException(msg) # propagate exception
-        except UnsupportedCommandException as e:
-            self.__write(f"<-== Unknwon command received: {msg}",log=True)
-            raise UnsupportedCommandException(msg) # propagate exception
+        except UnknownCommandException as e:
+            self.__write(f"<<<<<< Unknwon command received: {msg}",log=True)
+            raise UnknownCommandException(msg) # propagate exception
         return res
     def __send(self,cmd,args={},verbose=False):
         ret = False
         c = self.cta_mod.to_cta(cmd,args=args)
         self.com.send(c)
-        self.__write(f'==-> sent {cmd}',log=True)
+        self.__write(f'>>>>>> sent {cmd}',log=True)
         if verbose:
             if len(args) > 0:
                 self.__write('\twith args:')
@@ -103,6 +102,7 @@ class CTA2045Device:
                         v = int(v,16)
                     self.__write(f'\t{k}: {v}')
         ret = True # else an exception would be raised and this statement would be skipped when unwinding the stack
+        self.__clear()
         return ret
 
     def __setup(self):
@@ -142,6 +142,7 @@ class CTA2045Device:
         '''
         if not valid:
             self.__write(f"{'-'*5}> INVALID. Try again!\n")
+            self.prompted = False
         msg = "select a command:\n"
         for k,v in choices.items():
             msg += f"{k}: {v}\n"
@@ -165,12 +166,13 @@ class CTA2045Device:
         proc.daemon = True
         proc.start()
         choice = ''
+        self.__prompt(True)
         while 1:
-            # self.__clear()
-            self.__prompt(valid)
-            if select.select([sys.stdin],[],[],0): # 0=> disables blocking mode
+            i = select.select([sys.stdin],[],[],0) # 0=> disables blocking mode
+            if i[0]:
                 try:
                     choice = sys.stdin.read(1) # read 1 char
+                    sys.stdin.flush()
                     choice = int(choice) # try to cast it
                     valid = choice in choices
                     choice = '' if not valid else choices[choice]
@@ -183,8 +185,8 @@ class CTA2045Device:
                 return
             elif choice != '':
                 self.__send(choice) # sent command, daemon receives and responds to the command
+                choice = ''
             valid = True
-            self.__write(f"==========***** VALID: {valid}")
         return
     # ------------------------- Daemon Loop ----------------------------------
     # -----------------------------------------------------------------------------
