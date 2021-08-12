@@ -2,7 +2,7 @@ import serial
 from serial.tools.list_ports import comports #from serial.tools.list_ports_linux import SysFS
 from multiprocessing import Process, Lock, Queue
 import time, pandas as pd, traceback as tb
-from pycta2045.cta2045 import *
+from pycta2045.cta2045 import UnsupportedCommandException, UnknownCommandException
 
 class TimeoutException(Exception):
     '''

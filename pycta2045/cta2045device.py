@@ -212,7 +212,6 @@ class CTA2045Device:
                 pass
             except (UnsupportedCommandException,UnknownCommandException) as e:
                 self.__send('nak',{'nak_reason':'unsupported'})
-                pass
         return
     def run(self):
         self.com.start()

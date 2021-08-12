@@ -1,5 +1,5 @@
 import unittest
-import agents.scpi.handler as scpi
+import pycta2045.scpi.handler as scpi
 import multiprocessing
 import socket
 import time
@@ -78,6 +78,5 @@ class TestSCPI(unittest.TestCase):
         self.assertTrue(msg == None)
         return
 
-# if __name__=="__main__":
-#     unittest.main()
-#     exit()
+if __name__=="__main__":
+    unittest.main()

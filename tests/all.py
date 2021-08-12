@@ -1,8 +1,8 @@
 import unittest
-from tests.test_ev import TestEV
-from tests.test_cta import TestCTA
-from tests.test_scpi import TestSCPI
-from tests.test_com import TestCOM
+from tests.models.test_ev import TestEV
+from tests.cta2045.test_cta import TestCTA
+from tests.scpi.test_scpi import TestSCPI
+from tests.com.test_com import TestCOM
 
 def suite():
     suite = unittest.TestSuite()

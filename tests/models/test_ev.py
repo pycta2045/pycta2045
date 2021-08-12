@@ -1,9 +1,8 @@
 import unittest
 import pandas as pd
-from agents.models.ev_model import EV
+from pycta2045.models.ev_model import EV
 
 class TestEV(unittest.TestCase):
-    # @unittest.expectedFailure
     def testInit(self):
         c = EV()
         self.assertFalse(c == None)
@@ -44,7 +43,6 @@ class TestEV(unittest.TestCase):
         soc = soc[-1]
         self.assertTrue(soc == max_comfort) # should still be max comfort
         self.assertFalse(df_start.shape[0] >= df_end.shape[0])
-
     def testGenerateTimestamps(self):
         c = EV()
         df_start = c.charge()
@@ -61,12 +59,7 @@ class TestEV(unittest.TestCase):
 
         # assert the end is within 300 seconds margin -- 5 mins
         self.assertTrue(abs(c.t_end-ts[-1].tz_localize('US/Pacific').timestamp())<=300)
-        # print(c.max_time/(60*60))#)-ts[-1].timestamp())
         # self.assertTrue(abs(c.max_time-ts[-1].timestamp())<=300)
-
-
-
-
 
 if __name__=="__main__":
     unittest.main()

@@ -1,5 +1,5 @@
 import unittest
-from agents.cta2045.handler import CTA2045 as CTA
+from pycta2045.cta2045.handler import CTA2045 as CTA
 
 def print_status(status):
     if status:
@@ -93,5 +93,6 @@ class TestCTA(unittest.TestCase):
                 success=False
             print_status(success)
             self.assertTrue(k==cmd)
+
 if __name__=="__main__":
     unittest.main()
