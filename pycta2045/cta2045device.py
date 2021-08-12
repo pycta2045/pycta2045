@@ -1,7 +1,7 @@
-from agents.cta2045 import CTA2045, UnsupportedCommandException
-from agents.com import COM,TimeoutException
-import sys, os, time,  select, traceback as tb#, import threading
-from agents.models import CTA2045Model
+from pycta2045.cta2045 import *
+from pycta2045.com import *
+import sys, os, time,  select, traceback as tb, multiprocessing#, import threading
+from pycta2045.models import *
 
 
 choices = {
@@ -76,12 +76,17 @@ class CTA2045Device:
                     raise TimeoutException('Timeout!')
                 res = self.cta_mod.from_cta(msg)
                 if type(res) == dict:
-                    self.__write(f"<-== receved: {res['command']}",log=True)
-                    for k,v in res['args'].items():
-                        self.__write(f"\t{k} = {v}")
+                    self.__write(f"<-== received: {res['command']}",log=True)
+                    if verbose:
+                        for k,v in res['args'].items():
+                            self.__write(f"\t{k} = {v}")
                 if 'op1' in res:
                     self.last_command = res['op1']
         except UnsupportedCommandException as e:
+            self.__write(f"<-== Unsupported command received: {e.message}",log=True)
+            raise UnsupportedCommandException(msg) # propagate exception
+        except UnsupportedCommandException as e:
+            self.__write(f"<-== Unknwon command received: {msg}",log=True)
             raise UnsupportedCommandException(msg) # propagate exception
         return res
     def __send(self,cmd,args={},verbose=False):
@@ -124,6 +129,8 @@ class CTA2045Device:
                         self.support_flags[flag] = int(length)
             except TimeoutException:
                 flag = False
+            except UnsupportedCommandException  as e:
+                pass
         self.__write(str(self.support_flags))
         success = self.support_flags['intermediate'] and self.support_flags['data-link'] and self.support_flags['max payload'] > 0
         return success
@@ -142,14 +149,24 @@ class CTA2045Device:
         self.__write("enter a choice: ")
         return
 
-    # ------------------------- DCM Control Loop ----------------------------------
+    # ------------------------- DCM Loop ----------------------------------
     # -----------------------------------------------------------------------------
     def __run_dcm(self):
         valid = True
+        
+        # sent unsupported commands -- doesn't make sense for DCM to ack any of them
+        self.cta_mod.set_supported('shed',False)
+        self.cta_mod.set_supported('endshed',False)
+        self.cta_mod.set_supported('loadup',False)
+        self.cta_mod.set_supported('grid emergency',False)
+        self.cta_mod.set_supported('critical peak event',False)
+        # run daemon
+        proc = multiprocessing.Process(target=self.__run_daemon)
+        proc.daemon = True
+        proc.start()
         choice = ''
         while 1:
-            print('here')
-            #self.__clear()
+            # self.__clear()
             self.__prompt(valid)
             if select.select([sys.stdin],[],[],0): # 0=> disables blocking mode
                 try:
@@ -162,26 +179,16 @@ class CTA2045Device:
                     choice = ''
                     continue
             if choice == 'quit':
+                proc.terminate()
                 return
             elif choice != '':
-                self.__send(choice) # sent command
-            try:
-                response = self.__recv() # wait for link response
-                if response != None:
-                    cmd = response['command']
-                else:
-                    cmd = None
-                expected = self.cta_mod.complement(cmd)
-                print('expecting: ',expected)
-            except TimeoutException as e:
-                # nothing was received from the
-                pass
-            except UnsupportedCommandException as e:
-                self.__send('nak',{'nak_reason':'unsupported'})
+                self.__send(choice) # sent command, daemon receives and responds to the command
+            valid = True
+            self.__write(f"==========***** VALID: {valid}")
         return
-    # ------------------------- DER Control Loop ----------------------------------
+    # ------------------------- Daemon Loop ----------------------------------
     # -----------------------------------------------------------------------------
-    def __run_der(self):
+    def __run_daemon(self):
         while 1:
             args = {}
             try:
@@ -203,7 +210,7 @@ class CTA2045Device:
             except TimeoutException as e:
                 # nothing was received from UCM
                 pass
-            except UnsupportedCommandException as e:
+            except (UnsupportedCommandException,UnknownCommandException) as e:
                 self.__send('nak',{'nak_reason':'unsupported'})
                 pass
         return
@@ -222,8 +229,9 @@ class CTA2045Device:
                 'grid emergency':self.model.grid_emergency,
                 'critical peak event':self.model.critical_peak_event
             }
-            self.__run_der()
+            self.__run_daemon()
         elif self.mode=='DCM':
+            self.FDT = {} # empty it
             self.__run_dcm()
         else:
             raise UnknownModeException(f'Unknown Mode: {self.mode}')

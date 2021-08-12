@@ -7,7 +7,8 @@
             },
             "format":"0x08 0x01 RES # 0x01 D H",
             "op1":"0x01",
-            "op2":"D"
+            "op2":"D",
+            "supported": true
         },
         "endshed": {
             "type":{
@@ -16,7 +17,8 @@
             },
             "format":"0x08 0x01 RES # 0x02 D H",
             "op1":"0x02",
-            "op2":"D"
+            "op2":"D",
+            "supported": true
         },
         "loadup": {
             "type": {
@@ -25,7 +27,8 @@
             },
             "format":"0x08 0x01 RES # 0x17 D H",
             "op1":"0x17",
-            "op2":"D"
+            "op2":"D",
+            "supported": true
         },
         "critical peak event": {
             "type": {
@@ -34,7 +37,8 @@
             },
             "format":"0x08 0x01 RES # 0x0a D H",
             "op1":"0x0a",
-            "op2":"D"
+            "op2":"D",
+            "supported": true
          },
         "grid emergency": {
             "type": {
@@ -43,7 +47,8 @@
             },
             "format":"0x08 0x01 RES # 0x0b D H",
             "op1":"0x0b",
-            "op2":"D"
+            "op2":"D",
+            "supported": true
          },
         "outside comm connection status":{
             "type":{
@@ -52,7 +57,8 @@
             },
             "format":"0x08 0x01 RES # 0x0e CS H",
             "op1":"0x0e",
-            "op2":"CS"
+            "op2":"CS",
+            "supported": true
         },
         "max payload request": {
             "type": {
@@ -61,7 +67,8 @@
             },
             "format":"0x08 0x03 RES # 0x18 0x00 H",
             "op1":"0x18",
-            "op2":"0x00"
+            "op2":"0x00",
+            "supported": true
         },
         "max payload response":{
             "type": {
@@ -70,7 +77,8 @@
             },
             "format":"0x08 0x03 RES # 0x19 M H",
             "op1":"0x19",
-            "op2":"M"
+            "op2":"M",
+            "supported": true
         },
         "operating status request": {
             "type": {
@@ -79,7 +87,8 @@
             },
             "format":"0x08 0x01 RES # 0x12 0x00 H",
             "op1":"0x12",
-            "op2":"0x00"
+            "op2":"0x00",
+            "supported": true
         },
         "operating status response": {
             "type": {
@@ -88,7 +97,8 @@
             },
             "format":"0x08 0x01 RES # 0x13 OC H",
             "op1":"0x13",
-            "op2":"OC"
+            "op2":"OC",
+            "supported": true
         },
         "app ack":{
             "type": {
@@ -97,7 +107,8 @@
             },
             "format":"0x08 0x01 RES # 0x03 LO H",
             "op1":"0x03",
-            "op2":"LO"
+            "op2":"LO",
+            "supported": true
         },
         "app nak":{
             "type": {
@@ -106,7 +117,8 @@
             },
             "format":"0x08 0x01 RES # 0x04 ANR H",
             "op1":"0x04",
-            "op2":"ANR"
+            "op2":"ANR",
+            "supported": true
         },
         "commodity read response":{
             "type": {
@@ -115,7 +127,8 @@
             },
             "format":"0x08 0x02 RES # 0x06 0x80 IRC CC IR CA H",
             "op1":"0x06",
-            "op2":"0x80"
+            "op2":"0x80",
+            "supported": true
         },
         "commodity read request":{
             "type": {
@@ -124,7 +137,8 @@
             },
             "format":"0x08 0x02 RES # 0x06 CC H",
             "op1":"0x06",
-            "op2":"0x00"
+            "op2":"0x00",
+            "supported": true
         },
         "device info request":{
             "type": {
@@ -133,7 +147,8 @@
             },
             "format":"0x08 0x02 RES # 0x01 0x01 H",
             "op1":"0x01",
-            "op2":"0x01"
+            "op2":"0x01",
+            "supported": true
         },
         "device info response":{
             "type": {
@@ -142,7 +157,8 @@
             },
             "format":"0x08 0x02 RES # 0x01 0x81 0x00 CV VI DT DR CB RES MN SN FY FM FD H",
             "op1":"0x01",
-            "op2":"0x81"
+            "op2":"0x81",
+            "supported": true
         },
          "basic mtsq": {
             "type": {
@@ -151,7 +167,8 @@
             },
             "format":"0x08 0x01 RES # H",
             "op1":"none",
-            "op2": "none"
+            "op2": "none",
+            "supported": true
         },
         "intermediate mtsq": {
             "type": {
@@ -160,7 +177,8 @@
             },
             "format":"0x08 0x02 RES # H",
             "op1":"none",
-            "op2": "none"
+            "op2": "none",
+            "supported": true
         },
         "data-link mtsq": {
             "type": {
@@ -169,7 +187,8 @@
             },
             "format":"0x08 0x03 RES # H",
             "op1":"none",
-            "op2":"none"
+            "op2":"none",
+            "supported": true
         },
         "nak":{
             "type": {
@@ -178,7 +197,8 @@
             },
             "format":"0x15 R",
             "op1":"none",
-            "op2":"none"
+            "op2":"none",
+            "supported": true
         },
         "ack":{
             "type": {
@@ -187,7 +207,8 @@
             },
             "format":"0x06 0x00",
             "op1":"none",
-            "op2":"none"
+            "op2":"none",
+            "supported": true
         }
     },
     "hash":{

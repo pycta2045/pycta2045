@@ -2,7 +2,7 @@ import serial
 from serial.tools.list_ports import comports #from serial.tools.list_ports_linux import SysFS
 from multiprocessing import Process, Lock, Queue
 import time, pandas as pd, traceback as tb
-from agents.cta2045.handler import UnsupportedCommandException
+from pycta2045.cta2045 import *
 
 class TimeoutException(Exception):
     '''
@@ -102,7 +102,7 @@ class COM:
                                 # log
                                 self.__log({'src':self.THEM,'dest':self.US,'message':buff})
                                 buff = []
-                        except UnsupportedCommandException as e:
+                        except UnknownCommandException as e:
                             continue
                 if self.stopped:
                     print('exiting...')

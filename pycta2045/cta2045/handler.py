@@ -1,7 +1,4 @@
-import json
-import os
-import traceback as tb
-
+import json, os, traceback as tb
 
 class UnsupportedCommandException(Exception):
     '''
@@ -10,7 +7,13 @@ class UnsupportedCommandException(Exception):
     def __init__(self,msg):
         self.message = msg
         super().__init__(self.message)
-
+class UnknownCommandException(Exception):
+    '''
+        Used to indicate that the given command is unknown
+    '''
+    def __init__(self,msg):
+        self.message = msg
+        super().__init__(self.message)
 
 class CTA2045:
     def __init__(self,fname="CTA2045_commands.json"):
@@ -20,7 +23,7 @@ class CTA2045:
             with open(f'{path}/{fname}','r') as f:
                 self.cmds = json.load(f)
         except Exception as e:
-            print(e)
+            print("Issue reading JSON",e)
         return
     def dump_commands(self):
         '''(helper function)
@@ -154,11 +157,16 @@ class CTA2045:
             response = self.cmds['commands'][key]
             response['command'] = key
             response = self.extract_args(response,val)
+            # check if it is supported
+            if not response['supported']:
+                val = key
+                raise UnsupportedCommandException(key)
         except (KeyError,TypeError) as e:
-            raise UnsupportedCommandException(f'unsupported command: {val}')
-            pass
+            raise UnknownCommandException(f'{val}')
+        except UnsupportedCommandException as e:
+            raise UnsupportedCommandException(val) # pass command
         except Exception as e:
-            # unable to translate msg (unsupported) -- return None
+            # unable to translate msg (unknown) -- return None
             print(tb.format_tb())
             pass
         return response
@@ -195,7 +203,7 @@ class CTA2045:
         '''
         cmd_complement = []
         try:
-            if not 'ack' in command and not 'nak' in command:
+            if not 'ack' == command and not 'nak' == command:
                 cmd = self.cmds['commands'][command]
                 # find appropriate ack type
                 t = cmd['type']['str']
@@ -232,7 +240,24 @@ class CTA2045:
             # do nothing (value is still 0x00)
             pass
         return value
-
+    def set_supported(self,command,value: bool):
+        '''
+            Purpose: sets the `supported` field for the passed command to the passed bool value
+            Args:
+                * command: target command
+                * value: boolean value to assign to the `supported` field
+            Return:
+                * True if the value has be set
+                * False otherwise
+        '''
+        try:
+            assert(type(value) == bool)
+            self.cmds['commands'][command]['supported'] = value
+            return True
+        except Exception as e:
+            print(f'Failed to set the supported field for: {command}: ',e)
+            pass
+        return False
     def is_valid(self,msg):
         '''
             Purpose: checks if the passed message is a valid CTA msg (supported CTA2045 msgs only)
