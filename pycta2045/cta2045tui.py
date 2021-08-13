@@ -24,7 +24,7 @@ class UnknownModeException(Exception):
         return
 
 
-class CTA2045Device:
+class CTA2045DeviceTUI:
     def __init__(self,mode=DCM,log_size=10,model=None,comport='/dev/ttyS6'):
         self.mode = mode.__name__
         self.model = model
