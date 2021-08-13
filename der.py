@@ -4,5 +4,5 @@ import pycta2045.models as models
 
 ev = models.EV()
 dev = device.CTA2045Device(mode=device.DER,model=ev,comport='/dev/ttyS7')
-dev.run()
-
+log = dev.run()
+log.to_csv('logs/DER_log.csv')
