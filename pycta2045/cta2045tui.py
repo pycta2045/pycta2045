@@ -1,7 +1,6 @@
-from cta2045 import *
-from com import *
+import cta2045, com, models
 import sys, os, time,  select, traceback as tb, multiprocessing#, import threading
-from models import *
+import rich
 
 
 choices = {
@@ -134,7 +133,6 @@ class CTA2045Device:
         self.__write(str(self.support_flags))
         success = self.support_flags['intermediate'] and self.support_flags['data-link'] and self.support_flags['max payload'] > 0
         return success
-
     def __prompt(self,valid=False):
         '''
             outputs a prompt message to the screen
@@ -149,7 +147,6 @@ class CTA2045Device:
         self.__write(msg)
         self.__write("enter a choice: ")
         return
-
     # ------------------------- DCM Loop ----------------------------------
     # -----------------------------------------------------------------------------
     def __run_dcm(self):
@@ -237,3 +234,6 @@ class CTA2045Device:
         else:
             raise UnknownModeException(f'Unknown Mode: {self.mode}')
         return
+
+
+help(rich)

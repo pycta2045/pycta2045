@@ -1,7 +1,7 @@
 import numpy as np, pandas as pd, matplotlib.pyplot as plt
 import time, traceback as tb
-from pycta2045.models.model import CTA2045Model
-from pycta2045.cta2045 import CTA2045
+from models.model import CTA2045Model
+from cta2045 import CTA2045
 
 power_rating=12.0
 operating_status = {
