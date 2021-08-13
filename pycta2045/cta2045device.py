@@ -45,17 +45,22 @@ class CTA2045Device:
         return
     def __update_log(self,msg):
         self.log.append(msg)
-        self.log = self.log[-self.log_sz:]
+        # self.log = self.log[-self.log_sz:]
         return
+    def dump_log(self):
+        return self.log
+
+    # def sav_log(self,file):
+    #     return self.
     def __write(self,msg,log=False,clear=False,end='\n'):
         sz = 0
-        if clear == True:
-            print("\n".join(self.log))
-            print('-'*20)
-        else:
-            print(msg,end=end)
+        # if clear == True:
+        print("\n".join(self.log))
+        print('-'*20)
+        # else:
+            # print(msg,end=end)
         if log:
-                self.__update_log(msg)
+            self.__update_log(msg)
         return
     def __clear(self):
         # os.system('clear')
@@ -102,7 +107,6 @@ class CTA2045Device:
                         v = int(v,16)
                     self.__write(f'\t{k}: {v}')
         ret = True # else an exception would be raised and this statement would be skipped when unwinding the stack
-        self.__clear()
         return ret
 
     def __setup(self):
