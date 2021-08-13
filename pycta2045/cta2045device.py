@@ -1,6 +1,6 @@
 from cta2045 import *
 from com import *
-import sys, os, time,  select, traceback as tb, multiprocessing#, import threading
+import sys, os, pandas as pd, time,  select, traceback as tb, multiprocessing#, import threading
 from models import *
 
 
@@ -24,13 +24,14 @@ class UnknownModeException(Exception):
         super().__init__(self.msg)
         return
 
+recv_color = 'red'
+send_color = 'green'
 
 class CTA2045Device:
-    def __init__(self,mode=DCM,log_size=10,model=None,comport='/dev/ttyS6'):
+    def __init__(self,mode=DCM,timeout=1,model=None,comport='/dev/ttyS6'):
         self.mode = mode.__name__
         self.model = model
-        self.log = []
-        self.log_sz = log_size if log_size > 0 else -(log_size-1)
+        self.log = multiprocessing.Queue()
         self.cta_mod = CTA2045()
         self.com = COM(checksum=self.cta_mod.checksum,transform=self.cta_mod.hexify,is_valid=self.cta_mod.is_valid,port=comport)
         self.last_command = '0x00'
@@ -41,32 +42,25 @@ class CTA2045Device:
             'basic':False,
             'max payload':0
         }
-        self.timeout = .6
+        self.timeout = timeout
         return
     def __update_log(self,msg):
-        self.log.append(msg)
-        # self.log = self.log[-self.log_sz:]
+        self.log.put(msg)
         return
-    def dump_log(self):
-        return self.log
-
-    # def sav_log(self,file):
-    #     return self.
-    def __write(self,msg,log=False,clear=False,end='\n'):
-        sz = 0
-        # if clear == True:
-        print("\n".join(self.log))
-        print('-'*20)
-        # else:
-            # print(msg,end=end)
+    def get_log(self):
+        ts = []
+        msgs = []
+        while not self.log.empty():
+            t,msg = self.log.get().split(':')
+            ts.append(t)
+            msgs.append(msg)
+        df = pd.DataFrame({'time':ts, 'event':msgs})
+        df.set_index('time',inplace=True)
+        return df
+    def __write(self,msg,log=False,end='\n'):
         if log:
             self.__update_log(msg)
-        return
-    def __clear(self):
-        # os.system('clear')
-        # self.__write('',clear=True)
-        if self.mode == "DCM":
-            self.__prompt(True)
+        print(msg,end=end)
         return
     def __recv(self,verbose=True):
         res = None
@@ -75,29 +69,30 @@ class CTA2045Device:
             if res != None:
                 t_e = time.time()
                 msg,t = res # check against timeout
+                t = int(t)
                 if time.time() - t >= self.timeout:
-                    self.__write(f"<<<<<< waiting for response timeout!",log=True)
+                    self.__write(f"{t}: waiting for response timeout!",log=True)
                     raise TimeoutException('Timeout!')
                 res = self.cta_mod.from_cta(msg)
                 if type(res) == dict:
-                    self.__write(f"<<<<<< received: {res['command']}",log=True)
+                    self.__write(f"{t}: received {res['command']}",log=True)
                     if verbose:
                         for k,v in res['args'].items():
                             self.__write(f"\t{k} = {v}")
                 if 'op1' in res:
                     self.last_command = res['op1']
         except UnsupportedCommandException as e:
-            self.__write(f"<<<<<< Unsupported command received: {e.message}",log=True)
+            self.__write(f"{t}: received Unsupported Command -- {e.message}",log=True)
             raise UnsupportedCommandException(msg) # propagate exception
         except UnknownCommandException as e:
-            self.__write(f"<<<<<< Unknwon command received: {msg}",log=True)
+            self.__write(f"{t}: received Unknwon command -- {msg}",log=True)
             raise UnknownCommandException(msg) # propagate exception
         return res
     def __send(self,cmd,args={},verbose=False):
         ret = False
         c = self.cta_mod.to_cta(cmd,args=args)
         self.com.send(c)
-        self.__write(f'>>>>>> sent {cmd}',log=True)
+        self.__write(f'{int(time.time())}: sent {cmd}',log=True)
         if verbose:
             if len(args) > 0:
                 self.__write('\twith args:')
@@ -108,7 +103,6 @@ class CTA2045Device:
                     self.__write(f'\t{k}: {v}')
         ret = True # else an exception would be raised and this statement would be skipped when unwinding the stack
         return ret
-
     def __setup(self):
         res = None
         success=False
@@ -138,7 +132,6 @@ class CTA2045Device:
         self.__write(str(self.support_flags))
         success = self.support_flags['intermediate'] and self.support_flags['data-link'] and self.support_flags['max payload'] > 0
         return success
-
     def __prompt(self,valid=False):
         '''
             outputs a prompt message to the screen
@@ -153,7 +146,6 @@ class CTA2045Device:
         self.__write(msg)
         self.__write("enter a choice: ")
         return
-
     # ------------------------- DCM Loop ----------------------------------
     # -----------------------------------------------------------------------------
     def __run_dcm(self):
@@ -170,8 +162,15 @@ class CTA2045Device:
         proc.daemon = True
         proc.start()
         choice = ''
-        self.__prompt(True)
+        # prompt_time = 30 # every 30 secs will prompt
+        # next_prompt = time.time() + prompt_time
+        last_sz = self.log.qsize()
+        self.__prompt(valid)
         while 1:
+            if last_sz+2 <= self.log.qsize(): # if log has changed by 2 msgs
+                time.sleep(.5*self.timeout) # sleep to allow log msgs to be printed
+                self.__prompt(valid)
+                last_sz = self.log.qsize() # update last_log size
             i = select.select([sys.stdin],[],[],0) # 0=> disables blocking mode
             if i[0]:
                 try:
@@ -182,6 +181,7 @@ class CTA2045Device:
                     choice = '' if not valid else choices[choice]
                 except (KeyError,ValueError) as e:
                     valid = False
+                    self.__prompt(valid)
                     choice = ''
                     continue
             if choice == 'quit':
@@ -218,6 +218,8 @@ class CTA2045Device:
                 pass
             except (UnsupportedCommandException,UnknownCommandException) as e:
                 self.__send('nak',{'nak_reason':'unsupported'})
+            except KeyboardInterrupt as e:
+                break # exit loop & return
         return
     def run(self):
         self.com.start()
@@ -240,4 +242,4 @@ class CTA2045Device:
             self.__run_dcm()
         else:
             raise UnknownModeException(f'Unknown Mode: {self.mode}')
-        return
+        return self.get_log()
