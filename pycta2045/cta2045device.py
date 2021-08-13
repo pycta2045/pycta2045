@@ -1,7 +1,7 @@
-from pycta2045.cta2045 import *
-from pycta2045.com import *
+from cta2045 import *
+from com import *
 import sys, os, pandas as pd, time,  select, traceback as tb, multiprocessing#, import threading
-from pycta2045.models import *
+from models import *
 
 
 choices = {
