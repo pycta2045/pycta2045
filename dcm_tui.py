@@ -1,26 +1,67 @@
-import random
-import time
+"""
+Demonstrates a dynamic Layout
+"""
+from pycta2045 import cta2045 
+from pycta2045 import com
+import sys, os, pandas as pd, time,  select, traceback as tb, multiprocessing#, import threading
+from datetime import datetime
 
+from time import sleep
+
+from rich.align import Align
+from rich.console import Console
+from rich.layout import Layout
 from rich.live import Live
-from rich.table import Table
+from rich.text import Text
 
 
-def generate_table() -> Table:
-    """Make a new table."""
-    table = Table(border_style="green")
-    table.add_column("ID")
-    table.add_column("Value")
-    table.add_column("Status")
 
-    for row in range(random.randint(2, 6)):
-        value = random.random() * 100
-        table.add_row(
-            f"{row}", f"{value:3.2f}", "[red]ERROR" if value < 50 else "[green]SUCCESS"
+class DCM:
+    prompt = {
+        0:"quit",
+        1:"shed",
+        2:"endshed",
+        3:"loadup",
+        4: "critical peak event",
+        5:"grid emergency",
+        6:"operating status request",
+    }
+    """Renders the time in the center of the screen."""
+    def __init__(self):
+        self.log = multiprocessing.Queue()
+        self.counter = 0
+        self.console = Console()
+        self.layout = Layout()
+        self.layout.split(
+            Layout(ratio=1, name="main"),
+            Layout(size=10, name="Input"),
         )
-    return table
+        self.layout["main"].split_row(Layout(name="Log"), Layout(name="body", ratio=2))
+        self.counter = 0
+        pass
+    def write(self,msg,log=False,end='\n'):
+        if log:
+            self.log.put(msg)
+            print(",",msg,log,"\nss\n")
+        print(msg)
+    def render(self) -> Layout:
+        self.counter+= 1
+        self.layout['body'].update(Text(f"this is a text{self.counter}",style="green"))
+        self.layout['Input'].update(Text(self.console.input("henre"),style="red"))
+        return self.layout
 
 
-with Live(generate_table(), refresh_per_second=4) as live:
-    for _ in range(40):
-        time.sleep(0.4)
-        live.update(generate_table())
+
+def main():
+    dcm = DCM()
+
+    with Live(dcm.render(), screen=True, redirect_stderr=False) as live:
+        try:
+            while True:
+                live.update(dcm.render())
+        except KeyboardInterrupt:
+            pass
+    # output log
+    return
+if __name__=="__main__":
+    main()

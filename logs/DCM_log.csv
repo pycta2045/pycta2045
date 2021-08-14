@@ -1,21 +1,19 @@
 time,event
-1628886941, sent intermediate mtsq
-1628886941, received ack
-1628886941, sent data-link mtsq
-1628886942, received ack
-1628886942, sent max payload request
-1628886942, received ack
-1628886942, received max payload response
-1628886942, sent ack
-1628886942, sent basic mtsq
-1628886942, received ack
-1628886944, sent shed
-1628886945, received nak
-1628886946, sent endshed
-1628886946, received nak
-1628886948, received Unsupported Command -- shed
-1628886948, sent nak
-1628886954, received operating status request
-1628886954, sent ack
-1628886954, sent operating status response
-1628886954, received ack
+1628897308, sent intermediate mtsq
+1628897308, received ack
+1628897308, sent data-link mtsq
+1628897308, received ack
+1628897308, sent max payload request
+1628897308, received ack
+1628897308, received max payload response
+1628897309, sent ack
+1628897309, sent basic mtsq
+1628897309, received ack
+1628897309, sent shed
+1628897309, received nak
+1628897310, sent shed
+1628897310, received nak
+1628897311, sent shed
+1628897311, received nak
+1628897311, sent shed
+1628897311, received nak

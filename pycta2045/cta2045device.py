@@ -1,7 +1,7 @@
-from cta2045 import *
-from com import *
+from pycta2045.cta2045 import *
+from pycta2045.com import *
 import sys, os, pandas as pd, time,  select, traceback as tb, multiprocessing#, import threading
-from models import *
+from pycta2045.models import *
 
 
 choices = {
@@ -14,10 +14,6 @@ choices = {
     7:"quit"
 }
 
-class DCM:
-    pass
-class DER:
-    pass
 class UnknownModeException(Exception):
     def __init__(self,msg):
         self.msg = msg
@@ -28,8 +24,8 @@ recv_color = 'red'
 send_color = 'green'
 
 class CTA2045Device:
-    def __init__(self,mode=DCM,timeout=1,model=None,comport='/dev/ttyS6'):
-        self.mode = mode.__name__
+    def __init__(self,mode='DCM',timeout=1,model=None,comport='/dev/ttyS6'):
+        self.mode = mode.upper()
         self.model = model
         self.log = multiprocessing.Queue()
         self.cta_mod = CTA2045()
