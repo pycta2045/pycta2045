@@ -36,7 +36,7 @@ class COM:
             raise Exception(f"port {self.port} not found")
         try:
             self.ser = serial.Serial(self.port)
-            self.send_delay = .08 # (send delay) 40 ms of MAX time after receiving a msg and BEFORE sending ack/nak (200 ms according to CTA2045)
+            self.send_delay = .04 # (send delay) 40 ms of MAX time after receiving a msg and BEFORE sending ack/nak (200 ms according to CTA2045)
             self.recv_delay = .1 # (recv delay) 100 ms of MIN time after tansmission until the start of another (according to CTA2045)
             self.sleep_until = 1 # should be 100 mS of delay between recveing & sending a message (refer to CTA2045 msg sync info on t_MA & t_IM)
             #self.ser.rs485_mode = serial.rs485.RS485Settings(delay_before_tx=tma,delay_before_rx=tim)
@@ -69,23 +69,25 @@ class COM:
         packet = bytearray()
         self.__log({'src':self.US,'dest':self.THEM,'message':data})
         data = list(map(lambda x:int(x,16),data.split(' ')))
+        if len(data) > 4:
+            self.msg_expected = True
         packet.extend(data)
         if time.time() - self.last_msg_timestamp < self.sleep_until:
             time.sleep(self.send_delay) # delay until you can send the next msg
         res = self.ser.write(packet)
         self.last_msg_timestamp = time.time()
         self.sleep_until = time.time() + self.recv_delay
-        self.msg_expected = True
         return res>=2
     def __recv(self):
         '''
             TODO
+            buffer is a queue used by all threads
         '''
         data = None
-        buff = []
+        buff = [] # local buffer used to process chunk of packages
         print('starting listener...')
         try:
-            while not self.stopped:
+            while True:
                 if time.time() - self.last_msg_timestamp < self.sleep_until:
                     time.sleep(self.recv_delay)
                 if self.ser.inWaiting() > 0:
@@ -107,7 +109,7 @@ class COM:
                                 self.__log({'src':self.THEM,'dest':self.US,'message':buff})
                                 buff = []
                         except UnknownCommandException as e:
-                            continue
+                            continue                    
                     if self.msg_expected:
                         self.msg_expected = False
                 if self.stopped:

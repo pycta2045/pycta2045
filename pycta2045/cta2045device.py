@@ -267,7 +267,7 @@ class SimpleCTA2045Device:
         }
         self.timeout = timeout
         self.last_log_msg = None
-        self.daemon_running = False
+        self.stopped = True
         return
     def __update_log(self,msg):
         self.last_log_msg = msg
@@ -347,7 +347,7 @@ class SimpleCTA2045Device:
     # ------------------------- Daemon Loop ----------------------------------
     # -----------------------------------------------------------------------------
     def __run_daemon(self):
-        while not self.daemon_running:
+        while not self.stopped:
             args = {}
             try:
                 res = self.__recv() # always waiting for commands
@@ -371,7 +371,7 @@ class SimpleCTA2045Device:
             except (UnsupportedCommandException,UnknownCommandException) as e:
                 self.send('nak',{'nak_reason':'unsupported'})
             except KeyboardInterrupt as e:
-                break # exit loop & return
+                return # exit loop & return
         return
     def run(self):
         self.com.start()
@@ -401,12 +401,12 @@ class SimpleCTA2045Device:
         # run daemon
         self.thread = Thread(target=self.__run_daemon)
         self.thread.daemon = True
-        self.daemon_running = True
+        self.stopped = False
         self.thread.start()
         return
     def stop(self):
         self.com.stop()
         # give time to com mod to stop
         time.sleep(1)
-        self.daemon_running = False
+        self.stopped = True
         return
