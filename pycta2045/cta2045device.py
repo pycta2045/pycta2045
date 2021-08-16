@@ -275,11 +275,13 @@ class SimpleCTA2045Device:
     def get_log(self):
         ts = []
         msgs = []
+        timestmap_conversion = 1000 # unit conversion issue (need to change from secs to ms -- pandas)
         while not self.log.empty():
             t,msg = self.log.get().split(':')
-            ts.append(t)
+            ts.append(int(t)*timestmap_conversion)
             msgs.append(msg)
         df = pd.DataFrame({'time':ts, 'event':msgs})
+        df.time = pd.to_datetime(df.time)
         df.set_index('time',inplace=True)
         return df
     def __recv(self,verbose=True):

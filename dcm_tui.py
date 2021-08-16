@@ -1,9 +1,9 @@
 """
 Demonstrates a dynamic Layout
 """
-from pycta2045 import cta2045 
-from pycta2045 import com
-import sys, os, pandas as pd, time,  select, traceback as tb, multiprocessing#, import threading
+from pycta2045 import SimpleCTA2045Device
+import sys, os, pandas as pd, time,  select, traceback as tb#, import threading
+from queue import Queue
 from datetime import datetime
 from time import sleep
 
@@ -17,6 +17,7 @@ num_color = 'red'
 text_color = 'cyan'
 input_color = 'magenta'
 warning_color = 'bright_red'
+log_color_style = 'pale_violet_red1'
 class DCM: 
     prompt = {
         0: 'quit',
@@ -28,21 +29,21 @@ class DCM:
         6: 'operating status request',
     }
     def __init__(self,port='/dev/ttyS6'):
-        self.log = multiprocessing.Queue()
         self.counter = 0
         self.console = Console()
         self.layout = Layout()
         self.layout.split(
-            Layout(ratio=1, name="main"),
+            Layout(ratio=1, name="Output"),
             Layout(size=10, name="Input"),
         )
-        self.layout["main"].split_row(Layout(name="Log"), Layout(name="body", ratio=2))
-        self.cta_mod = cta2045.CTA2045()
-        self.com = com.COM(checksum=self.cta_mod.checksum,transform=self.cta_mod.hexify,is_valid=self.cta_mod.is_valid,port=port)
         self.plain_prompt  = list(map(lambda x: f"[{num_color}]{x[0]}[/{num_color}]: [{text_color}]{x[1]}[/{text_color}]",self.prompt.items()))
         self.plain_prompt = "\n".join(self.plain_prompt)
         self.pretty_prompt = Text("").from_markup(self.plain_prompt)
-        pass
+        self.device = SimpleCTA2045Device()
+        self.device.run()
+        self.log = self.device.get_log()
+        self.log_size = 60
+        return
     def write(self,msg,log=False,end='\n'):
         if log:
             self.log.put(msg)
@@ -50,8 +51,12 @@ class DCM:
         print(msg)
         return
     def render(self) -> Layout:
-        self.counter+= 1
-        self.layout['body'].update(Text(f"\n\nthis is a text{self.counter}",style="green"))
+        # grab log from device 
+        log = self.device.get_log()
+        # display log
+        self.log = self.log.append(log)
+        if not self.log.empty:
+            self.layout['Output'].update(Text(f"\n\n{self.log.tail(self.log_size)}",style=log_color_style))
         self.layout['Input'].update(self.pretty_prompt)
         return self.layout
     def update_input_text(self,pretty_text):
@@ -60,9 +65,7 @@ class DCM:
         self.render()
         return
     def send_command(self,cmd):
-        # convert to cta
-        cmd_bytes = self.cta_mod.to_cta(cmd)
-        self.com.send(cmd_bytes)
+        self.device.send(cmd)
         return
 
 def validate_input(text,dcm) -> str:
