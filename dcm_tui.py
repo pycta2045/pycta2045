@@ -33,6 +33,7 @@ class DCM:
         self.console = Console()
         self.layout = Layout()
         self.layout.split(
+            Layout(name="header", size=1),
             Layout(ratio=1, name="Output"),
             Layout(size=10, name="Input"),
         )
@@ -42,7 +43,7 @@ class DCM:
         self.device = SimpleCTA2045Device()
         self.device.run()
         self.log = self.device.get_log()
-        self.log_size = 60
+        self.log_size = 20
         return
     def write(self,msg,log=False,end='\n'):
         if log:
@@ -55,8 +56,8 @@ class DCM:
         log = self.device.get_log()
         # display log
         self.log = self.log.append(log)
-        if not self.log.empty:
-            self.layout['Output'].update(Text(f"\n\n{self.log.tail(self.log_size)}",style=log_color_style))
+        self.layout['Output'].update(Text(f"{self.log.tail(self.log_size)}",style=log_color_style))
+        self.layout['header'].update(Text(datetime.now().ctime(), style="bold magenta", justify="center"))
         self.layout['Input'].update(self.pretty_prompt)
         return self.layout
     def update_input_text(self,pretty_text):

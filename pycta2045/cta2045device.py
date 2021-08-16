@@ -3,7 +3,9 @@ from pycta2045.com import *
 import sys, os, pandas as pd, time,  select, traceback as tb, multiprocessing#, import threading
 from pycta2045.models import *
 from queue import Queue
+from datetime import datetime as dt
 from threading import Thread
+
 
 
 choices = {
@@ -53,7 +55,7 @@ class CTA2045Device:
             ts.append(t)
             msgs.append(msg)
         df = pd.DataFrame({'time':ts, 'event':msgs})
-        df.set_index('time',inplace=True)
+        # df.set_index('time',inplace=True)
         return df
     def __update_log(self,msg,log=False,end='\n'):
         if log:
@@ -65,9 +67,7 @@ class CTA2045Device:
         try:
             res = self.com.get_next_msg()
             if res != None:
-                t_e = time.time()
                 msg,t = res # check against timeout
-                t = int(t)
                 if time.time() - t >= self.timeout:
                     self.__update_log(f"{t}: waiting for response timeout!",log=True)
                     raise TimeoutException('Timeout!')
@@ -275,13 +275,11 @@ class SimpleCTA2045Device:
     def get_log(self):
         ts = []
         msgs = []
-        timestmap_conversion = 1000 # unit conversion issue (need to change from secs to ms -- pandas)
         while not self.log.empty():
             t,msg = self.log.get().split(':')
-            ts.append(int(t)*timestmap_conversion)
+            ts.append(dt.fromtimestamp(round(float(t),3)))
             msgs.append(msg)
         df = pd.DataFrame({'time':ts, 'event':msgs})
-        df.time = pd.to_datetime(df.time)
         df.set_index('time',inplace=True)
         return df
     def __recv(self,verbose=True):
@@ -290,7 +288,7 @@ class SimpleCTA2045Device:
             res = self.com.get_next_msg()
             if res != None:
                 msg,t = res # check against timeout
-                t = int(t)
+                t = t
                 # if time.time() - t >= self.timeout:
                 #     self.__update_log(f"{t}: waiting for response timeout!")
                 #     raise TimeoutException('Timeout!')
@@ -306,7 +304,7 @@ class SimpleCTA2045Device:
             self.__update_log(f"{t}: received Unknwon command -- {msg}")
             raise UnknownCommandException(msg) # propagate exception
         except TimeoutException as e:
-            t = int(time.time())
+            t = time.time()
             if not 'timeout' in self.last_log_msg:
                 self.__update_log(f"{t}: waiting for message timeout -- {e.message}")
             raise TimeoutException(e.message) # propagate exception
@@ -315,7 +313,7 @@ class SimpleCTA2045Device:
         ret = False
         c = self.cta_mod.to_cta(cmd,args=args)
         ret = self.com.send(c)
-        self.__update_log(f'{int(time.time())}: sent {cmd}')
+        self.__update_log(f'{time.time()}: sent {cmd}')
         return ret
     def __setup(self):
         res = None

@@ -1,9 +1,10 @@
 import serial
 from serial.tools.list_ports import comports #from serial.tools.list_ports_linux import SysFS
-from multiprocessing import Process, Lock, Queue
+# from multiprocessing import Process, Lock, Queue
+from threading import Thread, Lock
 import time, pandas as pd, traceback as tb
 from pycta2045.cta2045 import UnsupportedCommandException, UnknownCommandException
-from queue import Empty
+from queue import Queue, Empty
 
 class TimeoutException(Exception):
     '''
@@ -49,11 +50,12 @@ class COM:
             self.ser.bytesize= serial.EIGHTBITS
             self.buffer = Queue()
             self.lock = Lock()
-            self.process = None
+            self.thread = None
             self.stopped = True
             self.last_msg_timestamp =  0
             print('comport was created sucessfully')
             self.__msgs = pd.DataFrame(columns = ['time','src','dest','message'])
+            self.msg_expected = False
             self.verbose = verbose
 
         except Exception as e:
@@ -73,6 +75,7 @@ class COM:
         res = self.ser.write(packet)
         self.last_msg_timestamp = time.time()
         self.sleep_until = time.time() + self.recv_delay
+        self.msg_expected = True
         return res>=2
     def __recv(self):
         '''
@@ -105,6 +108,8 @@ class COM:
                                 buff = []
                         except UnknownCommandException as e:
                             continue
+                    if self.msg_expected:
+                        self.msg_expected = False
                 if self.stopped:
                     print('exiting...')
                     break
@@ -130,22 +135,18 @@ class COM:
         return
     def start(self):
         '''
-            Purpose: starts listen on the given port. It creates a process with __recv running in it.
+            Purpose: starts listen on the given port. It creates a thread with __recv running in it.
             Args: None
             Returns: None
-            NOTES:
-                * After facing behavior problems introduced by the use of threading and GIL, I decided to go with multiprocessing instead.
-                * This is a workaround dealing with GIL
-
         '''
-        if self.process == None and self.ser != None:
-            self.process = Process(target=self.__recv)
-            self.process.daemon = True
+        if self.thread == None and self.ser != None:
+            self.thread = Thread(target=self.__recv)
+            self.thread.daemon = True
             # flush the buffers
             self.ser.reset_input_buffer()
             self.ser.reset_output_buffer()
             self.stopped = False
-            self.process.start() # starts a new thread to listen to packets
+            self.thread.start() # starts a new thread to listen to packets
         return
     def get_next_msg(self):
         '''
@@ -156,7 +157,8 @@ class COM:
         try:
             msg = self.buffer.get(timeout=self.ser.timeout) # no need to acquire -- blocks by default
         except Empty as e:
-            raise TimeoutException("Timout!")
+            if self.msg_expected:
+                raise TimeoutException("Timout!")
         return msg
     def write_log(self,fname):
         if fname != None:
