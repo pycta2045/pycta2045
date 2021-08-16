@@ -267,6 +267,7 @@ class SimpleCTA2045Device:
         }
         self.timeout = timeout
         self.last_log_msg = None
+        self.daemon_running = False
         return
     def __update_log(self,msg):
         self.last_log_msg = msg
@@ -346,7 +347,7 @@ class SimpleCTA2045Device:
     # ------------------------- Daemon Loop ----------------------------------
     # -----------------------------------------------------------------------------
     def __run_daemon(self):
-        while 1:
+        while not self.daemon_running:
             args = {}
             try:
                 res = self.__recv() # always waiting for commands
@@ -398,7 +399,14 @@ class SimpleCTA2045Device:
         else:
             raise UnknownModeException(f'Unknown Mode: {self.mode}')
         # run daemon
-        proc = Thread(target=self.__run_daemon)
-        proc.daemon = True
-        proc.start()
-        return 
+        self.thread = Thread(target=self.__run_daemon)
+        self.thread.daemon = True
+        self.daemon_running = True
+        self.thread.start()
+        return
+    def stop(self):
+        self.com.stop()
+        # give time to com mod to stop
+        time.sleep(1)
+        self.daemon_running = False
+        return

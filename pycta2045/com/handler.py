@@ -85,7 +85,7 @@ class COM:
         buff = []
         print('starting listener...')
         try:
-            while True:
+            while not self.stopped:
                 if time.time() - self.last_msg_timestamp < self.sleep_until:
                     time.sleep(self.recv_delay)
                 if self.ser.inWaiting() > 0:
@@ -167,3 +167,6 @@ class COM:
         return False
     def get_log(self):
         return self.__msgs
+    def stop(self):
+        self.stopped = True
+        return
