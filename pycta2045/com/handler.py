@@ -3,6 +3,7 @@ from serial.tools.list_ports import comports #from serial.tools.list_ports_linux
 from multiprocessing import Process, Lock, Queue
 import time, pandas as pd, traceback as tb
 from pycta2045.cta2045 import UnsupportedCommandException, UnknownCommandException
+from queue import Empty
 
 class TimeoutException(Exception):
     '''
@@ -120,10 +121,12 @@ class COM:
                 * message: content of the message
             Return: void
         '''
-        self.__msgs=self.__msgs.append({'time':int(time.time()),'src': context['src'],'dest':context['dest'],'message':context['message']},ignore_index=True)
+        t = int(time.time())
+        self.__msgs=self.__msgs.append({'time':t,'src': context['src'],'dest':context['dest'],'message':context['message']},ignore_index=True)
         if self.verbose == True:
             st = '<'*5 if context['dest'] == self.US else '>'*5
-            print(f"{st} FROM: {context['src']} TO: {context['dest']} MESSAGE: {context['message']}")
+            print(f"{t}:{st} FROM: {context['src']} TO: {context['dest']} MESSAGE: {context['message']}")
+        self.last_message = context['message']
         return
     def start(self):
         '''
@@ -146,15 +149,19 @@ class COM:
         return
     def get_next_msg(self):
         '''
-            blocking function that returns the next msg in the buffer
+            non-blocking function that returns the next msg in the buffer. 
+            If buffer is empty, it waits until timeout value before raising timeout exception.
         '''
         msg = None
-        msg = self.buffer.get() # no need to acquire -- blocks by default
-            #if t >= time.time() + self.ser.timeout:
-                #raise TimeoutException("waiting for ack/nak timout!")
+        try:
+            msg = self.buffer.get(timeout=self.ser.timeout) # no need to acquire -- blocks by default
+        except Empty as e:
+            raise TimeoutException("Timout!")
         return msg
-    def dump_log(self,fname):
+    def write_log(self,fname):
         if fname != None:
             self.__msgs.to_csv(fname)
             return True
         return False
+    def get_log(self):
+        return self.__msgs
