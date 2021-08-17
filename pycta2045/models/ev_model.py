@@ -55,8 +55,8 @@ class EV(CTA2045Model):
         self.rampup_time = rampup_time
         self.max_time = max_cap/power_rating # kWh/kW = hrs
         self.max_time *= 60 * 60  # convert to secs
-        self.t_start = time.time()
-        self.t_end = int(self.t_start+self.max_time) # calculate when charging should end
+        self.t_start = np.ceil(time.time())
+        self.t_end = np.ceil(self.t_start+self.max_time) # calculate when charging should end
         self.decay_rate = decay_rate
         self.rampup_delay = rampup_delay
         self.state = operating_status['endshed']
@@ -165,7 +165,7 @@ class EV(CTA2045Model):
 
 
         # calculate the ratio of time / copies
-        self.t_ratio = self.max_time//len(self.power)
+        self.t_ratio = np.ceil(self.max_time/len(self.power))
 
 
         time_slots.append(self.time[-1])
@@ -179,7 +179,7 @@ class EV(CTA2045Model):
 
         d = {'time':self.time,'power':self.power,'soc':self.SOC,'current':self.currs,'voltage':self.volts}
 
-        # print(f'time: {len(self.time)} power: {len(self.power)} SOC: {len(self.SOC)} currs: {len(self.currs)} volts: {len(self.volts)}')
+        print(f'time: {len(self.time)} power: {len(self.power)} SOC: {len(self.SOC)} currs: {len(self.currs)} volts: {len(self.volts)}')
         df = pd.DataFrame(d)
         df.set_index('time',inplace=True)
         self.df = df
@@ -187,9 +187,9 @@ class EV(CTA2045Model):
     def generate_time_stamps(self):
         i = self.t_start
         ts = []
-        for i in range(int(self.t_start),int(self.t_end)+1,int(self.t_ratio)):
+        for i in range(int(self.t_start),int(self.t_end),int(self.t_ratio)):
             ts.append(pd.Timestamp(time.ctime(i),unit='s'))
-        return ts[:-1]
+        return ts
     def get_soc(self,time):
         '''
             Purpose: returns the SoC at the given Epoch timestamp

@@ -57,10 +57,15 @@ class CTA2045Device:
         df = pd.DataFrame({'time':ts, 'event':msgs})
         # df.set_index('time',inplace=True)
         return df
-    def __update_log(self,msg,log=False,end='\n'):
+    def __write(self,msg,log=False,end='\n'):
         if log:
             self.__update_log(msg)
         print(msg,end=end)
+        return
+    def __update_log(self,msg,log=False,end='\n'):
+        if log:
+            self.__update_log(msg)
+        # print(msg,end=end)
         return
     def __recv(self,verbose=True):
         res = None
@@ -90,7 +95,7 @@ class CTA2045Device:
         ret = False
         c = self.cta_mod.to_cta(cmd,args=args)
         self.com.send(c)
-        self.__write(f'{int(time.time())}: sent {cmd}',log=True)
+        self.__write(f'{time.time()}: sent {cmd}',log=True)
         if verbose:
             if len(args) > 0:
                 self.__write('\twith args:')

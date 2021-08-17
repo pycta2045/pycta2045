@@ -1,4 +1,4 @@
-import json, os, traceback as tb
+import json, os, traceback as tb, numpy as np
 
 class UnsupportedCommandException(Exception):
     '''
@@ -272,7 +272,7 @@ class CTA2045:
             # checksum is valid?
             unchecked_data = msg[:-2]
             checked_data = self.checksum(" ".join(unchecked_data)).split(" ")
-            if msg == checked_data:
+            if np.array_equal(msg,checked_data):
                 valid = True
         else: # could be link ack/nak
             if self.from_cta(" ".join(msg)) != None:

@@ -2,7 +2,7 @@ import serial
 from serial.tools.list_ports import comports #from serial.tools.list_ports_linux import SysFS
 # from multiprocessing import Process, Lock, Queue
 from threading import Thread, Lock
-import time, pandas as pd, traceback as tb
+import time, pandas as pd, traceback as tb, numpy as np
 from pycta2045.cta2045 import UnsupportedCommandException, UnknownCommandException
 from queue import Queue, Empty
 
@@ -84,7 +84,7 @@ class COM:
             buffer is a queue used by all threads
         '''
         data = None
-        buff = [] # local buffer used to process chunk of packages
+        buff = np.array([]) # local buffer used to process chunk of packages
         print('starting listener...')
         try:
             while True:
@@ -96,7 +96,7 @@ class COM:
                     # iterate over bytes in data and append each one onto the buffer
                     # each time you append to the buffer, check if that completes a cta2045 command
                     for i in data:
-                        buff.append(i)
+                        buff = np.append(buff,i)
                         try:
                             if self.is_valid_cta(buff):
                                 buff = " ".join(buff)
@@ -107,7 +107,7 @@ class COM:
                                 self.sleep_until = time.time() + self.send_delay # send delay
                                 # log
                                 self.__log({'src':self.THEM,'dest':self.US,'message':buff})
-                                buff = []
+                                buff = np.array([])
                         except UnknownCommandException as e:
                             continue                    
                     if self.msg_expected:

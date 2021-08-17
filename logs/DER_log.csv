@@ -1,11 +1,1 @@
-time,event
-1628896033, sent intermediate mtsq
-1628896034, received ack
-1628896034, sent data-link mtsq
-1628896034, received ack
-1628896034, sent max payload request
-1628896034, received ack
-1628896034, received max payload response
-1628896034, sent ack
-1628896034, sent basic mtsq
-1628896034, received ack
+,time,event
