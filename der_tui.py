@@ -77,7 +77,7 @@ def main():
         except Exception:
             return
 
-    with Live(der.render(), screen=True, redirect_stderr=False,refresh_per_second=20) as live:
+    with Live(der.render(), screen=True, redirect_stderr=False,refresh_per_second=1) as live:
         try:
             text = f""
             while True:

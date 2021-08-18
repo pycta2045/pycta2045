@@ -174,4 +174,5 @@ class COM:
         return self.__msgs
     def stop(self):
         self.stopped = True
+        self.thread.join()
         return

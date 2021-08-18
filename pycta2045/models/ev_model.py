@@ -78,6 +78,7 @@ class EV(CTA2045Model):
         if verbose:
             print(f'min_com: {self.min_comfort}  max: {self.max_comfort} shed: {self.min_shed,self.max_shed}')
         self.init_SoC = 0.0
+        self.commodity_log = pd.DataFrame({})
         return
 
     def calculate_SoC(self,current,voltage): # returns (power, SoC)
@@ -413,7 +414,8 @@ class EV(CTA2045Model):
             >> IR =  None  --> CTA2045 not used
         '''
         CA2 = self.max_cap * (1-soc)
-        
+        t = np.round(time.time(),decimals=3)
+        self.commodity_log = self.commodity_log.append({'time':dt.fromtimestamp(t),'Elect. Consumed - Cumulative (Wh)':int(CA),'Elect. Consumed - Inst. Rate (W)':int(IR),'EnergyTake - Cumulative (Wh)':int(CA2),'EnergyTake - Inst. Rate (W)':int(IR2)},ignore_index=True)
         if self.verbose:
             print(f'Energy Take: {CA2} {IR2} (not supported)')
         val['instantaneous_rate'] = CTA2045.hexify(int(IR),length=6)
@@ -423,9 +425,6 @@ class EV(CTA2045Model):
         IR2 = CTA2045.hexify(int(IR2),length=6)
         CA = f'{CA} {CC2} {IR2} {CA2}'
         val['cumulative_amount'] = CA
-
-
-
         return val
     def critical_peak_event(self,payload):
         '''
@@ -455,3 +454,5 @@ class EV(CTA2045Model):
         self.max_comfort = self.max_ge
         self.state = operating_status['grid emergency']
         return val
+    def get_commodity_log(self):
+        return self.commodity_log

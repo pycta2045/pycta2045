@@ -411,7 +411,6 @@ class SimpleCTA2045Device:
         return
     def stop(self):
         self.com.stop()
-        # give time to com mod to stop
-        time.sleep(1)
         self.stopped = True
+        self.thread.join()
         return
