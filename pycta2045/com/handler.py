@@ -86,6 +86,9 @@ class COM:
         data = None
         buff = np.array([]) # local buffer used to process chunk of packages
         print('starting listener...')
+        # clear buffer
+        self.ser.flushInput()
+        self.ser.flushOutput()
         try:
             while True:
                 if time.time() - self.last_msg_timestamp < self.sleep_until:

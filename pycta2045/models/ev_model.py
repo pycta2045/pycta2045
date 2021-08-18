@@ -1,5 +1,6 @@
 import numpy as np, pandas as pd, matplotlib.pyplot as plt
 import time, traceback as tb
+from datetime import datetime as dt
 from .model import CTA2045Model
 from pycta2045.cta2045 import CTA2045
 
@@ -8,6 +9,8 @@ operating_status = {
     'endshed':'idle normal',
     'shed':'idle curtailed',
     'loadup':'idle normal',
+    'grid emergency':'idle normal',
+    'critical peak event':'idle normal',
 }
 
 class EV(CTA2045Model):
@@ -20,7 +23,7 @@ class EV(CTA2045Model):
             * max_curr: maximum current value (Amps)
             * min_comfort: minimum user comfort level for SoC (%)
             * max_comfort: maximum user comfort level for SoC (%)
-            * decay_rate: rate by which the current decays in constant voltage (CV) phase
+            * decay_rate: rate by which the current decays in constant voltage (CV) phase <------------------- NO LONGER USED & SHOULD BE REMOVED -- ALSO REMOVE ARG DEFAULTS (DEL) 
             * rampup_delay: rate by which the current decays in constant voltage (CV) phase (time units)
             * rampup_time: time it takes to reach CV phase (time units)
             * max_cap : Nameplate Rating -- Nissan Leaf (Kwh)
@@ -28,7 +31,7 @@ class EV(CTA2045Model):
         Return:
             * None
         NOTES:
-            * decay rate: affects the upper half of the graph's concavity (Time v. SoC)
+            * decay rate: affects the upper half of the graph's concavity (Time v. SoC) <------------------- NO LONGER USED & SHOULD BE REMOVED -- ALSO REMOVE ARG DEFAULTS (DEL) 
                 * larger values >=1 result in a sharper edges when charging reaches max SoC
                 * smaller values <1 result in smother edges
                 * recommend: default value (0.9)
@@ -46,11 +49,20 @@ class EV(CTA2045Model):
         self.max_curr = max_curr
         self.max_volt = max_volt
         self.max_cap = max_cap * 1000 # in Kwh
+        # ------------- normal setpoints --------------------
         self.min_comfort = min_comfort
         self.max_comfort = max_comfort
         self.user_comfort = (min_comfort,max_comfort)
-        self.min_shed = min_comfort - 0.2 # drop by 20%
-        self.max_shed = max_comfort - 0.1 # drop by 10%
+        # ------------- shed setpoints --------------------
+        self.min_shed = min_comfort - (min_comfort*0.2) # drop by 20%
+        self.max_shed = max_comfort - (max_comfort*0.1) # drop by 10%
+        # ------------- GridEmergency setpoints --------------------
+        self.min_ge = min_comfort * 0.0
+        self.max_ge = max_comfort * 0.0
+        # ------------- Critical Peak Event setpoints --------------------
+        self.min_cpe = min_comfort * 0.5
+        self.max_cpe = max_comfort * 0.5
+
         self.verbose = verbose
         self.rampup_time = rampup_time
         self.max_time = max_cap/power_rating # kWh/kW = hrs
@@ -75,9 +87,19 @@ class EV(CTA2045Model):
         soc = q/self.max_cap
         # print(f'i: {current} p: {p} q: {q} soc: {soc}')
         return (p,soc)
-    def current_decay(self,rate,i):
-        return i * np.exp(-rate)
+    def current_decay(self,soc,i):
+        '''
+            This function should only be used in the 3rd phase of charging (Constant Voltage). 
+            That means we shouldn't have an issue with dividing by zero.
+        '''
+        current_cap = self.max_cap*soc
+        return i/current_cap 
     def update_state(self,c,v,soc,p):
+        decimal = 3
+        p = np.round(p,decimals=decimal)
+        c = np.round(c,decimals=decimal)
+        v = np.round(v,decimals=decimal)
+        soc = np.round(soc,decimals=decimal)
         self.time.append(self.timer)
         self.power.append(p)
         max_soc = self.max_comfort
@@ -129,16 +151,15 @@ class EV(CTA2045Model):
         v = self.max_volt
         i = self.max_curr
         SoC = self.SOC[-1]
-        min_cur = 0.05 * i
+        min_cur = 0.0001 * i
         if self.verbose:
-            print(f'PHASE3 SoC: {SoC} max: {self.max_comfort} SoC < max : {SoC < self.max_comfort}')
-        while SoC < self.max_comfort:
-            i = self.current_decay(self.decay_rate,self.currs[-1])
+            print(f'PHASE3 SoC: {SoC} max: {self.max_comfort} SoC < min {SoC <= self.min_comfort} SoC < max : {SoC < self.max_comfort} user_comfort{self.min_comfort,self.max_comfort}')
+        while SoC < self.min_comfort or SoC < self.max_comfort:
+            i = self.current_decay(SoC,i)
             i = min(self.max_curr,max(i,min_cur))
             p,soc = self.calculate_SoC(i,v) # calculate power, soc
             SoC += soc
-            self.timer+=self.t_inc
-            self.update_state(i,v,SoC,p)
+        self.timer+=self.t_inc
         return
     def charge(self,init_SoC=.0,fname=None):
         v = self.verbose
@@ -160,35 +181,34 @@ class EV(CTA2045Model):
             print(f'PHASE 3: SoC: {round(self.SOC[-1],3)}\n')
         time_slots.append(self.time[-1])
         self.phase3()
-
-
+        
+        self.update_state(0,0,self.SOC[-1],0) # charging has ended
 
 
         # calculate the ratio of time / copies
-        self.t_ratio = np.ceil(self.max_time/len(self.power))
+        self.t_ratio = np.round(self.max_time/len(self.power)) # risk: divide by zero when len(power) = 0
 
 
         time_slots.append(self.time[-1])
-        self.time = self.generate_time_stamps()
+        self.timestamps = self.generate_time_stamps()
         # self.time
         ys = [(self.SOC,'SOC (%)'),(self.power,'power (W)'),(self.currs,'current (A)'),(self.volts,'voltage (V)')] # super gross
         if fname != None:
             # self.subplot(self.time,ys,vlines=time_slots,fname=f'{fname}')
-            self.plot(self.time,ys[0])
-            self.plot(self.time,ys[1])
+            self.plot(self.timestamps,ys[0])
+            self.plot(self.timestamps,ys[1])
 
-        d = {'time':self.time,'power':self.power,'soc':self.SOC,'current':self.currs,'voltage':self.volts}
+        d = {'time':self.timestamps,'power':self.power,'soc':self.SOC,'current':self.currs,'voltage':self.volts}
 
-        print(f'time: {len(self.time)} power: {len(self.power)} SOC: {len(self.SOC)} currs: {len(self.currs)} volts: {len(self.volts)}')
+        # print(f'time: {len(self.timestamps)} power: {len(self.power)} SOC: {len(self.SOC)} currs: {len(self.currs)} volts: {len(self.volts)}')
         df = pd.DataFrame(d)
         df.set_index('time',inplace=True)
         self.df = df
         return df
     def generate_time_stamps(self):
-        i = self.t_start
-        ts = []
-        for i in range(int(self.t_start),int(self.t_end),int(self.t_ratio)):
-            ts.append(pd.Timestamp(time.ctime(i),unit='s'))
+        start = dt.fromtimestamp(self.t_start)
+        end = dt.fromtimestamp(self.t_end)
+        ts = pd.date_range(start=start, end=end, periods=len(self.power)).round('S') # round seconds
         return ts
     def get_soc(self,time):
         '''
@@ -215,18 +235,34 @@ class EV(CTA2045Model):
         '''
         record = None
         try:
-            if time >=self.t_end:
+            if self.verbose:
+                print("LAST 5 TIMESTAMPs: \n",self.df.tail(5))
+            # subtract time from the starting time of the charge
+            time -= self.t_start
+            i = int(time/self.t_ratio) # risk: divide by zero when t_ration = 0
+            if i >= len(self.df):
                 record = self.df.tail(1) # could be 100% or max_comfort (if in shed mode)
-            elif time <= self.t_start:
+            elif time <= 0:
                 record = self.df.head(1)
             else:
-                # subtract time from the starting time of the charge
-                time -= self.t_start
-                i = int(time/self.t_ratio)
                 record = self.df.iloc[i]
         except Exception as e:
             pass # returns None as record
         return record
+    def get_records(self):
+        '''
+            Purpose: returns log of all the records
+            Args:
+                * None
+            Returns: log of records containing (time, power, soc, current, voltage)
+            Notes: Returns None if charging has not started (not plugged-in)
+        '''
+        records = None
+        try:
+            records = self.df
+        except Exception:
+            pass # records will be None
+        return records
     def subplot(self,xs,ys,x_name='Time',vlines = None,fname=None): # change to use member variables not args
         num = len(ys)//2 # divide graphs by 2
         (fig,axs) = plt.subplots(num,num) # create 4 graphs
@@ -289,8 +325,8 @@ class EV(CTA2045Model):
             Return:
                 * val: dict containing return values used for CTA2045
         '''
-        print('shedding...')
         val = {}
+        print('shedding...')
         self.min_comfort = self.min_shed
         self.max_comfort = self.max_shed
         self.state = operating_status['shed']
@@ -303,8 +339,8 @@ class EV(CTA2045Model):
             Return:
                 * val: dict containing return values used for CTA2045
         '''
-        print('endshed...')
         val = {}
+        print('endshed...')
         self.min_comfort,self.max_comfort = self.user_comfort
         self.state = operating_status['endshed']
         #print(f'new min: {self.min_comfort} new max: {self.max_comfort}')
@@ -317,10 +353,15 @@ class EV(CTA2045Model):
             Return:
                 * val: dict containing return values used for CTA2045
         '''
-        print('loading up...')
         val = {}
+        print('loading up...')
         self.state = operating_status['loadup']
-        self.charge()
+        soc = 0
+        try:
+            soc = self.df['soc'].tail(1)[-1]
+        except Exception:
+            pass # use 0%
+        self.charge(init_SoC=soc)
         return val
     def operating_status(self,payload:dict):
         '''
@@ -330,8 +371,8 @@ class EV(CTA2045Model):
             Return:
                 * val: dict containing return values used for CTA2045
         '''
-        print('OpStatus...')
         val = {}
+        print('OpStatus...')
         val['op_state_code'] = self.state
         return val
     def commodity_read(self,payload:dict):
@@ -344,8 +385,8 @@ class EV(CTA2045Model):
             NOTE:
                 * a workaround to support multiple Commodity Codes (CC) is to tag CCs after IR values in a "chaining" manner
         '''
-        print('CommodityRead...')
         val = {}
+        print('CommodityRead...')
         IR = CA = CA2 = IR2 = soc = 0
         val['commodity_code'] = 'electricity consumed' # go with electricity consumed first
         try:
@@ -358,28 +399,29 @@ class EV(CTA2045Model):
         except Exception as e:
             print(tb.format_tb(e))
             pass
-            '''
-            # ---------------- calculate electricity consumed -----------------
-                >> CA = max_cap(Kwh) * SoC (%)
-                >> IR = power[time]
-            '''
-            CA = self.max_cap * (soc - self.init_SoC)
-            IR = CTA2045.hexify(int(IR),length=6)
-            CA = CTA2045.hexify(int(CA),length=6)
-            '''
-            # ---------------- calculate present energy (energy take) ---------
-                >> CA = max_cap(Kwh) * (1-SoC) (%)
-                >> IR =  None  --> CTA2045 not used
-            '''
-            CA2 = self.max_cap * (1-soc)
-
-
+        '''
+        # ---------------- calculate electricity consumed -----------------
+            >> CA = max_cap(Kwh) * SoC (%)
+            >> IR = power[time]
+        '''
+        CA = self.max_cap * (soc - self.init_SoC)
+        # IR = CTA2045.hexify(int(IR),length=6)
+        # CA = CTA2045.hexify(int(CA),length=6)
+        '''
+        # ---------------- calculate present energy (energy take) ---------
+            >> CA = max_cap(Kwh) * (1-SoC) (%)
+            >> IR =  None  --> CTA2045 not used
+        '''
+        CA2 = self.max_cap * (1-soc)
+        
+        if self.verbose:
+            print(f'Energy Take: {CA2} {IR2} (not supported)')
         val['instantaneous_rate'] = CTA2045.hexify(int(IR),length=6)
         CA = CTA2045.hexify(int(CA),length=6)
         CC2 = self.cta.get_code_value('commodity_code','present energy')
         CA2 = CTA2045.hexify(int(CA2),length=6)
         IR2 = CTA2045.hexify(int(IR2),length=6)
-        CA = f'{CA} {CC2} {CA2} {IR2}'
+        CA = f'{CA} {CC2} {IR2} {CA2}'
         val['cumulative_amount'] = CA
 
 
@@ -395,6 +437,9 @@ class EV(CTA2045Model):
         '''
         val = {}
         print('critical peak eventing...')
+        self.min_comfort = self.min_cpe
+        self.max_comfort = self.max_cpe
+        self.state = operating_status['critical peak event']
         return val
     def grid_emergency(self,payload):
         '''
@@ -406,4 +451,7 @@ class EV(CTA2045Model):
         '''
         val = {}
         print('grid emergencying...')
+        self.min_comfort = self.min_ge
+        self.max_comfort = self.max_ge
+        self.state = operating_status['grid emergency']
         return val
