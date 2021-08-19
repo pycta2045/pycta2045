@@ -15,7 +15,8 @@ choices = {
     4: "critical peak event",
     5:"grid emergency",
     6:"operating status request",
-    7:"quit"
+    7:"device info request",
+    8:"quit"
 }
 
 class UnknownModeException(Exception):

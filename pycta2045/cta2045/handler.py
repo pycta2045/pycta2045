@@ -111,6 +111,17 @@ class CTA2045:
         lsb = 255 - ((c1 + msb) % 255)
         val = f"{val} {self.hexify(msb)} {self.hexify(lsb)}"
         return val
+    def hex_process(self,val):
+        ret = ''
+        val = val.strip() # trim ends
+        val = val.split() # strip to list
+        for v in val:
+            # convert to int
+            i = int(v,16)
+            # hexify
+            h = self.hexify(i)
+            ret += f' {h}'
+        return ret.strip()
     def from_cta(self,val):
         '''
             Purpose: Translates hex representation of CTA2045 commands (0x06 0x00) to natural language representation (link-layer ack)
@@ -121,6 +132,7 @@ class CTA2045:
                 * This function uses CTA2045_commands.json. So it is limited to only supported commands in the JSON file.
                 * If the command is not supported, it returns None as an output.
         '''
+        val = self.hex_process(val)
         response = None
         key = None
         try:
@@ -128,6 +140,7 @@ class CTA2045:
             val = val.split(' ')
             l = len(val)
             for k,v in self.cmds['commands'].items():
+                print(f'checking against {k}')
                 t = v['type']['hex'].lower()
                 vlen = len(v['format'].split())
                 op1 = v['op1'].lower()
