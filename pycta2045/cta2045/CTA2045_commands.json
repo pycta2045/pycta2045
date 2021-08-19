@@ -287,6 +287,7 @@
         "water heater - heat pump variable":"0x00 0x1b",
         "water heater - phase change material":"0x00 0x1c",
         "other":"0x80 0x00",
+        "unspecified":"0x00 0x00",
         "length":"2"
     },
     "cta_version":{
@@ -310,8 +311,8 @@
         "length":"6"
     },
     "capability_bitmap":{
-        "cycling":"0x00",
-        "length":"1"
+        "cycling":"0x00 0x00 0x00 0x00",
+        "length":"4"
     },
     "intermediate_response_code":{
         "success":"0x00",
