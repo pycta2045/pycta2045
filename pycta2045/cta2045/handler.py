@@ -140,7 +140,6 @@ class CTA2045:
             val = val.split(' ')
             l = len(val)
             for k,v in self.cmds['commands'].items():
-                print(f'checking against {k}')
                 t = v['type']['hex'].lower()
                 vlen = len(v['format'].split())
                 op1 = v['op1'].lower()
@@ -291,3 +290,21 @@ class CTA2045:
             if self.from_cta(" ".join(msg)) != None:
                 valid = True
         return valid
+    def from_cta_bytes(self,encoded_bytes):
+        # convert to str
+        assert type(encoded_bytes) == bytes, 'argument must be of type bytes' 
+        s = bytes.decode()
+        s = s.replace('/',' ').strip()
+        # hexify
+        return self.from_cta(s)
+    def to_cta_bytes(self,cmd:str):
+        byte = b''
+        # convert to command
+        cta = self.to_cta(cmd)
+        assert cta != None, 'Error translating command'
+        arr = cta.split(' ')
+        for i in arr:
+            # convert to int from hex
+            byte += int(i,16).to_bytes(length=1,byteorder='big',signed=False)
+        # hexify
+        return byte
