@@ -4,7 +4,6 @@ from datetime import datetime as dt
 from .model import CTA2045Model
 from pycta2045.cta2045 import CTA2045
 
-power_rating=12.0
 operating_status = {
     'endshed':'idle normal',
     'shed':'idle curtailed',
@@ -14,7 +13,7 @@ operating_status = {
 }
 
 class EV(CTA2045Model):
-    def __init__(self,max_volt=240,max_curr=30,max_cap=40,min_comfort=.9,max_comfort=1.,decay_rate=.3,rampup_delay=1,rampup_time=5,verbose=False):
+    def __init__(self,max_volt=240,max_curr=30,max_cap=40,min_comfort=.9,max_comfort=1.,decay_rate=.5,rampup_delay=1,rampup_time=5,t_res=1,verbose=False):
         '''
         Purpose:
             initializes the model with the given parameters for charging
@@ -27,6 +26,7 @@ class EV(CTA2045Model):
             * rampup_delay: rate by which the current decays in constant voltage (CV) phase (time units)
             * rampup_time: time it takes to reach CV phase (time units)
             * max_cap : Nameplate Rating -- Nissan Leaf (Kwh)
+            * t_res: time resolution, which is used as increments/beat everythin is calculated by
             * verbose: print log messages
         Return:
             * None
@@ -48,6 +48,7 @@ class EV(CTA2045Model):
         self.timer = 0
         self.max_curr = max_curr
         self.max_volt = max_volt
+        self.power_rating = max_curr * max_volt
         self.max_cap = max_cap * 1000 # in Kwh
         # ------------- normal setpoints --------------------
         self.min_comfort = min_comfort
@@ -65,7 +66,7 @@ class EV(CTA2045Model):
 
         self.verbose = verbose
         self.rampup_time = rampup_time
-        self.max_time = max_cap/power_rating # kWh/kW = hrs
+        self.max_time = self.max_cap/self.power_rating # kWh/kW = hrs
         self.max_time *= 60 * 60  # convert to secs
         self.t_start = np.ceil(time.time())
         self.t_end = np.ceil(self.t_start+self.max_time) # calculate when charging should end
@@ -73,7 +74,7 @@ class EV(CTA2045Model):
         self.rampup_delay = rampup_delay
         self.state = operating_status['endshed']
         # self.t_inc = self.max_curr/self.max_time
-        self.t_inc = 1
+        self.t_inc = t_res
         self.cta = CTA2045()
         if verbose:
             print(f'min_com: {self.min_comfort}  max: {self.max_comfort} shed: {self.min_shed,self.max_shed}')
@@ -88,13 +89,14 @@ class EV(CTA2045Model):
         soc = q/self.max_cap
         # print(f'i: {current} p: {p} q: {q} soc: {soc}')
         return (p,soc)
-    def current_decay(self,soc,i):
+    def current_decay(self,step):
         '''
             This function should only be used in the 3rd phase of charging (Constant Voltage). 
             That means we shouldn't have an issue with dividing by zero.
         '''
-        current_cap = self.max_cap*soc
-        return i/current_cap 
+        # current_cap = self.max_cap*soc
+        decay = self.max_curr* np.power(1-self.decay_rate,step)
+        return decay
     def update_state(self,c,v,soc,p):
         decimal = 3
         p = np.round(p,decimals=decimal)
@@ -104,11 +106,12 @@ class EV(CTA2045Model):
         self.time.append(self.timer)
         self.power.append(p)
         max_soc = self.max_comfort
-        self.SOC.append(min(soc,max_soc))
+        f_soc = min(soc,max_soc)
+        self.SOC.append(f_soc)
         self.volts.append(v)
         self.currs.append(c)
         if self.verbose:
-            print(f'V: {v} I: {c} SOC:{int(soc*100)}%')
+            print(f'V: {v} I: {c} SOC: {int(soc*100)}%',' max SOC: ',max_soc)
         return
 
     def delay(self,init_SoC):
@@ -152,15 +155,16 @@ class EV(CTA2045Model):
         v = self.max_volt
         i = self.max_curr
         SoC = self.SOC[-1]
-        min_cur = 0.0001 * i
+        min_cur = 0.0005 * i
         if self.verbose:
             print(f'PHASE3 SoC: {SoC} max: {self.max_comfort} SoC < min {SoC <= self.min_comfort} SoC < max : {SoC < self.max_comfort} user_comfort{self.min_comfort,self.max_comfort}')
         while SoC < self.min_comfort or SoC < self.max_comfort:
-            i = self.current_decay(SoC,i)
+            i = self.current_decay(self.timer)
             i = min(self.max_curr,max(i,min_cur))
             p,soc = self.calculate_SoC(i,v) # calculate power, soc
             SoC += soc
-        self.timer+=self.t_inc
+            self.update_state(i,v,SoC,p)
+            self.timer+=self.t_inc
         return
     def charge(self,init_SoC=.0,fname=None):
         v = self.verbose
@@ -188,6 +192,8 @@ class EV(CTA2045Model):
 
         # calculate the ratio of time / copies
         self.t_ratio = np.round(self.max_time/len(self.power)) # risk: divide by zero when len(power) = 0
+        if self.verbose:
+            print(f't ratio = max time({self.max_time})/power_len({len(self.power)}) = ',self.t_ratio)
 
 
         time_slots.append(self.time[-1])
@@ -239,6 +245,8 @@ class EV(CTA2045Model):
             if self.verbose:
                 print("LAST 5 TIMESTAMPs: \n",self.df.tail(5))
             # subtract time from the starting time of the charge
+            if self.verbose:
+                print('query record at: time: ',time,' time-t_start: ',time-self.t_start,' ratio: ',self.t_ratio)
             time -= self.t_start
             i = int(time/self.t_ratio) # risk: divide by zero when t_ration = 0
             if i >= len(self.df):
