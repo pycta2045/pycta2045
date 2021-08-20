@@ -27,8 +27,6 @@ class COM:
         '''
         self.port = port
         self.ser = None
-        if 'dev' in self.port:
-            port = self.port.split('/')[-1]
         self.ser = serial.Serial(self.port)
         self.send_delay = .04 # (send delay) 40 ms of MAX time after receiving a msg and BEFORE sending ack/nak (200 ms according to CTA2045)
         self.recv_delay = .1 # (recv delay) 100 ms of MIN time after tansmission until the start of another (according to CTA2045)

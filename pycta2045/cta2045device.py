@@ -45,6 +45,9 @@ class CTA2045Device:
         }
         self.timeout = timeout
         return
+    def __del__(self):
+        self.stop()
+        return
     def __update_log(self,msg):
         self.log.put(msg)
         return
@@ -247,7 +250,11 @@ class CTA2045Device:
         else:
             raise UnknownModeException(f'Unknown Mode: {self.mode}')
         return self.get_log()
-
+    def stop(self):
+        self.com.stop()
+        self.stopped = True
+        self.thread.join()
+        return
 # ============================= Simplified inteface of CTA2045Device ==================================
 class SimpleCTA2045Device:
     '''
@@ -257,12 +264,12 @@ class SimpleCTA2045Device:
         It allows the user to just send a command without writing the logic of what and
         what not to send next (the part of recieving and responding to basic acks/naks, etc. is automated). 
     '''
-    def __init__(self,mode='DCM',timeout=1.,model=None,comport='/dev/ttyS6'):
+    def __init__(self,mode='DCM',timeout=1.,model=None,comport='/dev/ttyS6',verbose=False):
         self.mode = mode.upper()
         self.model = model
         self.log = Queue()
         self.cta_mod = CTA2045()
-        self.com = COM(checksum=self.cta_mod.checksum,transform=self.cta_mod.hexify,is_valid=self.cta_mod.is_valid,port=comport)
+        self.com = COM(checksum=self.cta_mod.checksum,transform=self.cta_mod.hexify,is_valid=self.cta_mod.is_valid,port=comport,verbose=verbose)
         self.last_command = '0x00'
         # flags for minimum cta2045 support
         self.support_flags = {
@@ -274,6 +281,9 @@ class SimpleCTA2045Device:
         self.timeout = timeout
         self.last_log_msg = None
         self.stopped = True
+        return
+    def __del__(self):
+        self.stop()
         return
     def __update_log(self,msg):
         self.last_log_msg = msg

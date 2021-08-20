@@ -343,6 +343,7 @@
         "length":16
     },
     "firmware_year":{
+        "30":"0x1e",
         "21":"0x15",
         "20":"0x14",
         "19":"0x13",
@@ -358,10 +359,10 @@
         "length":1
     },
     "firmware_month":{
-        "mar":"0x02",
+        "apr":"0x03",
         "january":"0x00",
         "feb":"0x01",
-        "apr":"0x03",
+        "mar":"0x02",
         "may":"0x04",
         "june":"0x05",
         "july":"0x06",

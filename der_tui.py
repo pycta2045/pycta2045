@@ -18,6 +18,7 @@ text_color = 'cyan'
 input_color = 'magenta'
 warning_color = 'bright_red'
 log_color_style = 'pale_violet_red1'
+port = '/dev/ttyS100'
 class DER:
     prompt = {
         0: 'quit',
@@ -28,7 +29,7 @@ class DER:
         5: 'grid emergency',
         6: 'operating status request',
     }
-    def __init__(self,port='/dev/ttyS6'):
+    def __init__(self,port=port):
         self.counter = 0
         self.console = Console()
         self.layout = Layout()
@@ -41,7 +42,7 @@ class DER:
         # self.plain_prompt = "\t".join(self.plain_prompt)
         # self.pretty_prompt = Text("").from_markup(self.plain_prompt,justify='center')
         self.model = ev_model.EV()
-        self.device = SimpleCTA2045Device(mode='DER',model=self.model,comport="/dev/ttyS7")
+        self.device = SimpleCTA2045Device(mode='DER',model=self.model,comport=port)
         self.device.run()
         self.log = self.device.get_log()
         self.log_size = 40
@@ -85,17 +86,17 @@ def main():
         except KeyboardInterrupt:
             pass
     der.device.stop()
-    save = ''
-    while not save in ['y','n']:
-        if not save in ['','y','n']:
-            print('invalid input! ',save)
-        print(f"would you like to save the log? [y/n]")
-        save = input(f"")
-        save = save.lower()
-    fname = ''
-    if save == 'y' and fname == '':
-        fname = input('Enter output log name (csv): ')
-        der.log.to_csv(f"{fname}.csv")
+    # save = ''
+    # while not save in ['y','n']:
+    #     if not save in ['','y','n']:
+    #         print('invalid input! ',save)
+    #     print(f"would you like to save the log? [y/n]")
+    #     save = input(f"")
+    #     save = save.lower()
+    # fname = ''
+    # if save == 'y' and fname == '':
+    #     fname = input('Enter output log name (csv): ')
+    #     der.log.to_csv(f"{fname}.csv")
     return
 if __name__=="__main__":
     main()

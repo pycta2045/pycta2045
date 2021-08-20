@@ -18,6 +18,7 @@ text_color = 'cyan'
 input_color = 'magenta'
 warning_color = 'bright_red'
 log_color_style = 'pale_violet_red1'
+port = '/dev/ttyS100'
 class DCM:
     prompt = {
         0: 'quit',
@@ -28,7 +29,7 @@ class DCM:
         5: 'grid emergency',
         6: 'operating status request',
     }
-    def __init__(self,port='/dev/ttyS6'):
+    def __init__(self,port=port):
         self.counter = 0
         self.console = Console()
         self.layout = Layout()
@@ -40,7 +41,7 @@ class DCM:
         self.plain_prompt  = list(map(lambda x: f"[{num_color}]{x[0]}[/{num_color}]: [{text_color}]{x[1]}[/{text_color}]",self.prompt.items()))
         self.plain_prompt = "\t".join(self.plain_prompt)
         self.pretty_prompt = Text("").from_markup(self.plain_prompt,justify='center')
-        self.device = SimpleCTA2045Device(comport="/dev/ttyS7")
+        self.device = SimpleCTA2045Device(comport=port)
         self.device.run()
         self.log = self.device.get_log()
         self.log_size = 40
@@ -114,26 +115,15 @@ def main():
                 dcm.update_input_text(text)
         except KeyboardInterrupt:
             pass
-    dcm.device.stop()
     terminated = True
-    # thread.join()
+    dcm.device.stop()
+    thread.join()
     # count
-    # thread_count = threading.active_count()
+    thread_count = threading.active_count()
 
-    # for t in threading.enumerate():
-    #     print(t)
+    for t in threading.enumerate():
+        print(t)
     # output log
-    save = ''
-    while not save in ['y','n']:
-        if not save in ['','y','n']:
-            print('invalid input! ',save)
-        print(f"would you like to save the log? [y/n]")
-        save = input(f"")
-        save = save.lower()
-    fname = ''
-    if save == 'y' and fname == '':
-        fname = input('Enter output log name (csv): ')
-        dcm.log.to_csv(f"{fname}.csv")
     return
 if __name__=="__main__":
     main()

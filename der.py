@@ -6,13 +6,12 @@ import matplotlib.pyplot as plt
 from rich import pretty
 pretty.install()
 
-
+port = '/dev/ttyS100'
 figsize = (50,50) # (w,h)
 version = '_1_5_k_max_cap' # experiment version
-
 ev = models.EV(max_cap=1.5,verbose=True)
 t_end = ev.t_end
-dev = device.CTA2045Device(mode="DER",model=ev,comport='/dev/ttyUSB0')
+dev = device.CTA2045Device(mode="DER",model=ev,comport=port)
 log = dev.run()
 print("LOG: ")
 print(log)
