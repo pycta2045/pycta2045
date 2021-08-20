@@ -131,7 +131,7 @@ class COM:
                 * message: content of the message
             Return: void
         '''
-        t = int(time.time())
+        t = time.time()
         self.__msgs=self.__msgs.append({'time':t,'src': context['src'],'dest':context['dest'],'message':context['message']},ignore_index=True)
         if self.verbose == True:
             st = '<'*5 if context['dest'] == self.US else '>'*5

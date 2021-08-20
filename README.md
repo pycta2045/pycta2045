@@ -21,6 +21,8 @@ phases:
 
 
 ## tests:
+>__NOTE__: Com unittests rely on the creation of a virtual serial port. To do so, it creates two virtual comports using socat (```ttyUSB99 and ttyUSB100```). The numbers were chosen (ignorantly) based on the idea that they should far away from any actual existing comports. Thus avoiding collisions with actual comports.
+
 run all tests with `python -m unittest tests/all.py`
 
 run a specific test with `python -m unittest tests/test.py`

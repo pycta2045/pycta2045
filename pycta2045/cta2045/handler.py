@@ -82,6 +82,10 @@ class CTA2045:
                             rep = self.cmds[k][rep]
                     else:
                         rep = list(self.cmds[f'{k}'].values())[0]
+                    if 'ascii' in k: 
+                        # convert rep from ascii -> hex -> int -> hex with proper length
+                        rep = int(rep.encode().hex(),16)
+                        rep = self.hexify(rep,length=self.cmds[k]['length'])
                     res = res.replace(byte,rep)
             v = res
             if '#' in res:

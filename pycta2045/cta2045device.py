@@ -29,12 +29,12 @@ recv_color = 'red'
 send_color = 'green'
 
 class CTA2045Device:
-    def __init__(self,mode='DCM',timeout=1,model=None,comport='/dev/ttyS6'):
+    def __init__(self,mode='DCM',timeout=1,model=None,comport='/dev/ttyS6',verbose=False):
         self.mode = mode.upper()
         self.model = model
         self.log = multiprocessing.Queue()
         self.cta_mod = CTA2045()
-        self.com = COM(checksum=self.cta_mod.checksum,transform=self.cta_mod.hexify,is_valid=self.cta_mod.is_valid,port=comport)
+        self.com = COM(checksum=self.cta_mod.checksum,transform=self.cta_mod.hexify,is_valid=self.cta_mod.is_valid,port=comport,verbose=verbose)
         self.last_command = '0x00'
         # flags for minimum cta2045 support
         self.support_flags = {

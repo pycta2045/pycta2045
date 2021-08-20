@@ -212,7 +212,7 @@
         }
     },
     "hash":{
-        "length":"2"
+        "length":2
     },
     "nak_reason":{
             "none":"0x00",
@@ -222,7 +222,7 @@
             "timeout":"0x05",
             "unsupported":"0x06",
             "unsupported request":"0x07",
-            "length":"1"
+            "length":1
     },
     "app_nak_reason":{
         "no reason":"0x00",
@@ -231,13 +231,13 @@
         "busy":"0x03",
         "length invalid":"0x04",
         "customer override":"0x05",
-        "length":"1"
+        "length":1
     },
     "connect_status_code":{
         "no":"0x00",
         "found":"0x01",
         "poor":"0x02",
-        "length":"1"
+        "length":1
     },
     "op_state_code":{
         "idle normal":"0x00",
@@ -246,7 +246,7 @@
         "run heightened":"0x03",
         "idle curtailed":"0x04",
         "idle heightened":"0x06",
-        "length":"1"
+        "length":1
     },
     "max_payload_length":{
         "4096": "0x0d",
@@ -263,7 +263,7 @@
         "1280": "0x0a",
         "1500": "0x0b",
         "2048": "0x0c",
-        "length":"1"
+        "length":1
     },
     "commodity_code":{
         "electricity consumed":"0x00",
@@ -278,7 +278,7 @@
         "total energy":"0x06",
         "present energy":"0x07",
         "present energy - estimated":"0x87",
-        "length":"1"
+        "length":1
     },
     "device_type":{
         "water heater - electric":"0x00 0x02",
@@ -288,31 +288,31 @@
         "water heater - phase change material":"0x00 0x1c",
         "other":"0x80 0x00",
         "unspecified":"0x00 0x00",
-        "length":"2"
+        "length":2
     },
-    "cta_version":{
-        "b":"0x42 0x00",
-        "length":"2"
+    "cta_version_ascii":{
+        "default":"B",
+        "length":2
     },
     "vendor_id":{
         "unspecified":"0x00 0x00",
-        "length":"2"
+        "length":2
     },
     "duration":{
         "unknown":"0x00",
-        "length":"1"
+        "length":1
     },
     "instantaneous_rate":{
         "default":"0x00 0x00 0x00 0x00 0x00 0x00",
-        "length":"6"
+        "length":6
     },
     "cumulative_amount":{
         "default":"0x00 0x00 0x00 0x00 0x00 0x00",
-        "length":"6"
+        "length":6
     },
     "capability_bitmap":{
         "cycling":"0x00 0x00 0x00 0x00",
-        "length":"4"
+        "length":4
     },
     "intermediate_response_code":{
         "success":"0x00",
@@ -324,23 +324,23 @@
         "other error":"0x06",
         "customer override":"0x07",
         "command not enabled":"0x08",
-        "length":"1"
+        "length":1
     },
     "device_revision":{
         "not supported":"0x00 0x00",
-        "length":"2"
+        "length":2
     },
     "last_opcode":{
         "default":"0x00",
-        "length":"1"
+        "length":1
     },
-    "model_number":{
-        "default": "0x00 0x00",
-        "length":"2"
+    "model_number_ascii":{
+        "default": "11",
+        "length":16
     },
-    "serial_number":{
-        "default":"0x00 0x00",
-        "length":"2"
+    "serial_number_ascii":{
+        "default":"11",
+        "length":16
     },
     "firmware_year":{
         "21":"0x15",
@@ -355,12 +355,12 @@
         "12":"0x0c",
         "11":"0x0b",
         "10":"0x0a",
-        "length":"1"
+        "length":1
     },
     "firmware_month":{
+        "mar":"0x02",
         "january":"0x00",
         "feb":"0x01",
-        "mar":"0x02",
         "apr":"0x03",
         "may":"0x04",
         "june":"0x05",
@@ -370,15 +370,15 @@
         "oct":"0x09",
         "nov":"0x0a",
         "dec":"0x0b",
-        "length":"1"
+        "length":1
     },
     "firmware_day":{
-        "default":"0x00",
-        "length":"1"
+        "default":"0x0c",
+        "length":1
     },
     "reserved":{
       "default":"0x00",
-      "length":"1"
+      "length":1
     },
     "codes":{
         "R":"nak_reason",
@@ -392,14 +392,14 @@
         "LO":"last_opcode",
         "CC":"commodity_code",
         "DT":"device_type",
-        "CV":"cta_version", 
+        "CV":"cta_version_ascii", 
         "DR":"device_revision",
         "CB":"capability_bitmap",
         "VI":"vendor_id",
         "CA":"cumulative_amount",
         "IR":"instantaneous_rate",
-        "MN":"model_number",
-        "SN":"serial_number",
+        "MN":"model_number_ascii",
+        "SN":"serial_number_ascii",
         "FY":"firmware_year",
         "FM":"firmware_month",
         "RES":"reserved",
