@@ -1,13 +1,13 @@
 import unittest
+from unittest.mock import MagicMock,patch, create_autospec
 import pycta2045.com.handler as COM
 import serial.tools.list_ports as lp
 from pycta2045.cta2045.handler import CTA2045
-import traceback as tb # del
+import serial
+from serial import SerialException
+
 
 cta = CTA2045()
-# these tests depend on an existing serial port 
-# please specify an existing serial port to run the tests
-port = 'ttyS7' 
 class TestCOM(unittest.TestCase):
     def testPortExistFail(self):
         port = 'fake'
@@ -15,13 +15,16 @@ class TestCOM(unittest.TestCase):
         c = None
         try:
             c = COM.COM(port=port,checksum=cta.checksum,transform=cta.hexify,is_valid=cta.is_valid)
+        except SerialException as e:
+            msg = e.__str__()
         except Exception as e:
             msg = e.args[0]
-        self.assertTrue('not found' in msg)
+        self.assertTrue('could not open' in msg)
         self.assertEqual(c,None)
-    def testPortExistSuccess(self):
-        comports = list(lp.comports())
-        print(f'using port: {port}')
+    
+    @patch('serial.Serial')
+    def testPortExistSuccess(self,mod):
+        port = 'ttyS0'
         msg = ''
         c = None
         try:
@@ -30,6 +33,38 @@ class TestCOM(unittest.TestCase):
             msg = e.args[0]
         self.assertTrue(c != None)
         self.assertTrue(msg == '')
+    
+    @patch('serial.Serial')
+    def testSend(self,mod):
+        port = 'ttyS0'
+        c = None
+        c = COM.COM(port=f'/dev/{port}',checksum=cta.checksum,transform=cta.hexify,is_valid=cta.is_valid)
+        self.assertTrue(c != None)
+        c.ser.write = MagicMock(return_value=2)
+
+        for cmd in ['shed','endshed','loadup','operating status request']:
+            sent_cmd = cta.to_cta(cmd)
+            sent_cmd_bytes = cta.to_cta_bytes(cmd)
+            ret = c.send(sent_cmd)
+            c.ser.write.assert_called_with(sent_cmd_bytes)
+    
+    @patch('serial.Serial')
+    def testRecv(self,mod):
+        port = 'ttyS0'
+        c = None
+        c = COM.COM(port=f'/dev/{port}',checksum=cta.checksum,transform=cta.hexify,is_valid=cta.is_valid)
+        self.assertTrue(c != None)
+        c.start() # start listener
+        for cmd in ['shed','endshed','loadup','operating status request']:
+            sent_cmd = cta.to_cta(cmd)
+            sent_cmd_bytes = cta.to_cta_bytes(cmd)
+            c.ser.read = MagicMock(return_value=sent_cmd_bytes)
+            c.ser.inWaiting = MagicMock(return_value=len(sent_cmd_bytes))
+            ret = c.get_next_msg()
+            if ret != None:
+                ret,_ = ret
+                self.assertTrue(sent_cmd == ret)
+        c.stop()
 
 if __name__=="__main__":
     unittest.main()

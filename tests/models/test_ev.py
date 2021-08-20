@@ -1,5 +1,6 @@
 import unittest
 import pandas as pd
+from datetime import datetime as dt
 from pycta2045.models.ev_model import EV
 
 class TestEV(unittest.TestCase):
@@ -28,7 +29,7 @@ class TestEV(unittest.TestCase):
 
         # test at the end -- should be 92%
         soc = c.get_soc(time=c.t_end)
-        soc = soc[-1]
+        # soc = soc[-1]
         self.assertTrue(soc == max_comfort) # should still be max comfort
 
         soc = c.get_soc(time=c.t_end+(60*60)) # get soc 1 hr after end time
@@ -40,7 +41,7 @@ class TestEV(unittest.TestCase):
         c.max_comfort = max_comfort
         df_end = c.charge()
         soc = c.get_soc(time=c.t_end)
-        soc = soc[-1]
+        # soc = soc[-1]
         self.assertTrue(soc == max_comfort) # should still be max comfort
         self.assertFalse(df_start.shape[0] >= df_end.shape[0])
     def testGenerateTimestamps(self):
@@ -52,11 +53,9 @@ class TestEV(unittest.TestCase):
         # assert the start
         self.assertTrue(ts[0].tz_localize('US/Pacific').timestamp() == int(c.t_start))
 
-        j = int(c.t_start)
-        for i in ts:
-            self.assertTrue(i.tz_localize('US/Pacific').timestamp() == j)
-            j += c.t_ratio
-
+        times = pd.date_range(start=dt.fromtimestamp(c.t_start),end=dt.fromtimestamp(c.t_end),periods=len(c.currs)).round('S')
+        for i,j in zip(ts,times):
+            self.assertTrue(i.timestamp() == j.timestamp())
         # assert the end is within 300 seconds margin -- 5 mins
         self.assertTrue(abs(c.t_end-ts[-1].tz_localize('US/Pacific').timestamp())<=300)
         # self.assertTrue(abs(c.max_time-ts[-1].timestamp())<=300)
