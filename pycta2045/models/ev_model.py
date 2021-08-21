@@ -364,6 +364,9 @@ class EV(CTA2045Model):
         '''
         val = {}
         print('loading up...')
+        # call endshed first
+        self.endshed(payload=val)
+        # now load up
         self.state = operating_status['loadup']
         soc = 0
         try:
