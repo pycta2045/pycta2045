@@ -1,19 +1,1017 @@
 time,event
-1628897308, sent intermediate mtsq
-1628897308, received ack
-1628897308, sent data-link mtsq
-1628897308, received ack
-1628897308, sent max payload request
-1628897308, received ack
-1628897308, received max payload response
-1628897309, sent ack
-1628897309, sent basic mtsq
-1628897309, received ack
-1628897309, sent shed
-1628897309, received nak
-1628897310, sent shed
-1628897310, received nak
-1628897311, sent shed
-1628897311, received nak
-1628897311, sent shed
-1628897311, received nak
+2021-08-23 15:24:16.731, sent intermediate mtsq
+2021-08-23 15:24:16.932, received ack
+2021-08-23 15:24:16.978, sent data-link mtsq
+2021-08-23 15:24:17.137, received ack
+2021-08-23 15:24:17.181, sent max payload request
+2021-08-23 15:24:17.343, received ack
+2021-08-23 15:24:17.347, received max payload response args ==> reserved=default; max_payload_length=4096
+2021-08-23 15:24:17.393, sent ack
+2021-08-23 15:24:17.435, sent basic mtsq
+2021-08-23 15:24:17.652, received ack
+2021-08-23 15:24:18.949, sent commodity read request
+2021-08-23 15:24:19.257, waiting for message timeout -- Timout!
+2021-08-23 15:48:31.978, received intermediate mtsq
+2021-08-23 15:48:32.025, sent ack
+2021-08-23 15:48:32.184, received data-link mtsq
+2021-08-23 15:48:32.229, sent ack
+2021-08-23 15:48:32.388, received max payload request
+2021-08-23 15:48:32.434, sent ack
+2021-08-23 15:48:32.477, sent max payload response
+2021-08-23 15:48:32.592, received ack
+2021-08-23 15:48:32.696, received basic mtsq
+2021-08-23 15:48:32.742, sent ack
+2021-08-23 15:48:34.578, sent commodity read request
+2021-08-23 15:48:34.709, received ack
+2021-08-23 15:48:34.816, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:48:34.861, sent ack
+2021-08-23 15:48:37.730, sent commodity read request
+2021-08-23 15:48:37.840, received ack
+2021-08-23 15:48:37.948, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:48:37.994, sent ack
+2021-08-23 15:48:40.146, sent loadup
+2021-08-23 15:48:40.262, received ack
+2021-08-23 15:48:40.366, received app ack args ==> reserved=default; last_opcode=0x17
+2021-08-23 15:48:40.415, sent ack
+2021-08-23 15:48:43.018, sent commodity read request
+2021-08-23 15:48:43.183, received ack
+2021-08-23 15:48:43.290, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:48:43.335, sent ack
+2021-08-23 15:48:45.714, sent commodity read request
+2021-08-23 15:48:45.737, waiting for message timeout -- Timout!
+2021-08-23 15:48:45.902, received ack
+2021-08-23 15:48:46.008, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:48:46.055, sent ack
+2021-08-23 15:48:47.545, sent commodity read request
+2021-08-23 15:48:47.658, waiting for message timeout -- Timout!
+2021-08-23 15:48:47.718, received ack
+2021-08-23 15:48:47.825, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:48:47.871, sent ack
+2021-08-23 15:48:51.874, waiting for message timeout -- Timout!
+2021-08-23 15:48:51.882, sent commodity read request
+2021-08-23 15:48:52.043, received ack
+2021-08-23 15:48:52.151, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:48:52.196, sent ack
+2021-08-23 15:48:55.400, waiting for message timeout -- Timout!
+2021-08-23 15:48:55.434, sent commodity read request
+2021-08-23 15:48:55.570, received ack
+2021-08-23 15:48:55.678, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:48:55.725, sent ack
+2021-08-23 15:48:57.243, sent commodity read request
+2021-08-23 15:48:57.326, waiting for message timeout -- Timout!
+2021-08-23 15:48:57.388, received ack
+2021-08-23 15:48:57.494, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:48:57.541, sent ack
+2021-08-23 15:48:58.529, sent commodity read request
+2021-08-23 15:48:58.703, received ack
+2021-08-23 15:48:58.810, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:48:58.857, sent ack
+2021-08-23 15:48:59.650, sent commodity read request
+2021-08-23 15:48:59.660, waiting for message timeout -- Timout!
+2021-08-23 15:48:59.817, received ack
+2021-08-23 15:48:59.923, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:48:59.971, sent ack
+2021-08-23 15:49:01.066, sent commodity read request
+2021-08-23 15:49:01.173, waiting for message timeout -- Timout!
+2021-08-23 15:49:01.233, received ack
+2021-08-23 15:49:01.344, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:49:01.393, sent ack
+2021-08-23 15:49:02.522, sent commodity read request
+2021-08-23 15:49:02.596, waiting for message timeout -- Timout!
+2021-08-23 15:49:02.657, received ack
+2021-08-23 15:49:02.764, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:49:02.811, sent ack
+2021-08-23 15:49:09.018, sent commodity read request
+2021-08-23 15:49:09.188, received ack
+2021-08-23 15:49:09.295, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:49:09.342, sent ack
+2021-08-23 15:49:12.143, waiting for message timeout -- Timout!
+2021-08-23 15:49:12.154, sent commodity read request
+2021-08-23 15:49:12.309, received ack
+2021-08-23 15:49:12.416, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:49:12.462, sent ack
+2021-08-23 15:49:13.955, sent commodity read request
+2021-08-23 15:49:14.065, waiting for message timeout -- Timout!
+2021-08-23 15:49:14.128, received ack
+2021-08-23 15:49:14.234, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:49:14.282, sent ack
+2021-08-23 15:49:15.554, sent commodity read request
+2021-08-23 15:49:15.749, received ack
+2021-08-23 15:49:15.859, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:49:15.906, sent ack
+2021-08-23 15:49:16.778, sent commodity read request
+2021-08-23 15:49:16.967, received ack
+2021-08-23 15:49:17.075, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:49:17.122, sent ack
+2021-08-23 15:49:18.082, sent commodity read request
+2021-08-23 15:49:18.284, received ack
+2021-08-23 15:49:18.389, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x01 0x20; cumulative_amount=0x00 0x00 0x00 0x00 0x00 0x0c
+2021-08-23 15:49:18.436, sent ack
+2021-08-23 15:49:19.434, sent commodity read request
+2021-08-23 15:49:19.596, received ack
+2021-08-23 15:49:19.702, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x01 0x20; cumulative_amount=0x00 0x00 0x00 0x00 0x00 0x0c
+2021-08-23 15:49:19.748, sent ack
+2021-08-23 15:49:20.427, sent loadup
+2021-08-23 15:49:20.549, waiting for message timeout -- Timout!
+2021-08-23 15:49:20.614, received ack
+2021-08-23 15:49:20.720, received app ack args ==> reserved=default; last_opcode=0x17
+2021-08-23 15:49:20.768, sent ack
+2021-08-23 15:49:24.027, sent commodity read request
+2021-08-23 15:49:24.240, received ack
+2021-08-23 15:49:24.251, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x0a 0x20; cumulative_amount=0x00 0x00 0x00 0x00 0x00 0x48
+2021-08-23 15:49:24.299, sent ack
+2021-08-23 15:49:27.058, sent commodity read request
+2021-08-23 15:49:27.102, waiting for message timeout -- Timout!
+2021-08-23 15:49:27.271, received ack
+2021-08-23 15:49:27.277, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x12 0x00; cumulative_amount=0x00 0x00 0x00 0x00 0x00 0xc0
+2021-08-23 15:49:27.323, sent ack
+2021-08-23 15:49:29.002, sent commodity read request
+2021-08-23 15:49:29.188, received ack
+2021-08-23 15:49:29.194, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x12 0x00; cumulative_amount=0x00 0x00 0x00 0x00 0x00 0xc0
+2021-08-23 15:49:29.242, sent ack
+2021-08-23 15:49:29.915, sent loadup
+2021-08-23 15:49:30.043, waiting for message timeout -- Timout!
+2021-08-23 15:49:30.103, received ack
+2021-08-23 15:49:30.109, received app ack args ==> reserved=default; last_opcode=0x17
+2021-08-23 15:49:30.158, sent ack
+2021-08-23 15:49:31.483, sent commodity read request
+2021-08-23 15:49:31.722, received ack
+2021-08-23 15:49:31.730, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x1c 0x20; cumulative_amount=default
+2021-08-23 15:49:31.777, sent ack
+2021-08-23 15:49:35.781, waiting for message timeout -- Timout!
+2021-08-23 15:49:35.795, sent commodity read request
+2021-08-23 15:49:36.051, received ack
+2021-08-23 15:49:36.057, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:49:36.106, sent ack
+2021-08-23 15:49:37.243, sent commodity read request
+2021-08-23 15:49:37.308, waiting for message timeout -- Timout!
+2021-08-23 15:49:37.467, received ack
+2021-08-23 15:49:37.472, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:49:37.519, sent ack
+2021-08-23 15:49:38.227, sent commodity read request
+2021-08-23 15:49:38.320, waiting for message timeout -- Timout!
+2021-08-23 15:49:38.480, received ack
+2021-08-23 15:49:38.485, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:49:38.533, sent ack
+2021-08-23 15:49:39.060, sent loadup
+2021-08-23 15:49:39.299, received ack
+2021-08-23 15:49:39.304, received app ack args ==> reserved=default; last_opcode=0x17
+2021-08-23 15:49:39.350, sent ack
+2021-08-23 15:49:40.151, waiting for message timeout -- Timout!
+2021-08-23 15:49:40.171, sent commodity read request
+2021-08-23 15:49:40.311, received ack
+2021-08-23 15:49:40.418, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:49:40.465, sent ack
+2021-08-23 15:51:52.685, sent commodity read request
+2021-08-23 15:51:52.820, received ack
+2021-08-23 15:51:52.927, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0xf4
+2021-08-23 15:51:52.974, sent ack
+2021-08-23 15:51:54.942, sent commodity read request
+2021-08-23 15:51:54.977, waiting for message timeout -- Timout!
+2021-08-23 15:51:55.142, received ack
+2021-08-23 15:51:55.248, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0xf4
+2021-08-23 15:51:55.295, sent ack
+2021-08-23 15:51:56.749, sent loadup
+2021-08-23 15:51:56.896, waiting for message timeout -- Timout!
+2021-08-23 15:51:56.967, received ack
+2021-08-23 15:51:57.071, received app ack args ==> reserved=default; last_opcode=0x17
+2021-08-23 15:51:57.117, sent ack
+2021-08-23 15:51:58.462, sent commodity read request
+2021-08-23 15:51:58.682, received ack
+2021-08-23 15:51:58.791, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:51:58.837, sent ack
+2021-08-23 15:52:00.341, sent commodity read request
+2021-08-23 15:52:00.440, waiting for message timeout -- Timout!
+2021-08-23 15:52:00.504, received ack
+2021-08-23 15:52:00.511, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:52:00.559, sent ack
+2021-08-23 15:52:01.750, sent commodity read request
+2021-08-23 15:52:01.764, waiting for message timeout -- Timout!
+2021-08-23 15:52:01.920, received ack
+2021-08-23 15:52:01.926, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:52:01.974, sent ack
+2021-08-23 15:52:32.485, received intermediate mtsq
+2021-08-23 15:52:32.532, sent ack
+2021-08-23 15:52:32.692, received data-link mtsq
+2021-08-23 15:52:32.741, sent ack
+2021-08-23 15:52:32.900, received max payload request
+2021-08-23 15:52:32.946, sent ack
+2021-08-23 15:52:32.990, sent max payload response
+2021-08-23 15:52:33.105, received ack
+2021-08-23 15:52:33.209, received basic mtsq
+2021-08-23 15:52:33.258, sent ack
+2021-08-23 15:52:34.038, sent commodity read request
+2021-08-23 15:52:34.059, waiting for message timeout -- Timout!
+2021-08-23 15:52:34.120, received ack
+2021-08-23 15:52:34.227, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:52:34.274, sent ack
+2021-08-23 15:52:35.142, sent commodity read request
+2021-08-23 15:52:35.237, received ack
+2021-08-23 15:52:35.345, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:52:35.390, sent ack
+2021-08-23 15:52:36.558, sent commodity read request
+2021-08-23 15:52:36.591, waiting for message timeout -- Timout!
+2021-08-23 15:52:36.659, received ack
+2021-08-23 15:52:36.766, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:52:36.813, sent ack
+2021-08-23 15:52:37.158, sent loadup
+2021-08-23 15:52:37.214, waiting for message timeout -- Timout!
+2021-08-23 15:52:37.374, received ack
+2021-08-23 15:52:37.378, received app ack args ==> reserved=default; last_opcode=0x17
+2021-08-23 15:52:37.427, sent ack
+2021-08-23 15:52:38.975, sent commodity read request
+2021-08-23 15:52:39.029, waiting for message timeout -- Timout!
+2021-08-23 15:52:39.091, received ack
+2021-08-23 15:52:39.198, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:52:39.244, sent ack
+2021-08-23 15:52:42.446, sent commodity read request
+2021-08-23 15:52:42.447, waiting for message timeout -- Timout!
+2021-08-23 15:52:42.620, received ack
+2021-08-23 15:52:42.726, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:52:42.773, sent ack
+2021-08-23 15:52:45.415, sent commodity read request
+2021-08-23 15:52:45.544, received ack
+2021-08-23 15:52:45.649, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:52:45.698, sent ack
+2021-08-23 15:52:52.791, sent commodity read request
+2021-08-23 15:52:52.903, waiting for message timeout -- Timout!
+2021-08-23 15:52:52.982, received ack
+2021-08-23 15:52:53.089, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:52:53.136, sent ack
+2021-08-23 15:52:56.951, sent commodity read request
+2021-08-23 15:52:57.107, received ack
+2021-08-23 15:52:57.214, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:52:57.263, sent ack
+2021-08-23 15:52:58.246, sent commodity read request
+2021-08-23 15:52:58.423, received ack
+2021-08-23 15:52:58.530, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:52:58.577, sent ack
+2021-08-23 15:52:59.263, sent commodity read request
+2021-08-23 15:52:59.377, waiting for message timeout -- Timout!
+2021-08-23 15:52:59.438, received ack
+2021-08-23 15:52:59.544, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:52:59.591, sent ack
+2021-08-23 15:53:00.335, sent commodity read request
+2021-08-23 15:53:00.392, waiting for message timeout -- Timout!
+2021-08-23 15:53:00.450, received ack
+2021-08-23 15:53:00.556, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:53:00.602, sent ack
+2021-08-23 15:53:01.582, sent commodity read request
+2021-08-23 15:53:01.769, received ack
+2021-08-23 15:53:01.876, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:53:01.924, sent ack
+2021-08-23 15:53:02.726, waiting for message timeout -- Timout!
+2021-08-23 15:53:02.742, sent commodity read request
+2021-08-23 15:53:02.891, received ack
+2021-08-23 15:53:02.998, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:53:03.045, sent ack
+2021-08-23 15:53:04.143, sent commodity read request
+2021-08-23 15:53:04.246, waiting for message timeout -- Timout!
+2021-08-23 15:53:04.309, received ack
+2021-08-23 15:53:04.420, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:53:04.468, sent ack
+2021-08-23 15:53:05.031, sent commodity read request
+2021-08-23 15:53:05.229, received ack
+2021-08-23 15:53:05.236, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:53:05.282, sent ack
+2021-08-23 15:53:05.807, sent commodity read request
+2021-08-23 15:53:06.047, received ack
+2021-08-23 15:53:06.053, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:53:06.101, sent ack
+2021-08-23 15:53:06.502, waiting for message timeout -- Timout!
+2021-08-23 15:53:06.535, sent commodity read request
+2021-08-23 15:53:06.766, received ack
+2021-08-23 15:53:06.771, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:53:06.818, sent ack
+2021-08-23 15:53:07.391, sent commodity read request
+2021-08-23 15:53:07.583, received ack
+2021-08-23 15:53:07.592, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:53:07.639, sent ack
+2021-08-23 15:53:08.232, sent commodity read request
+2021-08-23 15:53:08.401, received ack
+2021-08-23 15:53:08.406, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:53:08.453, sent ack
+2021-08-23 15:53:08.830, sent commodity read request
+2021-08-23 15:53:08.855, waiting for message timeout -- Timout!
+2021-08-23 15:53:09.013, received ack
+2021-08-23 15:53:09.018, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:53:09.064, sent ack
+2021-08-23 15:53:09.558, sent commodity read request
+2021-08-23 15:53:09.725, received ack
+2021-08-23 15:53:09.733, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:53:09.781, sent ack
+2021-08-23 15:53:10.295, sent commodity read request
+2021-08-23 15:53:10.543, received ack
+2021-08-23 15:53:10.549, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:53:10.595, sent ack
+2021-08-23 15:53:10.991, sent commodity read request
+2021-08-23 15:53:11.004, waiting for message timeout -- Timout!
+2021-08-23 15:53:11.259, received ack
+2021-08-23 15:53:11.264, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:53:11.309, sent ack
+2021-08-23 15:53:11.710, waiting for message timeout -- Timout!
+2021-08-23 15:53:11.718, sent commodity read request
+2021-08-23 15:53:11.871, received ack
+2021-08-23 15:53:11.979, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:53:12.026, sent ack
+2021-08-23 15:53:12.426, waiting for message timeout -- Timout!
+2021-08-23 15:53:12.439, sent commodity read request
+2021-08-23 15:53:12.586, received ack
+2021-08-23 15:53:12.694, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:53:12.740, sent ack
+2021-08-23 15:53:13.141, waiting for message timeout -- Timout!
+2021-08-23 15:53:13.159, sent commodity read request
+2021-08-23 15:53:13.300, received ack
+2021-08-23 15:53:13.407, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:53:13.453, sent ack
+2021-08-23 15:53:13.759, sent commodity read request
+2021-08-23 15:53:13.854, waiting for message timeout -- Timout!
+2021-08-23 15:53:13.914, received ack
+2021-08-23 15:53:14.022, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:53:14.073, sent ack
+2021-08-23 15:53:14.399, sent commodity read request
+2021-08-23 15:53:14.473, waiting for message timeout -- Timout!
+2021-08-23 15:53:14.534, received ack
+2021-08-23 15:53:14.640, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:53:14.686, sent ack
+2021-08-23 15:53:14.951, sent commodity read request
+2021-08-23 15:53:15.045, received ack
+2021-08-23 15:53:15.153, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:53:15.201, sent ack
+2021-08-23 15:53:15.542, sent commodity read request
+2021-08-23 15:53:15.601, waiting for message timeout -- Timout!
+2021-08-23 15:53:15.660, received ack
+2021-08-23 15:53:15.766, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:53:15.812, sent ack
+2021-08-23 15:53:16.151, sent commodity read request
+2021-08-23 15:53:16.212, waiting for message timeout -- Timout!
+2021-08-23 15:53:16.274, received ack
+2021-08-23 15:53:16.380, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:53:16.427, sent ack
+2021-08-23 15:53:16.696, sent commodity read request
+2021-08-23 15:53:16.827, waiting for message timeout -- Timout!
+2021-08-23 15:53:16.887, received ack
+2021-08-23 15:53:16.995, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:53:17.042, sent ack
+2021-08-23 15:53:17.359, sent commodity read request
+2021-08-23 15:53:17.443, waiting for message timeout -- Timout!
+2021-08-23 15:53:17.503, received ack
+2021-08-23 15:53:17.609, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:53:17.655, sent ack
+2021-08-23 15:53:18.023, sent commodity read request
+2021-08-23 15:53:18.056, waiting for message timeout -- Timout!
+2021-08-23 15:53:18.216, received ack
+2021-08-23 15:53:18.323, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x01 0x20; cumulative_amount=0x00 0x00 0x00 0x00 0x00 0x0c
+2021-08-23 15:53:18.369, sent ack
+2021-08-23 15:53:18.712, sent commodity read request
+2021-08-23 15:53:18.769, waiting for message timeout -- Timout!
+2021-08-23 15:53:18.829, received ack
+2021-08-23 15:53:18.935, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x01 0x20; cumulative_amount=0x00 0x00 0x00 0x00 0x00 0x0c
+2021-08-23 15:53:18.981, sent ack
+2021-08-23 15:53:20.368, sent loadup
+2021-08-23 15:53:20.544, received ack
+2021-08-23 15:53:20.649, received app ack args ==> reserved=default; last_opcode=0x17
+2021-08-23 15:53:20.695, sent ack
+2021-08-23 15:53:21.639, sent commodity read request
+2021-08-23 15:53:21.756, received ack
+2021-08-23 15:53:21.862, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x0a 0x20; cumulative_amount=0x00 0x00 0x00 0x00 0x00 0x48
+2021-08-23 15:53:21.909, sent ack
+2021-08-23 15:53:41.320, sent commodity read request
+2021-08-23 15:53:41.447, received ack
+2021-08-23 15:53:41.554, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x1c 0x20; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0x74
+2021-08-23 15:53:41.604, sent ack
+2021-08-23 15:53:45.031, sent commodity read request
+2021-08-23 15:53:45.176, received ack
+2021-08-23 15:53:45.283, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x1c 0x20; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0xc4
+2021-08-23 15:53:45.330, sent ack
+2021-08-23 15:53:50.999, sent commodity read request
+2021-08-23 15:53:51.214, received ack
+2021-08-23 15:53:51.321, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x1c 0x20; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0xc4
+2021-08-23 15:53:51.367, sent ack
+2021-08-23 15:53:53.192, sent commodity read request
+2021-08-23 15:53:53.331, received ack
+2021-08-23 15:53:53.438, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x1c 0x20; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0xc4
+2021-08-23 15:53:53.484, sent ack
+2021-08-23 15:53:55.151, sent commodity read request
+2021-08-23 15:53:55.348, received ack
+2021-08-23 15:53:55.455, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0xc4
+2021-08-23 15:53:55.501, sent ack
+2021-08-23 15:53:57.175, sent commodity read request
+2021-08-23 15:53:57.367, received ack
+2021-08-23 15:53:57.476, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0xc4
+2021-08-23 15:53:57.523, sent ack
+2021-08-23 15:53:58.664, sent loadup
+2021-08-23 15:53:58.724, waiting for message timeout -- Timout!
+2021-08-23 15:53:58.886, received ack
+2021-08-23 15:53:58.991, received app ack args ==> reserved=default; last_opcode=0x17
+2021-08-23 15:53:59.038, sent ack
+2021-08-23 15:54:00.992, sent commodity read request
+2021-08-23 15:54:01.039, waiting for message timeout -- Timout!
+2021-08-23 15:54:01.208, received ack
+2021-08-23 15:54:01.214, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x01 0x20; cumulative_amount=0x00 0x00 0x00 0x00 0x00 0x3c
+2021-08-23 15:54:01.260, sent ack
+2021-08-23 15:54:44.030, received intermediate mtsq
+2021-08-23 15:54:44.078, sent ack
+2021-08-23 15:54:44.236, received data-link mtsq
+2021-08-23 15:54:44.295, sent ack
+2021-08-23 15:54:44.456, received max payload request
+2021-08-23 15:54:44.510, sent ack
+2021-08-23 15:54:44.554, sent max payload response
+2021-08-23 15:54:44.766, received ack
+2021-08-23 15:54:44.770, received basic mtsq
+2021-08-23 15:54:44.816, sent ack
+2021-08-23 15:54:45.665, sent commodity read request
+2021-08-23 15:54:45.881, received ack
+2021-08-23 15:54:45.887, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:54:45.933, sent ack
+2021-08-23 15:54:46.640, sent loadup
+2021-08-23 15:54:46.734, waiting for message timeout -- Timout!
+2021-08-23 15:54:46.799, received ack
+2021-08-23 15:54:46.804, received app ack args ==> reserved=default; last_opcode=0x17
+2021-08-23 15:54:46.850, sent ack
+2021-08-23 15:54:49.305, sent commodity read request
+2021-08-23 15:54:49.521, received ack
+2021-08-23 15:54:49.531, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:54:49.580, sent ack
+2021-08-23 15:54:52.522, sent commodity read request
+2021-08-23 15:54:52.752, received ack
+2021-08-23 15:54:52.758, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:54:52.805, sent ack
+2021-08-23 15:54:55.089, sent commodity read request
+2021-08-23 15:54:55.208, waiting for message timeout -- Timout!
+2021-08-23 15:54:55.272, received ack
+2021-08-23 15:54:55.279, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:54:55.324, sent ack
+2021-08-23 15:54:57.561, sent commodity read request
+2021-08-23 15:54:57.727, waiting for message timeout -- Timout!
+2021-08-23 15:54:57.791, received ack
+2021-08-23 15:54:57.797, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:54:57.843, sent ack
+2021-08-23 15:55:01.649, sent commodity read request
+2021-08-23 15:55:01.814, received ack
+2021-08-23 15:55:01.820, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:55:01.867, sent ack
+2021-08-23 15:55:03.961, sent commodity read request
+2021-08-23 15:55:04.139, received ack
+2021-08-23 15:55:04.145, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:55:04.193, sent ack
+2021-08-23 15:55:12.490, sent commodity read request
+2021-08-23 15:55:12.598, waiting for message timeout -- Timout!
+2021-08-23 15:55:12.682, received ack
+2021-08-23 15:55:12.687, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:55:12.734, sent ack
+2021-08-23 15:55:15.874, sent commodity read request
+2021-08-23 15:55:15.938, waiting for message timeout -- Timout!
+2021-08-23 15:55:16.106, received ack
+2021-08-23 15:55:16.113, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:55:16.160, sent ack
+2021-08-23 15:55:17.714, sent commodity read request
+2021-08-23 15:55:17.762, waiting for message timeout -- Timout!
+2021-08-23 15:55:17.928, received ack
+2021-08-23 15:55:17.934, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:55:17.986, sent ack
+2021-08-23 15:55:19.937, sent commodity read request
+2021-08-23 15:55:19.987, waiting for message timeout -- Timout!
+2021-08-23 15:55:20.150, received ack
+2021-08-23 15:55:20.155, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:55:20.201, sent ack
+2021-08-23 15:55:22.658, sent commodity read request
+2021-08-23 15:55:22.770, received ack
+2021-08-23 15:55:22.876, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:55:22.923, sent ack
+2021-08-23 15:55:24.002, sent commodity read request
+2021-08-23 15:55:24.124, waiting for message timeout -- Timout!
+2021-08-23 15:55:24.185, received ack
+2021-08-23 15:55:24.191, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 15:55:24.238, sent ack
+2021-08-23 15:55:25.130, sent loadup
+2021-08-23 15:55:25.401, received ack
+2021-08-23 15:55:25.404, received app ack args ==> reserved=default; last_opcode=0x17
+2021-08-23 15:55:25.452, sent ack
+2021-08-23 15:55:31.370, sent commodity read request
+2021-08-23 15:55:31.459, waiting for message timeout -- Timout!
+2021-08-23 15:55:31.534, received ack
+2021-08-23 15:55:31.640, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x0a 0x20; cumulative_amount=0x00 0x00 0x00 0x00 0x00 0x6c
+2021-08-23 15:55:31.688, sent ack
+2021-08-23 15:55:33.930, sent commodity read request
+2021-08-23 15:55:34.154, received ack
+2021-08-23 15:55:34.161, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x0a 0x20; cumulative_amount=0x00 0x00 0x00 0x00 0x00 0x6c
+2021-08-23 15:55:34.211, sent ack
+2021-08-23 15:55:34.946, sent commodity read request
+2021-08-23 15:55:35.011, waiting for message timeout -- Timout!
+2021-08-23 15:55:35.073, received ack
+2021-08-23 15:55:35.180, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x0a 0x20; cumulative_amount=0x00 0x00 0x00 0x00 0x00 0x6c
+2021-08-23 15:55:35.226, sent ack
+2021-08-23 15:55:35.937, sent loadup
+2021-08-23 15:55:36.026, waiting for message timeout -- Timout!
+2021-08-23 15:55:36.186, received ack
+2021-08-23 15:55:36.190, received app ack args ==> reserved=default; last_opcode=0x17
+2021-08-23 15:55:36.238, sent ack
+2021-08-23 15:55:38.074, sent commodity read request
+2021-08-23 15:55:38.201, received ack
+2021-08-23 15:55:38.309, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x1c 0x20; cumulative_amount=default
+2021-08-23 15:55:38.357, sent ack
+2021-08-23 15:55:39.158, waiting for message timeout -- Timout!
+2021-08-23 15:55:39.178, sent commodity read request
+2021-08-23 15:55:39.317, received ack
+2021-08-23 15:55:39.424, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x1c 0x20; cumulative_amount=default
+2021-08-23 15:55:39.474, sent ack
+2021-08-23 15:55:40.634, sent commodity read request
+2021-08-23 15:55:40.675, waiting for message timeout -- Timout!
+2021-08-23 15:55:40.750, received ack
+2021-08-23 15:55:40.857, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x1c 0x20; cumulative_amount=0x00 0x00 0x00 0x00 0x00 0x50
+2021-08-23 15:55:40.904, sent ack
+2021-08-23 15:55:41.874, sent commodity read request
+2021-08-23 15:55:42.066, received ack
+2021-08-23 15:55:42.173, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x1c 0x20; cumulative_amount=0x00 0x00 0x00 0x00 0x00 0x50
+2021-08-23 15:55:42.219, sent ack
+2021-08-23 15:55:42.946, sent loadup
+2021-08-23 15:55:43.020, waiting for message timeout -- Timout!
+2021-08-23 15:55:43.081, received ack
+2021-08-23 15:55:43.187, received app ack args ==> reserved=default; last_opcode=0x17
+2021-08-23 15:55:43.235, sent ack
+2021-08-23 15:55:45.034, sent commodity read request
+2021-08-23 15:55:45.201, received ack
+2021-08-23 16:04:59.110, received intermediate mtsq
+2021-08-23 16:04:59.164, sent ack
+2021-08-23 16:04:59.325, received data-link mtsq
+2021-08-23 16:04:59.375, sent ack
+2021-08-23 16:04:59.532, received max payload request
+2021-08-23 16:04:59.578, sent ack
+2021-08-23 16:04:59.623, sent max payload response
+2021-08-23 16:04:59.837, received ack
+2021-08-23 16:04:59.840, received basic mtsq
+2021-08-23 16:04:59.886, sent ack
+2021-08-23 16:05:00.581, sent commodity read request
+2021-08-23 16:05:00.687, waiting for message timeout -- Timout!
+2021-08-23 16:05:00.749, received ack
+2021-08-23 16:05:00.756, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:05:00.804, sent ack
+2021-08-23 16:05:02.085, sent commodity read request
+2021-08-23 16:05:02.272, received ack
+2021-08-23 16:05:02.278, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:05:02.324, sent ack
+2021-08-23 16:05:02.908, sent loadup
+2021-08-23 16:05:03.126, waiting for message timeout -- Timout!
+2021-08-23 16:05:03.286, received ack
+2021-08-23 16:05:03.290, received app ack args ==> reserved=default; last_opcode=0x17
+2021-08-23 16:05:03.335, sent ack
+2021-08-23 16:05:05.813, sent commodity read request
+2021-08-23 16:05:06.004, received ack
+2021-08-23 16:05:06.010, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:05:06.058, sent ack
+2021-08-23 16:05:07.214, sent commodity read request
+2021-08-23 16:05:07.261, waiting for message timeout -- Timout!
+2021-08-23 16:05:07.431, received ack
+2021-08-23 16:05:07.438, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:05:07.489, sent ack
+2021-08-23 16:05:08.957, sent commodity read request
+2021-08-23 16:05:09.090, waiting for message timeout -- Timout!
+2021-08-23 16:05:09.151, received ack
+2021-08-23 16:05:09.157, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:05:09.206, sent ack
+2021-08-23 16:05:10.965, sent commodity read request
+2021-08-23 16:05:11.076, received ack
+2021-08-23 16:05:11.183, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:05:11.231, sent ack
+2021-08-23 16:05:12.229, sent commodity read request
+2021-08-23 16:05:12.393, received ack
+2021-08-23 16:05:12.500, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:05:12.551, sent ack
+2021-08-23 16:05:13.710, sent commodity read request
+2021-08-23 16:05:13.752, waiting for message timeout -- Timout!
+2021-08-23 16:05:13.810, received ack
+2021-08-23 16:05:13.918, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:05:13.965, sent ack
+2021-08-23 16:05:14.974, sent commodity read request
+2021-08-23 16:05:15.132, received ack
+2021-08-23 16:05:15.239, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:05:15.287, sent ack
+2021-08-23 16:05:16.489, waiting for message timeout -- Timout!
+2021-08-23 16:05:16.525, sent commodity read request
+2021-08-23 16:05:16.651, received ack
+2021-08-23 16:05:16.759, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:05:16.808, sent ack
+2021-08-23 16:05:18.810, waiting for message timeout -- Timout!
+2021-08-23 16:05:18.814, sent loadup
+2021-08-23 16:05:18.975, received ack
+2021-08-23 16:05:19.080, received app ack args ==> reserved=default; last_opcode=0x17
+2021-08-23 16:05:19.127, sent ack
+2021-08-23 16:05:21.926, sent commodity read request
+2021-08-23 16:05:21.937, waiting for message timeout -- Timout!
+2021-08-23 16:05:22.099, received ack
+2021-08-23 16:05:22.206, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:05:22.252, sent ack
+2021-08-23 16:05:26.253, sent commodity read request
+2021-08-23 16:05:26.269, waiting for message timeout -- Timout!
+2021-08-23 16:05:26.424, received ack
+2021-08-23 16:05:26.531, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:05:26.577, sent ack
+2021-08-23 16:05:33.301, sent loadup
+2021-08-23 16:05:33.382, waiting for message timeout -- Timout!
+2021-08-23 16:05:33.472, received ack
+2021-08-23 16:05:33.576, received app ack args ==> reserved=default; last_opcode=0x17
+2021-08-23 16:05:33.623, sent ack
+2021-08-23 16:05:43.414, sent commodity read request
+2021-08-23 16:05:43.630, waiting for message timeout -- Timout!
+2021-08-23 16:05:43.631, received ack
+2021-08-23 16:05:43.738, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x1c 0x20; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0x04
+2021-08-23 16:05:43.784, sent ack
+2021-08-23 16:05:44.509, sent commodity read request
+2021-08-23 16:05:44.585, waiting for message timeout -- Timout!
+2021-08-23 16:05:44.647, received ack
+2021-08-23 16:05:44.755, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x1c 0x20; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0x04
+2021-08-23 16:05:44.804, sent ack
+2021-08-23 16:05:46.294, sent commodity read request
+2021-08-23 16:05:46.406, waiting for message timeout -- Timout!
+2021-08-23 16:05:46.467, received ack
+2021-08-23 16:05:46.574, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0x04
+2021-08-23 16:05:46.620, sent ack
+2021-08-23 16:05:47.822, waiting for message timeout -- Timout!
+2021-08-23 16:05:47.846, sent commodity read request
+2021-08-23 16:05:47.985, received ack
+2021-08-23 16:05:48.090, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0x04
+2021-08-23 16:05:48.140, sent ack
+2021-08-23 16:05:59.870, sent loadup
+2021-08-23 16:06:00.034, received ack
+2021-08-23 16:06:00.140, received app ack args ==> reserved=default; last_opcode=0x17
+2021-08-23 16:06:00.187, sent ack
+2021-08-23 16:06:05.142, sent commodity read request
+2021-08-23 16:06:05.374, received ack
+2021-08-23 16:06:05.380, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=0x00 0x00 0x00 0x00 0x00 0x5c
+2021-08-23 16:06:05.432, sent ack
+2021-08-23 16:06:09.175, sent commodity read request
+2021-08-23 16:06:09.408, received ack
+2021-08-23 16:48:58.690, received intermediate mtsq
+2021-08-23 16:48:58.736, sent ack
+2021-08-23 16:48:58.894, received data-link mtsq
+2021-08-23 16:48:58.940, sent ack
+2021-08-23 16:48:59.098, received max payload request
+2021-08-23 16:48:59.147, sent ack
+2021-08-23 16:48:59.191, sent max payload response
+2021-08-23 16:48:59.303, received ack
+2021-08-23 16:48:59.407, received basic mtsq
+2021-08-23 16:48:59.453, sent ack
+2021-08-23 16:49:01.170, sent commodity read request
+2021-08-23 16:49:01.320, received ack
+2021-08-23 16:49:01.427, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:49:01.475, sent ack
+2021-08-23 16:49:02.522, sent commodity read request
+2021-08-23 16:49:02.640, received ack
+2021-08-23 16:49:02.748, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:49:02.797, sent ack
+2021-08-23 16:49:04.154, sent loadup
+2021-08-23 16:49:04.398, waiting for message timeout -- Timout!
+2021-08-23 16:49:24.161, received intermediate mtsq
+2021-08-23 16:49:24.207, sent ack
+2021-08-23 16:49:24.366, received data-link mtsq
+2021-08-23 16:49:24.412, sent ack
+2021-08-23 16:49:24.571, received max payload request
+2021-08-23 16:49:24.616, sent ack
+2021-08-23 16:49:24.661, sent max payload response
+2021-08-23 16:49:24.875, received ack
+2021-08-23 16:49:24.879, received basic mtsq
+2021-08-23 16:49:24.926, sent ack
+2021-08-23 16:49:26.074, sent loadup
+2021-08-23 16:49:26.127, waiting for message timeout -- Timout!
+2021-08-23 16:51:03.141, received intermediate mtsq
+2021-08-23 16:51:03.188, sent ack
+2021-08-23 16:51:03.345, received data-link mtsq
+2021-08-23 16:51:03.391, sent ack
+2021-08-23 16:51:03.549, received max payload request
+2021-08-23 16:51:03.594, sent ack
+2021-08-23 16:51:03.638, sent max payload response
+2021-08-23 16:51:03.854, received ack
+2021-08-23 16:51:03.858, received basic mtsq
+2021-08-23 16:51:03.903, sent ack
+2021-08-23 16:51:05.869, sent commodity read request
+2021-08-23 16:51:05.905, waiting for message timeout -- Timout!
+2021-08-23 16:51:06.088, received ack
+2021-08-23 16:51:06.094, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:51:06.141, sent ack
+2021-08-23 16:51:07.549, sent loadup
+2021-08-23 16:51:07.743, waiting for message timeout -- Timout!
+2021-08-23 16:51:07.906, received ack
+2021-08-23 16:51:07.912, received app ack args ==> reserved=default; last_opcode=0x17
+2021-08-23 16:51:07.958, sent ack
+2021-08-23 16:51:14.460, sent commodity read request
+2021-08-23 16:51:14.642, received ack
+2021-08-23 16:51:14.748, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:51:14.795, sent ack
+2021-08-23 16:51:22.109, sent commodity read request
+2021-08-23 16:51:22.278, received ack
+2021-08-23 16:51:22.285, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:51:22.333, sent ack
+2021-08-23 16:51:25.429, sent commodity read request
+2021-08-23 16:51:25.535, waiting for message timeout -- Timout!
+2021-08-23 16:51:25.607, received ack
+2021-08-23 16:51:25.614, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:51:25.661, sent ack
+2021-08-23 16:51:28.064, waiting for message timeout -- Timout!
+2021-08-23 16:51:28.094, sent commodity read request
+2021-08-23 16:51:28.329, received ack
+2021-08-23 16:51:28.337, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:51:28.383, sent ack
+2021-08-23 16:51:29.485, sent commodity read request
+2021-08-23 16:51:29.584, waiting for message timeout -- Timout!
+2021-08-23 16:51:29.648, received ack
+2021-08-23 16:51:29.654, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:51:29.701, sent ack
+2021-08-23 16:51:31.806, sent commodity read request
+2021-08-23 16:51:31.975, received ack
+2021-08-23 16:51:31.981, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:51:32.027, sent ack
+2021-08-23 16:51:33.845, sent commodity read request
+2021-08-23 16:51:34.029, waiting for message timeout -- Timout!
+2021-08-23 16:51:34.098, received ack
+2021-08-23 16:51:34.104, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:51:34.152, sent ack
+2021-08-23 16:51:35.598, sent commodity read request
+2021-08-23 16:51:35.753, waiting for message timeout -- Timout!
+2021-08-23 16:51:35.816, received ack
+2021-08-23 16:51:35.821, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:51:35.870, sent ack
+2021-08-23 16:51:37.534, sent commodity read request
+2021-08-23 16:51:37.649, received ack
+2021-08-23 16:51:37.757, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:51:37.805, sent ack
+2021-08-23 16:51:39.086, sent commodity read request
+2021-08-23 16:51:39.272, received ack
+2021-08-23 16:51:39.378, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:51:39.426, sent ack
+2021-08-23 16:51:41.158, sent commodity read request
+2021-08-23 16:51:41.290, received ack
+2021-08-23 16:51:41.398, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:51:41.444, sent ack
+2021-08-23 16:51:42.990, sent commodity read request
+2021-08-23 16:51:43.046, waiting for message timeout -- Timout!
+2021-08-23 16:51:43.108, received ack
+2021-08-23 16:51:43.214, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:51:43.265, sent ack
+2021-08-23 16:51:44.429, sent commodity read request
+2021-08-23 16:51:44.465, waiting for message timeout -- Timout!
+2021-08-23 16:51:44.624, received ack
+2021-08-23 16:51:44.732, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:51:44.778, sent ack
+2021-08-23 16:51:45.981, waiting for message timeout -- Timout!
+2021-08-23 16:51:46.022, sent commodity read request
+2021-08-23 16:51:46.143, received ack
+2021-08-23 16:51:46.251, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:51:46.299, sent ack
+2021-08-23 16:51:47.206, sent commodity read request
+2021-08-23 16:51:47.364, received ack
+2021-08-23 16:51:47.471, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:51:47.517, sent ack
+2021-08-23 16:51:49.654, sent commodity read request
+2021-08-23 16:51:49.785, received ack
+2021-08-23 16:51:49.891, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:51:49.938, sent ack
+2021-08-23 16:51:51.221, sent commodity read request
+2021-08-23 16:51:51.403, received ack
+2021-08-23 16:51:51.512, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:51:51.558, sent ack
+2021-08-23 16:51:52.574, sent commodity read request
+2021-08-23 16:51:52.721, received ack
+2021-08-23 16:51:52.828, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:51:52.874, sent ack
+2021-08-23 16:51:54.293, sent commodity read request
+2021-08-23 16:51:54.438, received ack
+2021-08-23 16:51:54.544, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:51:54.590, sent ack
+2021-08-23 16:51:55.981, sent commodity read request
+2021-08-23 16:51:56.154, received ack
+2021-08-23 16:51:56.259, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:51:56.305, sent ack
+2021-08-23 16:51:57.157, sent commodity read request
+2021-08-23 16:51:57.374, received ack
+2021-08-23 16:51:57.383, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:51:57.432, sent ack
+2021-08-23 16:51:58.333, sent commodity read request
+2021-08-23 16:51:58.495, received ack
+2021-08-23 16:51:58.501, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:51:58.547, sent ack
+2021-08-23 16:52:00.765, sent commodity read request
+2021-08-23 16:52:00.918, received ack
+2021-08-23 16:52:00.924, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:52:00.972, sent ack
+2021-08-23 16:52:02.053, sent commodity read request
+2021-08-23 16:52:02.174, waiting for message timeout -- Timout!
+2021-08-23 16:52:02.236, received ack
+2021-08-23 16:52:02.241, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:52:02.287, sent ack
+2021-08-23 16:52:03.206, sent commodity read request
+2021-08-23 16:52:03.454, received ack
+2021-08-23 16:52:03.463, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:52:03.512, sent ack
+2021-08-23 16:52:04.806, sent commodity read request
+2021-08-23 16:52:04.975, received ack
+2021-08-23 16:52:04.980, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:52:05.027, sent ack
+2021-08-23 16:52:06.445, sent commodity read request
+2021-08-23 16:52:06.630, waiting for message timeout -- Timout!
+2021-08-23 16:52:06.695, received ack
+2021-08-23 16:52:06.700, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:52:06.747, sent ack
+2021-08-23 16:52:08.118, sent commodity read request
+2021-08-23 16:52:08.312, received ack
+2021-08-23 16:52:08.317, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:52:08.365, sent ack
+2021-08-23 16:52:09.029, sent commodity read request
+2021-08-23 16:52:09.166, waiting for message timeout -- Timout!
+2021-08-23 16:52:09.227, received ack
+2021-08-23 16:52:09.237, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:52:09.285, sent ack
+2021-08-23 16:52:09.838, sent commodity read request
+2021-08-23 16:52:09.951, received ack
+2021-08-23 16:52:10.057, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:52:10.106, sent ack
+2021-08-23 16:52:10.654, sent commodity read request
+2021-08-23 16:52:10.772, received ack
+2021-08-23 16:52:10.879, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:52:10.930, sent ack
+2021-08-23 16:52:11.330, waiting for message timeout -- Timout!
+2021-08-23 16:52:11.358, sent commodity read request
+2021-08-23 16:52:11.493, received ack
+2021-08-23 16:52:11.600, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:52:11.648, sent ack
+2021-08-23 16:52:11.910, sent commodity read request
+2021-08-23 16:52:12.048, waiting for message timeout -- Timout!
+2021-08-23 16:52:12.108, received ack
+2021-08-23 16:52:12.215, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:52:12.264, sent ack
+2021-08-23 16:52:12.566, sent commodity read request
+2021-08-23 16:52:12.665, waiting for message timeout -- Timout!
+2021-08-23 16:52:12.727, received ack
+2021-08-23 16:52:12.834, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:52:12.886, sent ack
+2021-08-23 16:52:15.222, sent commodity read request
+2021-08-23 16:52:15.289, waiting for message timeout -- Timout!
+2021-08-23 16:52:15.350, received ack
+2021-08-23 16:52:15.458, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:52:15.506, sent ack
+2021-08-23 16:52:20.854, sent commodity read request
+2021-08-23 16:52:20.985, received ack
+2021-08-23 16:52:21.095, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:52:21.143, sent ack
+2021-08-23 16:52:25.822, sent commodity read request
+2021-08-23 16:52:25.947, waiting for message timeout -- Timout!
+2021-08-23 16:52:26.021, received ack
+2021-08-23 16:52:26.129, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:52:26.174, sent ack
+2021-08-23 16:52:31.062, sent commodity read request
+2021-08-23 16:52:31.254, received ack
+2021-08-23 16:52:31.361, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:52:31.411, sent ack
+2021-08-23 16:52:37.174, sent commodity read request
+2021-08-23 16:52:37.392, received ack
+2021-08-23 16:52:37.499, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x01 0x20; cumulative_amount=0x00 0x00 0x00 0x00 0x00 0x3c
+2021-08-23 16:52:37.546, sent ack
+2021-08-23 16:52:39.454, sent loadup
+2021-08-23 16:52:39.550, waiting for message timeout -- Timout!
+2021-08-23 16:52:39.616, received ack
+2021-08-23 16:52:39.720, received app ack args ==> reserved=default; last_opcode=0x17
+2021-08-23 16:52:39.767, sent ack
+2021-08-23 16:53:00.023, sent commodity read request
+2021-08-23 16:53:00.194, waiting for message timeout -- Timout!
+2021-08-23 16:53:00.223, received ack
+2021-08-23 16:53:00.229, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0x97
+2021-08-23 16:53:00.276, sent ack
+2021-08-23 16:53:06.055, sent commodity read request
+2021-08-23 16:53:06.173, received ack
+2021-08-23 16:53:06.280, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0x99
+2021-08-23 16:53:06.329, sent ack
+2021-08-23 16:53:07.823, sent commodity read request
+2021-08-23 16:53:07.930, waiting for message timeout -- Timout!
+2021-08-23 16:53:07.990, received ack
+2021-08-23 16:53:08.099, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0x9a
+2021-08-23 16:53:08.147, sent ack
+2021-08-23 16:53:09.575, sent commodity read request
+2021-08-23 16:53:09.709, received ack
+2021-08-23 16:53:09.818, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0x9a
+2021-08-23 16:53:09.865, sent ack
+2021-08-23 16:53:12.671, waiting for message timeout -- Timout!
+2021-08-23 16:53:12.711, sent commodity read request
+2021-08-23 16:53:12.836, received ack
+2021-08-23 16:53:12.945, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0x9b
+2021-08-23 16:53:12.993, sent ack
+2021-08-23 16:53:14.594, waiting for message timeout -- Timout!
+2021-08-23 16:53:14.616, sent commodity read request
+2021-08-23 16:53:14.759, received ack
+2021-08-23 16:53:14.866, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0x9c
+2021-08-23 16:53:14.913, sent ack
+2021-08-23 16:53:16.255, sent commodity read request
+2021-08-23 16:53:16.379, received ack
+2021-08-23 16:53:16.485, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0x9d
+2021-08-23 16:53:16.532, sent ack
+2021-08-23 16:53:17.791, sent commodity read request
+2021-08-23 16:53:17.908, received ack
+2021-08-23 16:53:18.014, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0x9d
+2021-08-23 16:53:18.064, sent ack
+2021-08-23 16:53:19.439, sent commodity read request
+2021-08-23 16:53:19.623, received ack
+2021-08-23 16:53:19.730, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0x9d
+2021-08-23 16:53:19.777, sent ack
+2021-08-23 16:53:21.048, sent commodity read request
+2021-08-23 16:53:21.242, received ack
+2021-08-23 16:53:21.350, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0x9d
+2021-08-23 16:53:21.395, sent ack
+2021-08-23 16:53:22.847, sent commodity read request
+2021-08-23 16:53:22.997, waiting for message timeout -- Timout!
+2021-08-23 16:53:23.066, received ack
+2021-08-23 16:53:23.176, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0x9e
+2021-08-23 16:53:23.223, sent ack
+2021-08-23 16:53:24.984, sent commodity read request
+2021-08-23 16:53:25.200, received ack
+2021-08-23 16:53:25.206, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0x9f
+2021-08-23 16:53:25.256, sent ack
+2021-08-23 16:53:27.659, waiting for message timeout -- Timout!
+2021-08-23 16:53:27.671, sent commodity read request
+2021-08-23 16:53:27.827, received ack
+2021-08-23 16:53:27.832, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0x9f
+2021-08-23 16:53:27.878, sent ack
+2021-08-23 16:53:29.871, sent commodity read request
+2021-08-23 16:53:29.888, waiting for message timeout -- Timout!
+2021-08-23 16:53:30.053, received ack
+2021-08-23 16:53:30.061, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0xa0
+2021-08-23 16:53:30.108, sent ack
+2021-08-23 16:53:32.295, sent commodity read request
+2021-08-23 16:53:32.478, received ack
+2021-08-23 16:53:32.484, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0xa1
+2021-08-23 16:53:32.530, sent ack
+2021-08-23 16:53:34.303, sent commodity read request
+2021-08-23 16:53:34.498, received ack
+2021-08-23 16:53:34.504, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0xa2
+2021-08-23 16:53:34.553, sent ack
+2021-08-23 16:53:36.128, sent commodity read request
+2021-08-23 16:53:36.155, waiting for message timeout -- Timout!
+2021-08-23 16:53:36.221, received ack
+2021-08-23 16:53:36.328, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0xa2
+2021-08-23 16:53:36.376, sent ack
+2021-08-23 16:53:38.032, sent commodity read request
+2021-08-23 16:53:38.147, received ack
+2021-08-23 16:53:38.254, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0xa3
+2021-08-23 16:53:38.304, sent ack
+2021-08-23 16:53:40.593, sent commodity read request
+2021-08-23 16:53:40.706, waiting for message timeout -- Timout!
+2021-08-23 16:53:40.778, received ack
+2021-08-23 16:53:40.884, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0xa4
+2021-08-23 16:53:40.929, sent ack
+2021-08-23 16:53:42.616, sent commodity read request
+2021-08-23 16:53:42.801, received ack
+2021-08-23 16:53:42.908, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0xa4
+2021-08-23 16:53:42.955, sent ack
+2021-08-23 16:53:44.957, waiting for message timeout -- Timout!
+2021-08-23 16:53:44.984, sent commodity read request
+2021-08-23 16:53:45.120, received ack
+2021-08-23 16:53:45.228, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0xa5
+2021-08-23 16:53:45.275, sent ack
+2021-08-23 16:53:46.839, sent commodity read request
+2021-08-23 16:53:46.876, waiting for message timeout -- Timout!
+2021-08-23 16:53:46.954, received ack
+2021-08-23 16:53:47.059, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x01 0xa6
+2021-08-23 16:53:47.106, sent ack
+2021-08-23 16:53:49.160, sent loadup
+2021-08-23 16:53:49.379, received ack
+2021-08-23 16:53:49.383, received app ack args ==> reserved=default; last_opcode=0x17
+2021-08-23 16:53:49.429, sent ack
+2021-08-23 16:53:50.976, sent commodity read request
+2021-08-23 16:53:51.031, waiting for message timeout -- Timout!
+2021-08-23 16:53:51.093, received ack
+2021-08-23 16:53:51.199, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=default
+2021-08-23 16:53:51.246, sent ack
+2021-08-23 16:53:58.136, sent commodity read request
+2021-08-23 16:53:58.326, received ack
+2021-08-23 16:53:58.432, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=default; cumulative_amount=default
+2021-08-23 16:53:58.483, sent ack
+2021-08-23 16:54:00.336, sent commodity read request
+2021-08-23 16:54:00.485, waiting for message timeout -- Timout!
+2021-08-23 16:54:00.554, received ack
+2021-08-23 16:54:00.664, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x00 0x01
+2021-08-23 16:54:00.710, sent ack
+2021-08-23 16:54:02.857, sent commodity read request
+2021-08-23 16:54:03.080, received ack
+2021-08-23 16:54:03.189, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x00 0x01
+2021-08-23 16:54:03.236, sent ack
+2021-08-23 16:54:05.465, sent commodity read request
+2021-08-23 16:54:05.602, received ack
+2021-08-23 16:54:05.711, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x00 0x03
+2021-08-23 16:54:05.758, sent ack
+2021-08-23 16:54:12.166, waiting for message timeout -- Timout!
+2021-08-23 16:54:12.200, sent commodity read request
+2021-08-23 16:54:12.348, received ack
+2021-08-23 16:54:12.354, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x00 0x06
+2021-08-23 16:54:12.401, sent ack
+2021-08-23 16:54:13.737, sent commodity read request
+2021-08-23 16:54:13.969, received ack
+2021-08-23 16:54:13.975, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x00 0x06
+2021-08-23 16:54:14.021, sent ack
+2021-08-23 16:54:15.784, sent commodity read request
+2021-08-23 16:54:16.000, received ack
+2021-08-23 16:54:16.005, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x00 0x06
+2021-08-23 16:54:16.052, sent ack
+2021-08-23 16:54:19.257, waiting for message timeout -- Timout!
+2021-08-23 16:54:19.296, sent commodity read request
+2021-08-23 16:54:19.521, received ack
+2021-08-23 16:54:19.527, received commodity read response args ==> reserved=default; intermediate_response_code=success; commodity_code=electricity consumed; instantaneous_rate=0x00 0x00 0x00 0x00 0x00 0x03; cumulative_amount=0x00 0x00 0x00 0x00 0x00 0x08
+2021-08-23 16:54:19.573, sent ack
+2021-08-23 16:54:20.632, sent commodity read request
