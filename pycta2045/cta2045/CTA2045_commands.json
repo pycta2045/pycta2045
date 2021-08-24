@@ -103,7 +103,7 @@
         "app ack":{
             "type": {
                 "hex":"0x08 0x01",
-                "str":"basic"
+                "str":"link"
             },
             "format":"0x08 0x01 RES # 0x03 LO H",
             "op1":"0x03",
@@ -113,7 +113,7 @@
         "app nak":{
             "type": {
                 "hex":"0x08 0x01",
-                "str":"basic"
+                "str":"link"
             },
             "format":"0x08 0x01 RES # 0x04 ANR H",
             "op1":"0x04",

@@ -311,7 +311,11 @@ class SimpleCTA2045Device:
                 #     raise TimeoutException('Timeout!')
                 res = self.cta_mod.from_cta(msg)
                 if type(res) == dict:
-                    self.__update_log(f"{t}: received {res['command']}")
+                    received = res['command']
+                    if 'args' in res and len(res['args'])>=2:
+                        l = [f"{k}={v}" for k,v in res['args'].items()]
+                        received += ' args ==> '+"; ".join(l)
+                    self.__update_log(f"{t}: received {received}")
                 if 'op1' in res:
                     self.last_command = res['op1']
         except UnsupportedCommandException as e:
