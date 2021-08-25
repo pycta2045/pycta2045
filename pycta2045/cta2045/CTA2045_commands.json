@@ -246,6 +246,8 @@
         "run heightened":"0x03",
         "idle curtailed":"0x04",
         "idle heightened":"0x06",
+        "idle opted out":"0x0b",
+        "run opted out":"0x0c",
         "length":1
     },
     "max_payload_length":{

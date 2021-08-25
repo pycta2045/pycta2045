@@ -5,6 +5,7 @@ from .model import CTA2045Model
 from pycta2045.cta2045 import CTA2045
 
 operating_status = {
+    'unplugged':'idle opted out',
     'endshed':'idle normal',
     'shed':'idle curtailed',
     'loadup':'idle normal',
@@ -13,7 +14,7 @@ operating_status = {
 }
 
 class EV(CTA2045Model):
-    def __init__(self,max_volt=240,max_curr=30,max_cap=40,min_comfort=.9,max_comfort=1.,decay_rate=.5,rampup_delay=1,rampup_time=5,t_res=1,verbose=False):
+    def __init__(self,initial_soc=0.0,max_volt=240,max_curr=30,max_cap=40,min_comfort=.9,max_comfort=1.,decay_rate=.5,rampup_delay=1,rampup_time=5,t_res=1,verbose=False):
         '''
         Purpose:
             initializes the model with the given parameters for charging
@@ -72,8 +73,9 @@ class EV(CTA2045Model):
         self.t_end = np.ceil(self.t_start+self.max_time) # calculate when charging should end
         self.decay_rate = decay_rate
         self.rampup_delay = rampup_delay
-        self.state = operating_status['endshed']
+        self.state = operating_status['unplugged']
         # self.t_inc = self.max_curr/self.max_time
+        self.init_SoC = initial_soc
         self.t_inc = t_res
         self.cta = CTA2045()
         if verbose:
@@ -113,10 +115,13 @@ class EV(CTA2045Model):
         if self.verbose:
             print(f'V: {v} I: {c} SOC: {int(soc*100)}%',' max SOC: ',max_soc)
         return
-
     def delay(self,init_SoC):
         times = list(range(self.rampup_delay+1))
         v = i = 0 # init to 0s
+        # grab last values if exist
+        if len(self.volts)>0 and len(self.currs)>0:
+            i = self.currs[-1]
+            v = self.volts[-1]
         self.init_SoC = init_SoC
         SoC = init_SoC
         for t in times:
@@ -125,7 +130,6 @@ class EV(CTA2045Model):
             SoC += soc
             self.update_state(i,v,SoC,p)
         return
-
     def phase1(self,init_SoC):
         v = i = 0 # init to 0s
         SoC = init_SoC
@@ -166,16 +170,17 @@ class EV(CTA2045Model):
             self.update_state(i,v,SoC,p)
             self.timer+=self.t_inc
         return
-    def charge(self,init_SoC=.0,fname=None):
+    def charge(self,init_SoC=0.0,fname=None):
         v = self.verbose
         time_slots = []
-        self.delay(init_SoC) #<=== to add ramp up delay
+        if len(self.power) == 0:
+            self.delay(init_SoC) #<=== to add ramp up delay
 
-        if v:
-            print('Charging...')
-            print(f'PHASE 1: init SoC: {round(init_SoC,3)}\n')
-        time_slots.append(self.time[-1])
-        self.phase1(init_SoC)
+            if v:
+                print('Charging...')
+                print(f'PHASE 1: init SoC: {round(init_SoC,3)}\n')
+            time_slots.append(self.time[-1])
+            self.phase1(init_SoC)
 
         if v:
             print(f'PHASE 2: SoC: {round(self.SOC[-1],3)}\n')
@@ -209,9 +214,9 @@ class EV(CTA2045Model):
 
         # print(f'time: {len(self.timestamps)} power: {len(self.power)} SOC: {len(self.SOC)} currs: {len(self.currs)} volts: {len(self.volts)}')
         df = pd.DataFrame(d)
-        df.set_index('time',inplace=True)
+        # df.set_index('time',inplace=True)
         self.df = df
-        return df
+        return df.set_index('time')
     def generate_time_stamps(self):
         start = dt.fromtimestamp(self.t_start)
         end = dt.fromtimestamp(self.t_end)
@@ -225,12 +230,12 @@ class EV(CTA2045Model):
             Returns: associated SoC
             Notes: Returns None if charging has not started (not plugged-in)
         '''
+        soc = self.init_SoC
         try:
             record = self.get_record(time)
             soc = record['soc']
         except Exception as e:
             print(e)
-            soc = None
         return soc
     def get_record(self,time):
         '''
@@ -243,10 +248,8 @@ class EV(CTA2045Model):
         record = None
         try:
             if self.verbose:
-                print("LAST 5 TIMESTAMPs: \n",self.df.tail(5))
+                print("RECORDS PROFILE\n",self.df)
             # subtract time from the starting time of the charge
-            if self.verbose:
-                print('query record at: time: ',time,' time-t_start: ',time-self.t_start,' ratio: ',self.t_ratio)
             time -= self.t_start
             i = int(time/self.t_ratio) # risk: divide by zero when t_ration = 0
             if i >= len(self.df):
@@ -257,8 +260,10 @@ class EV(CTA2045Model):
                 record = self.df.iloc[i]
         except Exception as e:
             pass # returns None as record
+        if self.verbose:
+            print('target record',record)
         return record
-    def get_records(self):
+    def get_all_records(self):
         '''
             Purpose: returns log of all the records
             Args:
@@ -326,6 +331,32 @@ class EV(CTA2045Model):
             self.update_state(i,v,soc,p)
         return soc
     # ============================ CTA2045 functions =========================
+    def update_charging(self):
+        # grab record at current time (if it exists)
+        soc = self.init_SoC
+        rec = self.get_record(time.time())
+        try:
+            # grab index of record
+            i = rec.name
+            # drop everthing past the index (for the df)
+            self.df = self.df[:i]
+            # grab stop index for lists
+            i = len(self.df)+1
+            # drop everthing past the drop index (for lists)
+            self.power = self.power[:i]
+            self.currs = self.currs[:i]
+            self.volts = self.volts[:i]
+            self.time = self.time[:i]
+            self.SOC = self.SOC[:i]
+            soc = rec['soc']
+        except AttributeError as e:
+            print(e)
+            pass
+        except Exception as e:
+            print(tb.format_tb(e))
+        # call charge with last soc
+        self.charge(init_SoC=soc)
+        return
     def shed(self,payload:dict):
         '''
             Purpose: modifies the setpoint
@@ -339,6 +370,7 @@ class EV(CTA2045Model):
         self.min_comfort = self.min_shed
         self.max_comfort = self.max_shed
         self.state = operating_status['shed']
+        self.update_charging()
         return val
     def endshed(self,payload:dict):
         '''
@@ -364,16 +396,12 @@ class EV(CTA2045Model):
         '''
         val = {}
         print('loading up...')
-        # call endshed first
-        self.endshed(payload=val)
-        # now load up
+        if not operating_status['loadup'] in self.state:
+            # call endshed first
+            self.endshed(payload=val)
+            self.update_charging()
+         # now load up
         self.state = operating_status['loadup']
-        soc = 0
-        try:
-            soc = self.df['soc'].tail(1)[-1]
-        except Exception:
-            pass # use 0%
-        self.charge(init_SoC=soc)
         return val
     def operating_status(self,payload:dict):
         '''
@@ -450,6 +478,7 @@ class EV(CTA2045Model):
         self.min_comfort = self.min_cpe
         self.max_comfort = self.max_cpe
         self.state = operating_status['critical peak event']
+        self.update_charging()
         return val
     def grid_emergency(self,payload):
         '''
@@ -464,6 +493,7 @@ class EV(CTA2045Model):
         self.min_comfort = self.min_ge
         self.max_comfort = self.max_ge
         self.state = operating_status['grid emergency']
+        self.update_charging()
         return val
     def get_commodity_log(self):
         return self.commodity_log

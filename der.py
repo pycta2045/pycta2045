@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from rich import pretty
 pretty.install()
 
-port = '/dev/ttyS4'
+port = '/dev/ttyS7'
 figsize = (50,50) # (w,h)
 version = '1' # experiment version
 ev = models.EV(max_cap=.5,verbose=True)
