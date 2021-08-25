@@ -8,7 +8,7 @@ pretty.install()
 
 port = '/dev/ttyS7'
 figsize = (50,50) # (w,h)
-version = '1' # experiment version
+version = '2_loadups' # experiment version
 ev = models.EV(max_cap=.5,verbose=True)
 t_end = ev.t_end
 dev = device.CTA2045Device(mode="DER",model=ev,comport=port)
@@ -16,7 +16,7 @@ log = dev.run()
 print("LOG: ")
 print(log)
 log.to_csv('logs/DER_log.csv')
-log = ev.get_records()
+log = ev.get_all_records()
 
 assert log is not None, "log is None"
 log.to_csv("logs/ev_records_soc.csv")
@@ -45,4 +45,5 @@ print('plotting time vs IR...')
 # IRs.plot(figsize=figsize) # plot IR
 IRs.plot() # plot IR
 plt.savefig(fname=f'figs/ev_records_commodity_IR_{version}.png')
+print('closing..')
 plt.close()
