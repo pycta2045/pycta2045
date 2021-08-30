@@ -416,6 +416,7 @@ class SimpleCTA2045Device:
             self.cta_mod.set_supported('loadup',False)
             self.cta_mod.set_supported('grid emergency',False)
             self.cta_mod.set_supported('critical peak event',False)
+            self.cta_mod.set_supported('device info request',False)
         else:
             raise UnknownModeException(f'Unknown Mode: {self.mode}')
         # run daemon
