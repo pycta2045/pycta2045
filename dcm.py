@@ -13,9 +13,10 @@ prompt = {
     4: 'critical peak event',
     5: 'grid emergency',
     6: 'operating status request',
-    7: 'commodity read request'
+    7: 'commodity read request',
+    8: 'outside comm connection status',
 }
-port = '/dev/ttyS7'
+port = '/dev/ttyUSB0'
 log_sz = 30
 # default mode of operation is DCM
 dev = device.SimpleCTA2045Device(comport=port)

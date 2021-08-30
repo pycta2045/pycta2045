@@ -18,7 +18,7 @@ text_color = 'cyan'
 input_color = 'magenta'
 warning_color = 'bright_red'
 log_color_style = 'pale_violet_red1'
-port = '/dev/ttyS100'
+port = '/dev/ttyUSB0'
 class DCM:
     prompt = {
         0: 'quit',
@@ -28,6 +28,7 @@ class DCM:
         4: 'critical peak event',
         5: 'grid emergency',
         6: 'operating status request',
+        7: 'commodity read request',
     }
     def __init__(self,port=port):
         self.counter = 0
@@ -124,6 +125,8 @@ def main():
     for t in threading.enumerate():
         print(t)
     # output log
+    log = dcm.get_log()
+    log.to_csv('logs/DCM_Tui.csv')
     return
 if __name__=="__main__":
     main()
