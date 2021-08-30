@@ -13,6 +13,11 @@ phases:
 
 ------------------- 
 
+### installation:
+```
+    sudo apt-get install libatlas-base-dev libopenjp2-7 libtiff5 -y 
+```
+------------------- 
 
 ### virtual ports:
 1. use `socat -d pty,link=/dev/ttyS99,raw,echo=0 pty,link=/dev/ttyS100,raw,echo=0` to create two virtual ports

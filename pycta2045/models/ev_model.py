@@ -14,7 +14,7 @@ operating_status = {
 }
 
 class EV(CTA2045Model):
-    def __init__(self,initial_soc=0.0,max_volt=240,max_curr=30,max_cap=40,min_comfort=.9,max_comfort=1.,decay_rate=.5,rampup_delay=1,rampup_time=5,t_res=1,verbose=False):
+    def __init__(self,initial_soc=0.0,max_volt=240,max_curr=30,max_cap=40,min_comfort=.8,max_comfort=1.,decay_rate=.5,rampup_delay=1,rampup_time=5,t_res=1,verbose=False):
         '''
         Purpose:
             initializes the model with the given parameters for charging
@@ -23,7 +23,7 @@ class EV(CTA2045Model):
             * max_curr: maximum current value (Amps)
             * min_comfort: minimum user comfort level for SoC (%)
             * max_comfort: maximum user comfort level for SoC (%)
-            * decay_rate: rate by which the current decays in constant voltage (CV) phase <------------------- NO LONGER USED & SHOULD BE REMOVED -- ALSO REMOVE ARG DEFAULTS (DEL) 
+            * decay_rate: rate by which the current decays in constant voltage (CV) phase <------------------- NO LONGER USED & SHOULD BE REMOVED -- ALSO REMOVE ARG DEFAULTS (DEL)
             * rampup_delay: rate by which the current decays in constant voltage (CV) phase (time units)
             * rampup_time: time it takes to reach CV phase (time units)
             * max_cap : Nameplate Rating -- Nissan Leaf (Kwh)
@@ -32,7 +32,7 @@ class EV(CTA2045Model):
         Return:
             * None
         NOTES:
-            * decay rate: affects the upper half of the graph's concavity (Time v. SoC) <------------------- NO LONGER USED & SHOULD BE REMOVED -- ALSO REMOVE ARG DEFAULTS (DEL) 
+            * decay rate: affects the upper half of the graph's concavity (Time v. SoC) <------------------- NO LONGER USED & SHOULD BE REMOVED -- ALSO REMOVE ARG DEFAULTS (DEL)
                 * larger values >=1 result in a sharper edges when charging reaches max SoC
                 * smaller values <1 result in smother edges
                 * recommend: default value (0.9)
@@ -91,13 +91,14 @@ class EV(CTA2045Model):
         soc = q/self.max_cap
         # print(f'i: {current} p: {p} q: {q} soc: {soc}')
         return (p,soc)
-    def current_decay(self,step):
+    def current_decay(self,curr):
         '''
-            This function should only be used in the 3rd phase of charging (Constant Voltage). 
+            This function should only be used in the 3rd phase of charging (Constant Voltage).
             That means we shouldn't have an issue with dividing by zero.
         '''
         # current_cap = self.max_cap*soc
-        decay = self.max_curr* np.power(1-self.decay_rate,step)
+        soc = self.SOC[-1]
+        decay = curr* np.exp(soc - self.max_comfort - .06)
         return decay
     def update_state(self,c,v,soc,p):
         decimal = 3
@@ -113,7 +114,7 @@ class EV(CTA2045Model):
         self.volts.append(v)
         self.currs.append(c)
         if self.verbose:
-            print(f'V: {v} I: {c} SOC: {int(soc*100)}%',' max SOC: ',max_soc)
+            print(f'V: {v} I: {c} SOC: {int(soc*100)}%')
         return
     def delay(self,init_SoC):
         times = list(range(self.rampup_delay+1))
@@ -131,12 +132,13 @@ class EV(CTA2045Model):
             self.update_state(i,v,SoC,p)
         return
     def phase1(self,init_SoC):
-        v = i = 0 # init to 0s
+        v = self.max_volt
+        i = 0 # init to 0s
         SoC = init_SoC
-        ramp_volts = self.max_volt / self.rampup_time # to calculate how long it should take to reach max volts in given ramp up time
-        ramp_curr = self.max_curr/self.rampup_time
+        #ramp_volts = self.max_volt / self.rampup_time # to calculate how long it should take to reach max volts in given ramp up time
+        ramp_curr = self.max_curr/self.rampup_time # to calculate how long it should take to reach max volts in given ramp up time
         while v < self.max_volt and SoC < self.min_comfort and SoC < self.max_comfort:
-            v+=ramp_volts # increment voltage
+            #v+=ramp_volts # increment voltage
             i+=ramp_curr # increment current
             v = min(v,self.max_volt)
             i = min(i,self.max_curr)
@@ -149,7 +151,8 @@ class EV(CTA2045Model):
         v = self.max_volt
         i = self.max_curr
         SoC = self.SOC[-1]
-        while SoC < self.min_comfort and SoC < self.max_comfort:
+        while SoC < self.min_comfort and SoC < self.max_comfort:#and SoC < self.max_comfort and SoC < .7:
+            # print(2**SoC)
             self.timer+=self.t_inc
             p,soc = self.calculate_SoC(i,v) # calculate power, soc
             SoC += soc
@@ -161,9 +164,9 @@ class EV(CTA2045Model):
         SoC = self.SOC[-1]
         min_cur = 0.0005 * i
         if self.verbose:
-            print(f'PHASE3 SoC: {SoC} max: {self.max_comfort} SoC < min {SoC <= self.min_comfort} SoC < max : {SoC < self.max_comfort} user_comfort{self.min_comfort,self.max_comfort}')
+            print(f'PHASE3 SoC: {SoC} max: {self.max_comfort} min: {self.min_comfort} {len(self.SOC)}')
         while SoC < self.min_comfort or SoC < self.max_comfort:
-            i = self.current_decay(self.timer)
+            i = self.current_decay(i)
             i = min(self.max_curr,max(i,min_cur))
             p,soc = self.calculate_SoC(i,v) # calculate power, soc
             SoC += soc
@@ -191,7 +194,7 @@ class EV(CTA2045Model):
             print(f'PHASE 3: SoC: {round(self.SOC[-1],3)}\n')
         time_slots.append(self.time[-1])
         self.phase3()
-        
+
         self.update_state(0,0,self.SOC[-1],0) # charging has ended
 
 
@@ -273,7 +276,7 @@ class EV(CTA2045Model):
         '''
         records = None
         try:
-            records = self.df
+            records = self.df.set_index('time')
         except Exception:
             pass # records will be None
         return records

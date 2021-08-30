@@ -8,8 +8,8 @@ pretty.install()
 
 port = '/dev/ttyS7'
 figsize = (50,50) # (w,h)
-version = '2_loadups' # experiment version
-ev = models.EV(max_cap=.5,verbose=True)
+version = '40kw' # experiment version
+ev = models.EV(max_cap=40,verbose=True,decay_rate=.08)
 t_end = ev.t_end
 dev = device.CTA2045Device(mode="DER",model=ev,comport=port)
 log = dev.run()
@@ -21,10 +21,16 @@ log = ev.get_all_records()
 assert log is not None, "log is None"
 log.to_csv("logs/ev_records_soc.csv")
 log = log[['soc','power']]
+x = log['soc']
+y = log['power']
 print('plotting soc...')
 # log.plot(subplots=True,figsize=figsize)
 log.plot(subplots=True)
 plt.savefig(fname=f'figs/ev_records_soc_{version}.png')
+plt.close()
+
+plt.plot(x,y)
+plt.savefig(f'figs/power_vs_soc_{version}.png')
 plt.close()
 
 log = ev.get_commodity_log()
@@ -47,3 +53,4 @@ IRs.plot() # plot IR
 plt.savefig(fname=f'figs/ev_records_commodity_IR_{version}.png')
 print('closing..')
 plt.close()
+
