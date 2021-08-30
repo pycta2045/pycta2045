@@ -234,8 +234,8 @@
         "length":1
     },
     "connect_status_code":{
-        "no":"0x00",
         "found":"0x01",
+        "no":"0x00",
         "poor":"0x02",
         "length":1
     },
