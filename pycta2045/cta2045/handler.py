@@ -217,6 +217,8 @@ class CTA2045:
                     value = next(k for k,v in self.cmds[arg].items() if v.upper() == value.upper())
                 except Exception as e:
                     value = self.unhexify(value)
+                    if 'ascii' in arg:
+                        value = chr(value)
                 cmd['args'][arg] = value
                 j += length - 1
             i += 1
