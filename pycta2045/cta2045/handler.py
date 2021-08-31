@@ -53,7 +53,7 @@ class CTA2045:
         value = " ".join(list(map(lambda x: '0x'+x,padded)))
         return value
     @staticmethod
-    def unhexify(value):
+    def unhexify(value, func: callable = int):
         '''(helper function)
             Purpose: Returns the decimal representation of given hex (helper function).
             Args:
@@ -62,8 +62,14 @@ class CTA2045:
             Return: decimal representation.
         '''
         h = '0x'
-        h += value.replace('0x','').replace(' ','')
+        h += parse_hex(value).replace(' ','')
         return int(h,16)
+
+    @staticmethod
+    def parse_hex(value):
+        value = value.replace('0x','')
+        return value
+
     def to_cta(self,cmd,**args):
         '''
             Purpose: Translates natural language commands like shed, endshed, commodity read, etc.  to corresponding hex value representation as specified by CTA2045-B.
@@ -216,9 +222,10 @@ class CTA2045:
                 try:
                     value = next(k for k,v in self.cmds[arg].items() if v.upper() == value.upper())
                 except Exception as e:
-                    value = self.unhexify(value)
                     if 'ascii' in arg:
-                        value = chr(value)
+                        value = '' .join(map(chr,self.parse_hex(value).split()))
+                    else:
+                        value = self.unhexify(value)
                 cmd['args'][arg] = value
                 j += length - 1
             i += 1
