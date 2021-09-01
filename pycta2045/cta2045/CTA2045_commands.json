@@ -293,7 +293,7 @@
         "length":2
     },
     "cta_version_ascii":{
-        "default":"B",
+        "default":" B",
         "length":2
     },
     "vendor_id":{
@@ -337,11 +337,11 @@
         "length":1
     },
     "model_number_ascii":{
-        "default": "11",
+        "default": "1111111111111111",
         "length":16
     },
     "serial_number_ascii":{
-        "default":"11",
+        "default":"1111111111111111",
         "length":16
     },
     "firmware_year":{
