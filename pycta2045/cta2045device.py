@@ -157,7 +157,7 @@ class CTA2045Device:
     # -----------------------------------------------------------------------------
     def __run_dcm(self):
         valid = True
-        
+
         # sent unsupported commands -- doesn't make sense for DCM to ack any of them
         self.cta_mod.set_supported('shed',False)
         self.cta_mod.set_supported('endshed',False)
@@ -259,10 +259,10 @@ class CTA2045Device:
 class SimpleCTA2045Device:
     '''
         This class provides a simplified interface for pycta2045.
-        One can use it to send CTA2045 commands via the send method. 
+        One can use it to send CTA2045 commands via the send method.
         One can also get a log of the messages exchanged via the get_log method.
         It allows the user to just send a command without writing the logic of what and
-        what not to send next (the part of recieving and responding to basic acks/naks, etc. is automated). 
+        what not to send next (the part of recieving and responding to basic acks/naks, etc. is automated).
     '''
     def __init__(self,mode='DCM',timeout=1.,model=None,comport='/dev/ttyS6',verbose=False):
         self.mode = mode.upper()

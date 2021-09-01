@@ -53,17 +53,24 @@ class CTA2045:
         value = " ".join(list(map(lambda x: '0x'+x,padded)))
         return value
     @staticmethod
-    def unhexify(value, func: callable = int):
+    def unhexify(value, combine = False,func: callable = None, arguments:dict =None):
         '''(helper function)
             Purpose: Returns the decimal representation of given hex (helper function).
             Args:
                 * value: Integer in hex (seperate by space -- 0x00 0x01 ...).
                 * length: Number of bytes to convert
             Return: decimal representation.
+            Note: it can also apply a function on the values passed if func != None
         '''
-        h = '0x'
-        h += parse_hex(value).replace(' ','')
-        return int(h,16)
+        h = ''
+        h += CTA2045.parse_hex(value)
+        ret = ' '.join(map(lambda x: str(int(x,16)),h.split())) # convert to ints
+        if func != None:
+            ret = ''.join(map(lambda x: func(int(x),**arguments),ret.split())) # apply the function on 
+        if combine:
+            h = h.replace(' ','')
+            ret = int(h,16)
+        return ret
 
     @staticmethod
     def parse_hex(value):
@@ -222,10 +229,15 @@ class CTA2045:
                 try:
                     value = next(k for k,v in self.cmds[arg].items() if v.upper() == value.upper())
                 except Exception as e:
+                    arguments = {}
+                    func = None
+                    combine = False
                     if 'ascii' in arg:
-                        value = '' .join(map(chr,self.parse_hex(value).split()))
-                    else:
-                        value = self.unhexify(value)
+                        func = chr
+                        # value = self.unhexify(value,func=func, arguments=arguments)
+                    elif 'CA' or 'IR' in arg:
+                        combine = True
+                    value = self.unhexify(value,combine=combine,func=func,arguments=arguments)
                 cmd['args'][arg] = value
                 j += length - 1
             i += 1
