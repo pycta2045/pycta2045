@@ -65,8 +65,8 @@ class CTA2045:
         h = ''
         h += CTA2045.parse_hex(value)
         ret = ' '.join(map(lambda x: str(int(x,16)),h.split())) # convert to ints
-        if func != None:
-            ret = ''.join(map(lambda x: func(int(x),**arguments),ret.split())) # apply the function on 
+        #if func != None:
+            #ret = ''.join(map(lambda x: func(int(x),**arguments),ret.split())) # apply the function on 
         if combine:
             h = h.replace(' ','')
             ret = int(h,16)
@@ -232,12 +232,15 @@ class CTA2045:
                     arguments = {}
                     func = None
                     combine = False
+                    # change this into being a seperated hex
                     if 'ascii' in arg:
-                        func = chr
                         # value = self.unhexify(value,func=func, arguments=arguments)
-                    elif 'CA' or 'IR' in arg:
-                        combine = True
-                    value = self.unhexify(value,combine=combine,func=func,arguments=arguments)
+                        value = self.unhexify(value)
+                        value = ''.join(map(lambda x: chr(int(x)),value.split())) # apply the function on 
+                    elif 'commodity' in key:
+                        value = self.unhexify(value,combine=True)
+                    else:
+                        value = self.unhexify(value)
                 cmd['args'][arg] = value
                 j += length - 1
             i += 1
