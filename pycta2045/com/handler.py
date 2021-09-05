@@ -20,7 +20,7 @@ class COM:
     '''
     US = 'DER'
     THEM = 'DCM'
-    def __init__(self, checksum, transform, is_valid, port="/dev/ttyS6",timeout=.4,verbose=False):
+    def __init__(self, checksum, transform, is_valid, mode='DER', port="/dev/ttyS6",timeout=.4,verbose=False):
         '''
             * Note:
                 * timeout (defualt) is set to 500 ms as specified by CTA2045
@@ -49,6 +49,7 @@ class COM:
         self.__msgs = pd.DataFrame(columns = ['time','src','dest','message'])
         self.msg_expected = False
         self.verbose = verbose
+        if mode == 'DCM': self.US,self.THEM = ('DCM','DER') # reverse default mode
         return
     def __del__(self):
         self.stopped = True

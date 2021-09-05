@@ -293,7 +293,7 @@
         "length":2
     },
     "cta_version_ascii":{
-        "default":" B",
+        "default":"B",
         "length":2
     },
     "vendor_id":{

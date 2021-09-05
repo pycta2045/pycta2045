@@ -236,11 +236,11 @@ class CTA2045:
                     if 'ascii' in arg:
                         # value = self.unhexify(value,func=func, arguments=arguments)
                         value = self.unhexify(value)
-                        value = ''.join(map(lambda x: chr(int(x)),value.split())) # apply the function on 
+                        value = ''.join(map(lambda x: chr(int(x)),value.split())).strip() # apply the function on 
                     elif 'commodity' in key:
                         value = self.unhexify(value,combine=True)
                     else:
-                        value = self.unhexify(value)
+                        value = self.parse_hex(value) # leave it as parsed hex
                 cmd['args'][arg] = value
                 j += length - 1
             i += 1

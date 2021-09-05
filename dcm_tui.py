@@ -18,7 +18,7 @@ text_color = 'cyan'
 input_color = 'magenta'
 warning_color = 'bright_red'
 log_color_style = 'pale_violet_red1'
-port = '/dev/ttyUSB0'
+port = '/dev/ttyS2'
 class DCM:
     prompt = {
         0: 'quit',
@@ -29,6 +29,7 @@ class DCM:
         5: 'grid emergency',
         6: 'operating status request',
         7: 'commodity read request',
+        8: 'device info request',
     }
     def __init__(self,port=port):
         self.counter = 0
@@ -36,7 +37,7 @@ class DCM:
         self.layout = Layout()
         self.layout.split(
             Layout(name="header", size=1),
-            Layout(ratio=1, name="Output"),
+            Layout(ratio=3, name="Output"),
             Layout(size=10, name="Input"),
         )
         self.plain_prompt  = list(map(lambda x: f"[{num_color}]{x[0]}[/{num_color}]: [{text_color}]{x[1]}[/{text_color}]",self.prompt.items()))
@@ -45,7 +46,7 @@ class DCM:
         self.device = SimpleCTA2045Device(comport=port)
         self.device.run()
         self.log = self.device.get_log()
-        self.log_size = 40
+        self.log_size = 10
         return
     def write(self,msg,log=False,end='\n'):
         if log:
@@ -53,12 +54,20 @@ class DCM:
             print(",",msg,log,"\nss\n")
         print(msg)
         return
+    def parse_log(self,log):
+        header = [log.index.name] + log.columns.tolist()
+        sep = '\t'*5
+        l = [sep.join(header)]
+        for i,r in log.iterrows():
+            l.append(f"{i}\t{r['event']}\n")
+        return '\n'.join(l)
     def render(self) -> Layout:
         # grab log from device
         log = self.device.get_log()
         # display log
         self.log = self.log.append(log)
-        self.layout['Output'].update(Text(f"{self.log.tail(self.log_size)}",style=log_color_style,justify='center'))
+        log = self.log.tail(self.log_size)
+        self.layout['Output'].update(Text(f"{self.parse_log(log)}",style=log_color_style,justify='left'))
         self.layout['header'].update(Text(datetime.now().ctime(), style="bold magenta", justify="center"))
         self.layout['Input'].update(self.pretty_prompt)
         return self.layout

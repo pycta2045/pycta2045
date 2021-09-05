@@ -3,6 +3,9 @@ from pycta2045 import cta2045device as device
 import pandas as pd
 from rich.console import Console
 from rich import pretty,print
+
+
+
 pretty.install()
 con = Console()
 prompt = {
@@ -15,8 +18,9 @@ prompt = {
     6: 'operating status request',
     7: 'commodity read request',
     8: 'outside comm connection status',
+    9: 'device info request',
 }
-port = '/dev/ttyUSB0'
+port = '/dev/ttyS2'
 log_sz = 30
 # default mode of operation is DCM
 dev = device.SimpleCTA2045Device(comport=port)
