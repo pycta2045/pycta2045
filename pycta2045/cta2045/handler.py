@@ -95,7 +95,12 @@ class CTA2045:
             args = args['args']
         try:
             res = self.cmds['commands'][f'{cmd}']['format']
-            for byte in res.split(' '):
+            arr = res.split(' ')
+            for byte in arr:
+                # print(res)
+                if '(' == byte or ')' == byte:
+                    res = res.replace(f'{byte} ','')
+                    continue
                 if byte.isalpha():
                     k = self.cmds['codes'][f'{byte}']
                     if k== 'hash':
@@ -113,6 +118,7 @@ class CTA2045:
                         rep = self.hexify(rep,length=self.cmds[k]['length'])
                     res = res.replace(byte,rep)
             v = res
+
             if '#' in res:
                 payload = res.split(' # ')[-1]
                 payload_length = len(payload.split(' ')) - 1 # account for hash checksum (ignore it)

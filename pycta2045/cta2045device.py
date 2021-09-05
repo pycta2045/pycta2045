@@ -12,13 +12,13 @@ choices = {
     1:"shed",
     2:"endshed",
     3:"loadup",
-    4: "critical peak event",
+    4:"critical peak event",
     5:"grid emergency",
     6:"operating status request",
     7:"device info request",
-    8:"quit"
+    8:"commodity read request",
+    9:"quit"
 }
-
 class UnknownModeException(Exception):
     def __init__(self,msg):
         self.msg = msg
@@ -164,6 +164,7 @@ class CTA2045Device:
         self.cta_mod.set_supported('loadup',False)
         self.cta_mod.set_supported('grid emergency',False)
         self.cta_mod.set_supported('critical peak event',False)
+        self.cta_mod.set_supported('commodity read request',False)
         # run daemon
         proc = multiprocessing.Process(target=self.__run_daemon)
         proc.daemon = True
@@ -417,6 +418,7 @@ class SimpleCTA2045Device:
             self.cta_mod.set_supported('grid emergency',False)
             self.cta_mod.set_supported('critical peak event',False)
             self.cta_mod.set_supported('device info request',False)
+            self.cta_mod.set_supported('commodity read request',False)
         else:
             raise UnknownModeException(f'Unknown Mode: {self.mode}')
         # run daemon
