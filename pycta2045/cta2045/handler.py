@@ -139,6 +139,7 @@ class CTA2045:
                 res = res.replace(byte,rep)
                 i += 1
             v = res
+
             if '#' in res:
                 payload = res.split(' # ')[-1]
                 payload_length = len(payload.split(' ')) - 1 # account for hash checksum (ignore it)
