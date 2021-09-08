@@ -76,7 +76,19 @@ class CTA2045:
     def parse_hex(value):
         value = value.replace('0x','')
         return value
-
+    def hex_sub(self,key,**args):
+        if key in args:
+            rep = args[key]
+            # convert to approperiate value if it isn't
+            if rep in self.cmds[key]:
+                rep = self.cmds[key][rep]
+        else:
+            rep = list(self.cmds[f'{key}'].values())[0]
+        if 'ascii' in key: 
+            # convert rep from ascii -> hex -> int -> hex with proper length
+            rep = int(rep.encode().hex(),16)
+            rep = self.hexify(rep,length=self.cmds[key]['length'])
+        return rep
     def to_cta(self,cmd,**args):
         '''
             Purpose: Translates natural language commands like shed, endshed, commodity read, etc.  to corresponding hex value representation as specified by CTA2045-B.
@@ -94,24 +106,38 @@ class CTA2045:
         if 'args' in args: # drop a level
             args = args['args']
         try:
+            print('constructing results...')
             res = self.cmds['commands'][f'{cmd}']['format']
-            for byte in res.split(' '):
+            i = 0
+            arr = res.split(' ')
+            while i < len(arr): #byte in res.split(' '):
+                byte = arr[i]
                 if byte.isalpha():
                     k = self.cmds['codes'][f'{byte}']
                     if k== 'hash':
+                        i += 1
                         continue
-                    if k in args:
-                        rep = args[k]
-                        # convert to approperiate value if it isn't
-                        if rep in self.cmds[k]:
-                            rep = self.cmds[k][rep]
-                    else:
-                        rep = list(self.cmds[f'{k}'].values())[0]
-                    if 'ascii' in k: 
-                        # convert rep from ascii -> hex -> int -> hex with proper length
-                        rep = int(rep.encode().hex(),16)
-                        rep = self.hexify(rep,length=self.cmds[k]['length'])
-                    res = res.replace(byte,rep)
+                    rep = self.hex_sub(k,**args)
+                elif byte == '(':
+                    j = arr.index(')') # grab ending index
+                    # delete )
+                    del arr[j]
+                    repeated = arr[i+1:j]
+                    repeated = list(map(lambda k: self.cmds['codes'][k],repeated))
+                    print('repeated: ',repeated)
+                    print('args: ',args.keys())
+                    for r in repeated:
+                        if r in args:
+                            print('passed: ',args[r])
+
+                    # remove the ( )
+                    res = res.replace('( ','')
+                    res = res.replace(') ','')
+                    rep = ''
+                else:
+                    rep = byte
+                res = res.replace(byte,rep)
+                i += 1
             v = res
             if '#' in res:
                 payload = res.split(' # ')[-1]
