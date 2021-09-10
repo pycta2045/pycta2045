@@ -66,7 +66,7 @@ class CTA2045:
         h += CTA2045.parse_hex(value)
         ret = ' '.join(map(lambda x: str(int(x,16)),h.split())) # convert to ints
         #if func != None:
-            #ret = ''.join(map(lambda x: func(int(x),**arguments),ret.split())) # apply the function on 
+            #ret = ''.join(map(lambda x: func(int(x),**arguments),ret.split())) # apply the function on
         if combine:
             h = h.replace(' ','')
             ret = int(h,16)
@@ -84,7 +84,7 @@ class CTA2045:
                 rep = self.cmds[key][rep]
         else:
             rep = list(self.cmds[f'{key}'].values())[0]
-        if 'ascii' in key: 
+        if 'ascii' in key:
             # convert rep from ascii -> hex -> int -> hex with proper length
             rep = int(rep.encode().hex(),16)
             rep = self.hexify(rep,length=self.cmds[key]['length'])
@@ -263,7 +263,7 @@ class CTA2045:
                     if 'ascii' in arg:
                         # value = self.unhexify(value,func=func, arguments=arguments)
                         value = self.unhexify(value)
-                        value = ''.join(map(lambda x: chr(int(x)),value.split())).strip() # apply the function on 
+                        value = ''.join(map(lambda x: chr(int(x)),value.split())).strip() # apply the function on
                     elif 'commodity' in key:
                         value = self.unhexify(value,combine=True)
                     else:
@@ -359,7 +359,7 @@ class CTA2045:
         return valid
     def from_cta_bytes(self,encoded_bytes):
         # convert to str
-        assert type(encoded_bytes) == bytes, 'argument must be of type bytes' 
+        assert type(encoded_bytes) == bytes, 'argument must be of type bytes'
         s = bytes.decode()
         s = s.replace('/',' ').strip()
         # hexify
