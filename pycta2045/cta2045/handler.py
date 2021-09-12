@@ -83,7 +83,8 @@ class CTA2045:
             if rep in self.cmds[key]:
                 rep = self.cmds[key][rep]
         else:
-            rep = list(self.cmds[f'{key}'].values())[0]
+            # rep = list(self.cmds[f'{key}'].values())[0]
+            rep = self.get_default(key)
         if 'ascii' in key:
             # convert rep from ascii -> hex -> int -> hex with proper length
             rep = int(rep.encode().hex(),16)
@@ -92,11 +93,11 @@ class CTA2045:
     def consume_argument_dict(self,args:dict,repeated:list)->list:
         i = 0
         res = []
-        while len(args)>0:
-            target = repeated[i%len(repated)]
+        while len(args)>0 or i%len(repeated) != 0 or len(res) == 0:
+            target = repeated[i%len(repeated)]
             try:
-                can = next(filter(lambda x: x.startswith))
-                can = args.pop(e)
+                can = next(filter(lambda x: x.startswith(target),args))
+                can = args.pop(can)
             except StopIteration:
                 can = self.get_default(target)
             res.append(can)
@@ -140,23 +141,17 @@ class CTA2045:
                     rep = self.hex_sub(k,**args)
                 elif byte == '(':
                     j = arr.index(')') # grab ending index
-                    # delete )
-                    del arr[j]
                     repeated = arr[i+1:j]
                     repeated = list(map(lambda k: self.cmds['codes'][k],repeated))
-                    print('repeated: ',repeated)
-                    # print('args: ',args.keys())
-                    if len(args) > 0:
-                        repeated:list = self.consume_argument_dict(args,repated)
-                    
-                    # for r in repeated:
-                    #     if r in args:
-                    #         # print('passed: ',args[r])
-                    #         pass
-                    print(repeated)
-                    # remove the ( )
+                    repeated_len = len(repeated)
+                    repeated:list = self.consume_argument_dict(args,repeated)
+                    # remove the ( 
                     res = res.replace('( ','')
-                    res = res.replace(') ','')
+                    # remove the repeated elements 
+                    res = res.split()
+                    del res[i:i+len(repeated)]
+                    res = ' '.join(res)
+                    res = res.replace(')',' '.join(repeated))
                     rep = ''
                 else:
                     rep = byte
