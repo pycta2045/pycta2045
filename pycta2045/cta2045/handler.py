@@ -106,7 +106,6 @@ class CTA2045:
         if 'args' in args: # drop a level
             args = args['args']
         try:
-            print('constructing results...')
             res = self.cmds['commands'][f'{cmd}']['format']
             i = 0
             arr = res.split(' ')
@@ -124,12 +123,12 @@ class CTA2045:
                     del arr[j]
                     repeated = arr[i+1:j]
                     repeated = list(map(lambda k: self.cmds['codes'][k],repeated))
-                    print('repeated: ',repeated)
-                    print('args: ',args.keys())
+                    # print('repeated: ',repeated)
+                    # print('args: ',args.keys())
                     for r in repeated:
                         if r in args:
-                            print('passed: ',args[r])
-
+                            # print('passed: ',args[r])
+                            pass
                     # remove the ( )
                     res = res.replace('( ','')
                     res = res.replace(') ','')
@@ -238,38 +237,60 @@ class CTA2045:
             print(tb.format_tb())
             pass
         return response
+    def consume_argument(self,arg, pos, length, msg, form, key):
+        value = msg[pos:pos+length]
+        # get associated key
+        value = " ".join(value)
+        try:
+            value = next(k for k,v in self.cmds[arg].items() if v.upper() == value.upper())
+        except Exception as e:
+            arguments = {}
+            func = None
+            combine = False
+            # change this into being a seperated hex
+            if 'ascii' in arg:
+                value = self.unhexify(value)
+                value = ''.join(map(lambda x: chr(int(x)),value.split())).strip() # apply the function on
+            elif 'commodity' in key:
+                value = self.unhexify(value,combine=True)
+            else:
+                value = self.parse_hex(value) # leave it as parsed hex
+        return value
     def extract_args(self,cmd,val):
         # get command name
         key = cmd['command']
         cmd['args'] = {}
         # get arguments
-        #if key in self.cmds['commands']:
         form = cmd['format'].split()
         i = j = 0
         while i < len(form) and j < len(val):
+            if form[i] == '(':
+                i += 1 # ignore the ( symbol
+                repeat = []
+                start = i
+                end = form.index(')')
+                repeat = form[start:end]
+                # repeatedly extract arguments until end of val
+                num = entry = 0
+                while j < len(val) and len(val) - j > len(repeat):    
+                    arg = self.cmds['codes'][repeat[num%len(repeat)]]
+                    length = int(self.cmds[arg]['length'])
+                    value = self.consume_argument(arg,j,length,val,form,key)
+                    if f'{arg}{entry}' in cmd['args']:
+                        entry += 1
+                        cmd['args'][f'{arg}{entry}'] = value
+                    else:
+                        cmd['args'][f'{arg}{entry}'] = value
+                    j += length
+                    num += 1
+                i += num + 1 # ignore the ) symbol
+                continue
             if form[i].isalpha() and form[i] != 'H':
                 arg = self.cmds['codes'][form[i]]
                 length = int(self.cmds[arg]['length'])
-                value = val[j:j+length]
-                # get associated key
-                value = " ".join(value)
-                try:
-                    value = next(k for k,v in self.cmds[arg].items() if v.upper() == value.upper())
-                except Exception as e:
-                    arguments = {}
-                    func = None
-                    combine = False
-                    # change this into being a seperated hex
-                    if 'ascii' in arg:
-                        # value = self.unhexify(value,func=func, arguments=arguments)
-                        value = self.unhexify(value)
-                        value = ''.join(map(lambda x: chr(int(x)),value.split())).strip() # apply the function on
-                    elif 'commodity' in key:
-                        value = self.unhexify(value,combine=True)
-                    else:
-                        value = self.parse_hex(value) # leave it as parsed hex
+                value = self.consume_argument(arg,j,length,val, form, key)
                 cmd['args'][arg] = value
-                j += length - 1
+                j += length -1 
             i += 1
             j += 1
         return cmd
