@@ -430,13 +430,14 @@ class EV(CTA2045Model):
         '''
         val = {}
         print('CommodityRead...')
-        IR = CA = CA2 = IR2 = soc = 0
-        val['commodity_code'] = 'electricity consumed' # go with electricity consumed first
+        IR0 = CA0 = CA1 = IR1 = soc = 0
+        CC0 = 'electricity consumed'
+        # val['commodity_code0'] = 'electricity consumed' # go with electricity consumed first
         try:
             t = time.time()
             record = self.get_record(t)
             soc = record['soc']
-            IR = record['power']
+            IR0 = record['power']
         except TypeError as e: # caused by Nonetype since get_record returns None if charging was not started
             pass # use default IR & CA values
         except Exception as e:
@@ -447,26 +448,39 @@ class EV(CTA2045Model):
             >> CA = max_cap(Kwh) * SoC (%)
             >> IR = power[time]
         '''
-        CA = self.max_cap * (soc - self.init_SoC)
-        # IR = CTA2045.hexify(int(IR),length=6)
-        # CA = CTA2045.hexify(int(CA),length=6)
+        CA0 = self.max_cap * (soc - self.init_SoC)
+        IR0 = CTA2045.hexify(int(IR0),length=6)
+        CA0 = CTA2045.hexify(int(CA0),length=6)
         '''
         # ---------------- calculate present energy (energy take) ---------
             >> CA = max_cap(Kwh) * (1-SoC) (%)
             >> IR =  None  --> CTA2045 not used
         '''
-        CA2 = self.max_cap * (1-soc)
+        CA1 = self.max_cap * (1-soc)
         t = np.round(time.time(),decimals=3)
-        self.commodity_log = self.commodity_log.append({'time':dt.fromtimestamp(t),'Elect. Consumed - Cumulative (Wh)':int(CA),'Elect. Consumed - Inst. Rate (W)':int(IR),'EnergyTake - Cumulative (Wh)':int(CA2),'EnergyTake - Inst. Rate (W)':int(IR2)},ignore_index=True)
+        self.commodity_log = self.commodity_log.append({'time':dt.fromtimestamp(t),
+                                                        'Elect. Consumed - Cumulative (Wh)':CA0,
+                                                        'Elect. Consumed - Inst. Rate (W)':IR0,
+                                                        'EnergyTake - Cumulative (Wh)':CA1,
+                                                        'EnergyTake - Inst. Rate (W)':IR1}
+                                                        ,ignore_index=True)
         if self.verbose:
-            print(f'Energy Take: {CA2} {IR2} (not supported)')
-        val['instantaneous_rate'] = CTA2045.hexify(int(IR),length=6)
+            print(f'Energy Take: {CA1} {IR1} (not supported)')
+        # val['instantaneous_rate'] = CTA2045.hexify(IR0,length=6)
         CA = CTA2045.hexify(int(CA),length=6)
-        CC2 = self.cta.get_code_value('commodity_code','present energy')
-        CA2 = CTA2045.hexify(int(CA2),length=6)
-        IR2 = CTA2045.hexify(int(IR2),length=6)
-        CA = f'{CA} {CC2} {IR2} {CA2}'
-        val['cumulative_amount'] = CA
+        CC1 = self.cta.get_code_value('commodity_code','present energy')
+        CA1 = CTA2045.hexify(int(CA1),length=6)
+        IR1 = CTA2045.hexify(int(IR1),length=6)
+        val = {
+            # ------------------------ electricity consumed measurements ---------------
+            'commodity_code0':CC0,
+            'cumulative_amount0':CA0,
+            'instantaneous_rate0':IR0,
+            # ------------------------ energy take measurements ------------------------
+            'commodity_code1':CC1,
+            'cumulative_amount1':CA1,
+            'instantaneous_rate1':IR1,
+        }
         return val
     def critical_peak_event(self,payload):
         '''
