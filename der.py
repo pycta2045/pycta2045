@@ -6,13 +6,13 @@ import matplotlib.pyplot as plt
 from rich import pretty
 pretty.install()
 
-port = '/dev/ttyS7'
+port = '/dev/ttyS2'
 figsize = (50,50) # (w,h)
-version = '40kw' # experiment version
-ev = models.EV(max_cap=40,verbose=True,decay_rate=.08)
+version = '50kw' # experiment version
+ev = models.EV(max_cap=50,verbose=True,decay_rate=.08)
 t_end = ev.t_end
 dev = device.CTA2045Device(mode="DER",model=ev,comport=port)
-log = dev.run()
+log = dev.run(block=True)
 print("LOG: ")
 print(log)
 log.to_csv('logs/DER_log.csv')

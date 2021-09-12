@@ -23,7 +23,7 @@ prompt = {
 port = '/dev/ttyS2'
 log_sz = 30
 # default mode of operation is DCM
-dev = device.SimpleCTA2045Device(comport=port)
+dev = device.CTA2045Device(comport=port)
 dev.run()
 complete_log = pd.DataFrame({})
 while True:

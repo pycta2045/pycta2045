@@ -1,7 +1,7 @@
 """
 Demonstrates a dynamic Layout
 """
-from pycta2045 import SimpleCTA2045Device
+from pycta2045 import CTA2045Device
 import sys, os, pandas as pd, time,  select, traceback as tb, threading
 from queue import Queue
 from datetime import datetime
@@ -43,7 +43,7 @@ class DCM:
         self.plain_prompt  = list(map(lambda x: f"[{num_color}]{x[0]}[/{num_color}]: [{text_color}]{x[1]}[/{text_color}]",self.prompt.items()))
         self.plain_prompt = "\t".join(self.plain_prompt)
         self.pretty_prompt = Text("").from_markup(self.plain_prompt,justify='center')
-        self.device = SimpleCTA2045Device(comport=port)
+        self.device = CTA2045Device(comport=port)
         self.device.run()
         self.log = self.device.get_log()
         self.log_size = 10

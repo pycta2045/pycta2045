@@ -62,7 +62,7 @@ class CTA2045Device:
             ts.append(t)
             msgs.append(msg)
         df = pd.DataFrame({'time':ts, 'event':msgs})
-        # df.set_index('time',inplace=True)
+        df.set_index('time',inplace=True)
         return df
     def __write(self,msg,log=False,end='\n'):
         if log:
@@ -178,7 +178,7 @@ class CTA2045Device:
         # next_prompt = time.time() + prompt_time
         last_sz = self.log.qsize()
         self.__prompt(valid)
-        while 1:
+        while not self.stopped:
             if last_sz+2 <= self.log.qsize(): # if log has changed by 2 msgs
                 time.sleep(.5*self.timeout) # sleep to allow log msgs to be printed
                 self.__prompt(valid)
@@ -249,6 +249,7 @@ class CTA2045Device:
                 'critical peak event':self.model.critical_peak_event
             }
             if block:
+                self.stopped = False
                 self.__run_daemon()
         elif self.mode=='DCM':
             self.FDT = {} # empty it
@@ -261,6 +262,7 @@ class CTA2045Device:
             self.cta_mod.set_supported('device info request',False)
             self.cta_mod.set_supported('commodity read request',False)
             if block:
+                self.stopped = False
                 self.__run_dcm()
         else:
             raise UnknownModeException(f'Unknown Mode: {self.mode}')
