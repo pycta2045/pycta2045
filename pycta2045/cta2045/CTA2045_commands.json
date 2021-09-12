@@ -278,6 +278,7 @@
         "natural gas - m":"0x04",
         "water - l":"0x05",
         "total energy":"0x06",
+        "total energy - estimated":"0x86",
         "present energy":"0x07",
         "present energy - estimated":"0x87",
         "length":1

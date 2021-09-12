@@ -89,6 +89,22 @@ class CTA2045:
             rep = int(rep.encode().hex(),16)
             rep = self.hexify(rep,length=self.cmds[key]['length'])
         return rep
+    def consume_argument_dict(self,args:dict,repeated:list)->list:
+        i = 0
+        res = []
+        while len(args)>0:
+            target = repeated[i%len(repated)]
+            try:
+                can = next(filter(lambda x: x.startswith))
+                can = args.pop(e)
+            except StopIteration:
+                can = self.get_default(target)
+            res.append(can)
+            i += 1
+        return res
+    def get_default(self,key):
+        ret = next(filter(None,self.cmds[key].values()))
+        return ret
     def to_cta(self,cmd,**args):
         '''
             Purpose: Translates natural language commands like shed, endshed, commodity read, etc.  to corresponding hex value representation as specified by CTA2045-B.
@@ -101,6 +117,11 @@ class CTA2045:
                     * first value in the corresponding key within CTA2045_commands.json.
                 * it uses Fletcher’s 16-bit 1’s complement as a hashing function as specified by CTA2045-B.
                     * This DOES NOT provide security. In fact, CTA2045-B does not address security measures at all.
+                * if repeated arguments are passed (like in commodity read response), the function extects the arguments keys to be numbered:
+                    * Example: (commodity_code0, cumulative_amount0, instantaneous_rate0) for the first commodity read measurement
+                        * (commodity_code1, cumulative_amount1, instantaneous_rate1) for the second
+                        * ...
+                        * (commodity_coden, cumulative_amountn, instantaneous_raten) for the nth measurement, and so on. 
         '''
         v = self.hexify(0)
         if 'args' in args: # drop a level
@@ -123,12 +144,16 @@ class CTA2045:
                     del arr[j]
                     repeated = arr[i+1:j]
                     repeated = list(map(lambda k: self.cmds['codes'][k],repeated))
-                    # print('repeated: ',repeated)
+                    print('repeated: ',repeated)
                     # print('args: ',args.keys())
-                    for r in repeated:
-                        if r in args:
-                            # print('passed: ',args[r])
-                            pass
+                    if len(args) > 0:
+                        repeated:list = self.consume_argument_dict(args,repated)
+                    
+                    # for r in repeated:
+                    #     if r in args:
+                    #         # print('passed: ',args[r])
+                    #         pass
+                    print(repeated)
                     # remove the ( )
                     res = res.replace('( ','')
                     res = res.replace(') ','')
@@ -147,7 +172,7 @@ class CTA2045:
                 res = res.split(' H')[0]
                 v = f"{self.checksum(res)}"
         except Exception as e:
-            print(e)
+            raise UnknownCommandException(e)
         return v
     def checksum(self,val):
         '''

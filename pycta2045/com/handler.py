@@ -163,5 +163,7 @@ class COM:
         return self.__msgs
     def stop(self):
         self.stopped = True
-        self.thread.join()
+        if not self.thread == None:
+            self.thread.join()
+        print('stopped com!')
         return

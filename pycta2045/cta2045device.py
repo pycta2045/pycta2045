@@ -46,6 +46,7 @@ class CTA2045Device:
         self.timeout = timeout
         self.last_log_msg = None
         self.stopped = True
+        self.running = False
         return
     def __del__(self):
         self.stop()
@@ -99,6 +100,8 @@ class CTA2045Device:
             raise UnknownCommandException(msg) # propagate exception
         return res
     def send(self,cmd,args={},verbose=False):
+        if not self.running:
+            raise Exception('device not running. Try the run() function first!')
         ret = False
         c = self.cta_mod.to_cta(cmd,args=args)
         self.com.send(c)
@@ -235,6 +238,7 @@ class CTA2045Device:
         return
     def run(self,block=False):
         self.com.start()
+        self.running = True
         self.__setup()
         if self.mode == 'DER':
             # validate model in DER mode
