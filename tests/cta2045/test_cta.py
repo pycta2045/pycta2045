@@ -1,4 +1,4 @@
-import unittest
+import unittest, numpy as np
 from pycta2045.cta2045.handler import CTA2045 as CTA
 
 def print_status(status):
@@ -56,7 +56,6 @@ class TestCTA(unittest.TestCase):
         print_status(success)
         self.assertEqual(res.upper(),device_info.upper())
         return
-
     def test_to_cta(self):
         print(f'{"-" * 5} to_cta test {"-" * 5}')
         cta = CTA()
@@ -64,7 +63,7 @@ class TestCTA(unittest.TestCase):
         for k,v in cmds.items():
             success=True
             v = v['format']
-            print(f'tesing {k}....',end='')
+            print(f'testing {k}....',end='')
             res = cta.to_cta(k)
             # check length -- should be greater because of the checksum bytes, which not included in the format
             if not len(res) >= len(v):
@@ -93,6 +92,34 @@ class TestCTA(unittest.TestCase):
                 success=False
             print_status(success)
             self.assertTrue(k==cmd)
-
+    def test_repeated_args(self):
+        print(f'{"-" * 5} repeated arguments test {"-" * 5}')
+        cta = CTA()
+        # using commodity read response since it is currently the only supported command that uses repeated arguments
+        CC0 = cta.get_code_value('commodity_code','electricity consumed')
+        CC1 = cta.get_code_value('commodity_code','present energy')
+        CA0,CA1 = np.random.randint(0,1000,size=2)
+        IR0,IR1 = np.random.randint(0,1000,size=2)
+        passed_args = {
+            'commodity_code0':CC0,
+            'cumulative_amount0':cta.hexify(CA0,length=6),
+            'instantaneous_rate0':cta.hexify(IR0,length=6),
+            'cumulative_amount1':cta.hexify(CA1,length=6),
+            'instantaneous_rate1':cta.hexify(IR1,length=6),
+            'commodity_code1':CC1,
+        }
+        commodity_read_hex = cta.to_cta('commodity read response',args=passed_args.copy())
+        # convert back and verify
+        returned = cta.from_cta(commodity_read_hex)
+        returned_args = returned['args']
+        for k,v in passed_args.items(): 
+            print('testing',k,'....',end='')
+            if k in returned_args:
+                returned_value = returned_args[k]
+                if 'commodity_code' in k:
+                    returned_value = cta.unhexify(cta.get_code_value('commodity_code',returned_value))
+                stat = int(returned_value) == int(cta.unhexify(v,combine=True))
+                print_status(stat)
+        # print(passed_args,returned_args)
 if __name__=="__main__":
     unittest.main()

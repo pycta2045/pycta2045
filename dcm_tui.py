@@ -2,7 +2,7 @@
 Demonstrates a dynamic Layout
 """
 from pycta2045 import CTA2045Device
-import sys, os, pandas as pd, time,  select, traceback as tb, threading
+import sys, os, pandas as pd, time,  select, traceback as tb, threading, argparse as ap
 from queue import Queue
 from datetime import datetime
 from time import sleep
@@ -18,7 +18,10 @@ text_color = 'cyan'
 input_color = 'magenta'
 warning_color = 'bright_red'
 log_color_style = 'pale_violet_red1'
-port = '/dev/ttyS2'
+parser = ap.ArgumentParser()
+parser.add_argument('-p',required=False,type=str,help="com port to use for connection. e.g: -p /dev/ttyS2", default='/dev/ttyS2')
+args = parser.parse_args()
+port = args.p
 class DCM:
     prompt = {
         0: 'quit',
@@ -89,6 +92,7 @@ def validate_input(text,dcm) -> str:
     return -1
 
 def main():
+    
     dcm = DCM()
     con = Console()
     terminated = False

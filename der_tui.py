@@ -2,7 +2,7 @@
 Demonstrates a dynamic Layout
 """
 from pycta2045 import SimpleCTA2045Device, ev_model
-import sys, os, pandas as pd, time,  select, traceback as tb, threading
+import sys, os, pandas as pd, time,  select, traceback as tb, threading, argparse as ap
 from queue import Queue
 from datetime import datetime
 from time import sleep
@@ -18,7 +18,6 @@ text_color = 'cyan'
 input_color = 'magenta'
 warning_color = 'bright_red'
 log_color_style = 'pale_violet_red1'
-port = '/dev/ttyS100'
 class DER:
     prompt = {
         0: 'quit',
@@ -65,6 +64,10 @@ class DER:
 
 
 def main():
+    parser = ap.ArgumentParser()
+    parser.add_argument('-p',required=False,type=str,help="com port to use for connection. e.g: -p /dev/ttyS2", default='/dev/ttyS2')
+    args = parser.parse_args()
+    port = args.p
     der = DER()
     con = Console()
     def usr_input():
@@ -86,17 +89,6 @@ def main():
         except KeyboardInterrupt:
             pass
     der.device.stop()
-    # save = ''
-    # while not save in ['y','n']:
-    #     if not save in ['','y','n']:
-    #         print('invalid input! ',save)
-    #     print(f"would you like to save the log? [y/n]")
-    #     save = input(f"")
-    #     save = save.lower()
-    # fname = ''
-    # if save == 'y' and fname == '':
-    #     fname = input('Enter output log name (csv): ')
-    #     der.log.to_csv(f"{fname}.csv")
     return
 if __name__=="__main__":
     main()
