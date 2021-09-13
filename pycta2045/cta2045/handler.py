@@ -71,11 +71,13 @@ class CTA2045:
             h = h.replace(' ','')
             ret = int(h,16)
         return ret
-
     @staticmethod
     def parse_hex(value):
         value = value.replace('0x','')
         return value
+    def get_default(self,key):
+        ret = next(filter(None,self.cmds[key].values()))
+        return ret
     def hex_sub(self,key,**args):
         if key in args:
             rep = args[key]
@@ -83,8 +85,7 @@ class CTA2045:
             if rep in self.cmds[key]:
                 rep = self.cmds[key][rep]
         else:
-            # rep = list(self.cmds[f'{key}'].values())[0]
-            rep = self.get_default(key)
+            rep = self.get_default(key=key)
         if 'ascii' in key:
             # convert rep from ascii -> hex -> int -> hex with proper length
             rep = int(rep.encode().hex(),16)
@@ -103,9 +104,6 @@ class CTA2045:
             res.append(can)
             i += 1
         return res
-    def get_default(self,key):
-        ret = next(filter(None,self.cmds[key].values()))
-        return ret
     def to_cta(self,cmd,**args):
         '''
             Purpose: Translates natural language commands like shed, endshed, commodity read, etc.  to corresponding hex value representation as specified by CTA2045-B.
@@ -149,16 +147,18 @@ class CTA2045:
                     res = res.replace('( ','')
                     # remove the repeated elements 
                     res = res.split()
-                    del res[i:i+len(repeated)]
+                    # print('before del: ',res, ' slice: ',res[i:i+len(repeated)])
+                    del res[i:i+repeated_len]
+                    # print('after del: ',res)
                     res = ' '.join(res)
-                    res = res.replace(')',' '.join(repeated))
-                    rep = ''
+                    byte = ')'
+                    rep = ' '.join(repeated)
+                    # i = i+len(repeated)
                 else:
                     rep = byte
                 res = res.replace(byte,rep)
                 i += 1
             v = res
-
             if '#' in res:
                 payload = res.split(' # ')[-1]
                 payload_length = len(payload.split(' ')) - 1 # account for hash checksum (ignore it)

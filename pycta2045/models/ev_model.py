@@ -431,8 +431,7 @@ class EV(CTA2045Model):
         val = {}
         print('CommodityRead...')
         IR0 = CA0 = CA1 = IR1 = soc = 0
-        CC0 = 'electricity consumed'
-        # val['commodity_code0'] = 'electricity consumed' # go with electricity consumed first
+        CC0 = self.cta.get_code_value('commodity_code','electricity consumed')
         try:
             t = time.time()
             record = self.get_record(t)
@@ -464,10 +463,6 @@ class EV(CTA2045Model):
                                                         'EnergyTake - Cumulative (Wh)':CA1,
                                                         'EnergyTake - Inst. Rate (W)':IR1}
                                                         ,ignore_index=True)
-        if self.verbose:
-            print(f'Energy Take: {CA1} {IR1} (not supported)')
-        # val['instantaneous_rate'] = CTA2045.hexify(IR0,length=6)
-        CA = CTA2045.hexify(int(CA),length=6)
         CC1 = self.cta.get_code_value('commodity_code','present energy')
         CA1 = CTA2045.hexify(int(CA1),length=6)
         IR1 = CTA2045.hexify(int(IR1),length=6)
@@ -481,6 +476,8 @@ class EV(CTA2045Model):
             'cumulative_amount1':CA1,
             'instantaneous_rate1':IR1,
         }
+        if self.verbose:
+            print(f'Commodity Read Response: ',val)
         return val
     def critical_peak_event(self,payload):
         '''
