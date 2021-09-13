@@ -1,6 +1,6 @@
 from pycta2045.cta2045 import *
 from pycta2045.com import *
-import sys, os, pandas as pd, time,  select, traceback as tb, multiprocessing#, import threading
+import sys, os, pandas as pd, time,  select, traceback as tb, multiprocessing
 from pycta2045.models import *
 from queue import Queue
 from datetime import datetime as dt
@@ -29,7 +29,7 @@ recv_color = 'red'
 send_color = 'green'
 
 class CTA2045Device:
-    def __init__(self,mode='DCM',timeout=1,model=None,comport='/dev/ttyS6',verbose=False):
+    def __init__(self,mode:str='DCM',timeout:int=1,model=None,comport:str='/dev/ttyS6',verbose:bool=False):
         self.mode = mode.upper()
         self.model = model
         self.log = multiprocessing.Queue()
@@ -51,11 +51,11 @@ class CTA2045Device:
     def __del__(self):
         self.stop()
         return
-    def __update_log(self,msg):
+    def __update_log(self,msg:str)->None:
         self.last_log_msg = msg
         self.log.put(msg)
         return
-    def get_log(self):
+    def get_log(self)->pd.DataFrame:
         ts = []
         msgs = []
         while not self.log.empty():
@@ -65,17 +65,16 @@ class CTA2045Device:
         df = pd.DataFrame({'time':ts, 'event':msgs})
         df.set_index('time',inplace=True)
         return df
-    def __write(self,msg,log=False,end='\n'):
+    def __write(self,msg:str,log:bool=False,end:str='\n')->None:
         if log:
             self.__update_log(msg)
         print(msg,end=end)
         return
-    def __update_log(self,msg,log=False,end='\n'):
+    def __update_log(self,msg:str,log:bool=False,end:str='\n')->None:
         if log:
             self.__update_log(msg)
-        # print(msg,end=end)
         return
-    def __recv(self,verbose=True):
+    def __recv(self,verbose:bool=True)->dict:
         res = None
         try:
             res = self.com.get_next_msg()
@@ -99,7 +98,7 @@ class CTA2045Device:
             self.__write(f"{t}: received Unknwon command -- {msg}",log=True)
             raise UnknownCommandException(msg) # propagate exception
         return res
-    def send(self,cmd,args={},verbose=False):
+    def send(self,cmd:str,args:dict={},verbose:bool=False)->bool:
         if not self.running:
             raise Exception('device not running. Try the run() function first!')
         ret = False
@@ -117,7 +116,7 @@ class CTA2045Device:
         ret = True # else an exception would be raised and this statement would be skipped when unwinding the stack
         self.__update_log(f'{time.time()}: sent {cmd}')
         return ret
-    def __setup(self):
+    def __setup(self)->bool:
         res = None
         success=False
         cmds = [('intermediate mtsq','intermediate'),
@@ -146,10 +145,9 @@ class CTA2045Device:
         self.__write(str(self.support_flags))
         success = self.support_flags['intermediate'] and self.support_flags['data-link'] and self.support_flags['max payload'] > 0
         return success
-    def __prompt(self,valid=False):
+    def __prompt(self,valid:bool=False)->None:
         '''
             outputs a prompt message to the screen
-
         '''
         if not valid:
             self.__write(f"{'-'*5}> INVALID. Try again!\n")
@@ -162,9 +160,8 @@ class CTA2045Device:
         return
     # ------------------------- DCM Loop ----------------------------------
     # -----------------------------------------------------------------------------
-    def __run_dcm(self):
+    def __run_dcm(self)->None:
         valid = True
-
         # sent unsupported commands -- doesn't make sense for DCM to ack any of them
         self.cta_mod.set_supported('shed',False)
         self.cta_mod.set_supported('endshed',False)
@@ -177,8 +174,6 @@ class CTA2045Device:
         proc.daemon = True
         proc.start()
         choice = ''
-        # prompt_time = 30 # every 30 secs will prompt
-        # next_prompt = time.time() + prompt_time
         last_sz = self.log.qsize()
         self.__prompt(valid)
         while not self.stopped:
@@ -209,7 +204,7 @@ class CTA2045Device:
         return
     # ------------------------- Daemon Loop ----------------------------------
     # -----------------------------------------------------------------------------
-    def __run_daemon(self):
+    def __run_daemon(self)->None:
         while not self.stopped:
             args = {}
             try:
@@ -236,7 +231,7 @@ class CTA2045Device:
             except KeyboardInterrupt as e:
                 break # exit loop & return
         return
-    def run(self,block=False):
+    def run(self,block:bool=False)->None:
         self.com.start()
         self.running = True
         self.__setup()
@@ -277,7 +272,7 @@ class CTA2045Device:
             self.stopped = False
             self.thread.start()
         return
-    def stop(self):
+    def stop(self)->None:
         self.com.stop()
         self.stopped = True
         self.thread.join()
