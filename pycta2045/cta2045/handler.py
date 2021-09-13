@@ -16,7 +16,7 @@ class UnknownCommandException(Exception):
         super().__init__(self.message)
 
 class CTA2045:
-    def __init__(self,fname="CTA2045_commands.json"):
+    def __init__(self,fname:str="CTA2045_commands.json"):
         self.cmds = {}
         path = os.path.dirname(__file__)
         try:
@@ -26,7 +26,7 @@ class CTA2045:
             print("Issue reading JSON",e)
         return
     def dump_commands(self):
-        '''(helper function)
+        '''
             Purpose: dumps all supported CTA2045 commands (helper function).
             Args:
                 * None
@@ -34,8 +34,8 @@ class CTA2045:
         '''
         return self.cmds['commands']
     @staticmethod
-    def hexify(value,length=1):
-        '''(helper function)
+    def hexify(value:int,length:int=1)->str:
+        '''
             Purpose: Returns the hex representation of given integer (helper function).
             Args:
                 * value: Integer in decimal representation.
@@ -53,32 +53,44 @@ class CTA2045:
         value = " ".join(list(map(lambda x: '0x'+x,padded)))
         return value
     @staticmethod
-    def unhexify(value, combine = False,func: callable = None, arguments:dict =None):
-        '''(helper function)
+    def unhexify(value:str, combine:bool = False, func: callable = None, arguments:dict =None):
+        '''
             Purpose: Returns the decimal representation of given hex (helper function).
             Args:
                 * value: Integer in hex (seperate by space -- 0x00 0x01 ...).
                 * length: Number of bytes to convert
-            Return: decimal representation.
-            Note: it can also apply a function on the values passed if func != None
+            Return: Decimal representation of the passed value 
+            Note:
+                * it returns a single `int` if combine is true
+                * it returns a single space seperated `string` representing multiple ints in the passed value (if combine is false).
         '''
         h = ''
         h += CTA2045.parse_hex(value)
         ret = ' '.join(map(lambda x: str(int(x,16)),h.split())) # convert to ints
-        #if func != None:
-            #ret = ''.join(map(lambda x: func(int(x),**arguments),ret.split())) # apply the function on
         if combine:
             h = h.replace(' ','')
             ret = int(h,16)
         return ret
     @staticmethod
-    def parse_hex(value):
+    def parse_hex(value:str)->str:
+        '''
+            (Helper) Function that parses a cta2045 hex into "clean" hex (removes 0x from all the bytes)
+        '''
         value = value.replace('0x','')
         return value
-    def get_default(self,key):
+    def get_default(self,key:str)->str:
+        '''
+            (Helper) Function that returns the default value (i.e. first value in database) for the passed key 
+        '''
         ret = next(filter(None,self.cmds[key].values()))
         return ret
-    def hex_sub(self,key,**args):
+    def hex_sub(self,key:str,**args:dict)->str:
+        '''
+            (Helper) Function that returns a CTA2045 formatted hex
+            Note:
+                * It either uses the passed arguments to substitute for CTA2045 arguments
+                * Or uses the default values from the database   
+        '''
         if key in args:
             rep = args[key]
             # convert to approperiate value if it isn't
@@ -92,6 +104,9 @@ class CTA2045:
             rep = self.hexify(rep,length=self.cmds[key]['length'])
         return rep
     def consume_argument_dict(self,args:dict,repeated:list)->list:
+        '''
+           (Helper) Function that uses passed arguments to plug inplace of repeated arguments. It returns a CTA2045 formatted message that includes the passed arguments.   
+        '''
         i = 0
         res = []
         while len(args)>0 or i%len(repeated) != 0 or len(res) == 0:
@@ -104,7 +119,7 @@ class CTA2045:
             res.append(can)
             i += 1
         return res
-    def to_cta(self,cmd,**args):
+    def to_cta(self,cmd:str,**args:dict)->str:
         '''
             Purpose: Translates natural language commands like shed, endshed, commodity read, etc.  to corresponding hex value representation as specified by CTA2045-B.
             Args:
@@ -169,7 +184,7 @@ class CTA2045:
         except Exception as e:
             raise UnknownCommandException(e)
         return v
-    def checksum(self,val):
+    def checksum(self,val:str)->str:
         '''
             Purpose: Hashes the passed argument using Fletcher’s checksum algorithm
             Args:
@@ -186,10 +201,12 @@ class CTA2045:
         lsb = 255 - ((c1 + msb) % 255)
         val = f"{val} {self.hexify(msb)} {self.hexify(lsb)}"
         return val
-    def hex_process(self,val):
+    def hex_process(self,val:str)->str:
+        '''
+            (Helper) Function that process the hex to generate CTA2045 formatted hex (used by from_cta method).
+        '''
         ret = ''
-        val = val.strip() # trim ends
-        val = val.split() # strip to list
+        val = val.strip().split() # trim ends and split to list
         for v in val:
             # convert to int
             i = int(v,16)
@@ -197,12 +214,12 @@ class CTA2045:
             h = self.hexify(i)
             ret += f' {h}'
         return ret.strip()
-    def from_cta(self,val):
+    def from_cta(self,val:str)->dict:
         '''
             Purpose: Translates hex representation of CTA2045 commands (0x06 0x00) to natural language representation (link-layer ack)
             Args:
                 * val: a hex representation of a CTA2045 command
-            Return: String of what the command represents.
+            Return: Dictionary of what the command represents.
             Notes:
                 * This function uses CTA2045_commands.json. So it is limited to only supported commands in the JSON file.
                 * If the command is not supported, it returns None as an output.
@@ -257,7 +274,10 @@ class CTA2045:
             print(tb.format_tb())
             pass
         return response
-    def consume_argument(self,arg, pos, length, msg, form, key):
+    def consume_argument(self,arg:dict, pos:int, length:int, msg:str, form:str, key:str)->str:
+        '''
+            (Helper) Function that returns translates a specific (in a specific position and length) argument in the given message (used indirectly by from_cta -- through extract_args).
+        '''
         value = msg[pos:pos+length]
         # get associated key
         value = " ".join(value)
@@ -276,7 +296,10 @@ class CTA2045:
             else:
                 value = self.parse_hex(value) # leave it as parsed hex
         return value
-    def extract_args(self,cmd,val):
+    def extract_args(self,cmd:str,val:str)->dict:
+        '''
+            (Helper) Function that uses the passed value (CTA2045 formatted hex and command type) and extracts expected arguments from it (used by from_cta). 
+        '''
         # get command name
         key = cmd['command']
         cmd['args'] = {}
@@ -314,12 +337,14 @@ class CTA2045:
             i += 1
             j += 1
         return cmd
-    def complement(self,command):
+    def complement(self,command:str)->list:
         '''
             Purpose: returns the complement of passed command (if supported only)
             Args:
                 * cmd (string): desired command to find complement of
             Return: complement of passed command
+            Note:
+                * Can be used by devices to follow CTA2045 protocol (i.e. should send an ACK followed by App ACK)
         '''
         cmd_complement = []
         try:
@@ -339,13 +364,13 @@ class CTA2045:
             # command not found or unable to response -- send a nak
             cmd_complement = ['nak']
         return cmd_complement
-    def get_code_value(self,key=None,code=None):
+    def get_code_value(self,key:str=None,code:str=None)->str:
         '''
             Purpose: returns the value for the requested code.
             Args:
                 * key (string): desired key code to search in.
                 * code (string): desired code field to find the value of
-            Return: value of the given code field
+            Return: value of the given code field (string of CTA2045 hex)
             NOTE:
                 * returns 0 if code was not found
                 * example:
@@ -360,7 +385,7 @@ class CTA2045:
             # do nothing (value is still 0x00)
             pass
         return value
-    def set_supported(self,command,value: bool):
+    def set_supported(self,command:str,value: bool)->bool:
         '''
             Purpose: sets the `supported` field for the passed command to the passed bool value
             Args:
@@ -378,7 +403,7 @@ class CTA2045:
             print(f'Failed to set the supported field for: {command}: ',e)
             pass
         return False
-    def is_valid(self,msg):
+    def is_valid(self,msg:str)->bool:
         '''
             Purpose: checks if the passed message is a valid CTA msg (supported CTA2045 msgs only)
             Args:
@@ -398,17 +423,30 @@ class CTA2045:
             if self.from_cta(" ".join(msg)) != None:
                 valid = True
         return valid
-    def from_cta_bytes(self,encoded_bytes):
+    def from_cta_bytes(self,encoded_bytes:bytes)->dict:
+        '''
+            Purpose: function that translates CTA2045 bytes into a dictionary of corresponding CTA2045 command.
+            Args:
+                * encoded_bytes: CTA2045 bytes
+            Returns: dictionary containing information translated corresponding command 
+        '''
         # convert to str
         assert type(encoded_bytes) == bytes, 'argument must be of type bytes'
         s = bytes.decode()
         s = s.replace('/',' ').strip()
         # hexify
         return self.from_cta(s)
-    def to_cta_bytes(self,cmd:str):
+    def to_cta_bytes(self,cmd:str,**args:dict)->bytes:
+        '''
+            Purpose: function that returns a CTA2045 command bytes (uses to_cta before converting to bytes).
+            Args:
+                * cmd (string): desired CTA2045 command
+                * args (dict): optional arguments that are used in the translation process
+            Returns: bytes of the CTA2045 command ready to be sent via serial com port
+        '''
         byte = b''
         # convert to command
-        cta = self.to_cta(cmd)
+        cta = self.to_cta(cmd,args=args)
         assert cta != None, 'Error translating command'
         arr = cta.split(' ')
         for i in arr:

@@ -14,7 +14,8 @@ operating_status = {
 }
 
 class EV(CTA2045Model):
-    def __init__(self,initial_soc=0.0,max_volt=240,max_curr=30,max_cap=40,min_comfort=.8,max_comfort=1.,decay_rate=.5,rampup_delay=1,rampup_time=5,t_res=1,verbose=False):
+    def __init__(self,initial_soc:float=0.0,max_volt:int=240,max_curr:int=30,max_cap:int=40,min_comfort:float=.8,
+        max_comfort:float=1.,decay_rate:float=.5,rampup_delay:int=1,rampup_time:int=5,t_res:int=1,verbose:bool=False):
         '''
         Purpose:
             initializes the model with the given parameters for charging
@@ -84,23 +85,20 @@ class EV(CTA2045Model):
         self.commodity_log = pd.DataFrame({})
         return
 
-    def calculate_SoC(self,current,voltage): # returns (power, SoC)
+    def calculate_SoC(self,current:float,voltage:int)->tuple: # returns (power, SoC)
         p = current * voltage
         q = current * self.timer
-        # print(self.timer)
         soc = q/self.max_cap
-        # print(f'i: {current} p: {p} q: {q} soc: {soc}')
         return (p,soc)
-    def current_decay(self,curr):
+    def current_decay(self,curr:float)->float:
         '''
             This function should only be used in the 3rd phase of charging (Constant Voltage).
             That means we shouldn't have an issue with dividing by zero.
         '''
-        # current_cap = self.max_cap*soc
         soc = self.SOC[-1]
         decay = curr* np.exp(soc - self.max_comfort - .06)
         return decay
-    def update_state(self,c,v,soc,p):
+    def update_state(self,c:float,v:int,soc:float,p:float)->None:
         decimal = 3
         p = np.round(p,decimals=decimal)
         c = np.round(c,decimals=decimal)
@@ -116,7 +114,7 @@ class EV(CTA2045Model):
         if self.verbose:
             print(f'V: {v} I: {c} SOC: {int(soc*100)}%')
         return
-    def delay(self,init_SoC):
+    def delay(self,init_SoC:float)->None:
         times = list(range(self.rampup_delay+1))
         v = i = 0 # init to 0s
         # grab last values if exist
@@ -131,7 +129,7 @@ class EV(CTA2045Model):
             SoC += soc
             self.update_state(i,v,SoC,p)
         return
-    def phase1(self,init_SoC):
+    def phase1(self,init_SoC:float)->None:
         v = self.max_volt
         i = 0 # init to 0s
         SoC = init_SoC
@@ -147,7 +145,7 @@ class EV(CTA2045Model):
             self.timer+=self.t_inc
             self.update_state(i,v,SoC,p)
         return
-    def phase2(self):
+    def phase2(self)->None:
         v = self.max_volt
         i = self.max_curr
         SoC = self.SOC[-1]
@@ -158,7 +156,7 @@ class EV(CTA2045Model):
             SoC += soc
             self.update_state(i,v,SoC,p)
         return
-    def phase3(self):
+    def phase3(self)->None:
         v = self.max_volt
         i = self.max_curr
         SoC = self.SOC[-1]
@@ -173,7 +171,7 @@ class EV(CTA2045Model):
             self.update_state(i,v,SoC,p)
             self.timer+=self.t_inc
         return
-    def charge(self,init_SoC=0.0,fname=None):
+    def charge(self,init_SoC=0.0,fname=None)->pd.DataFrame:
         v = self.verbose
         time_slots = []
         if len(self.power) == 0:
@@ -206,7 +204,6 @@ class EV(CTA2045Model):
 
         time_slots.append(self.time[-1])
         self.timestamps = self.generate_time_stamps()
-        # self.time
         ys = [(self.SOC,'SOC (%)'),(self.power,'power (W)'),(self.currs,'current (A)'),(self.volts,'voltage (V)')] # super gross
         if fname != None:
             # self.subplot(self.time,ys,vlines=time_slots,fname=f'{fname}')
@@ -215,17 +212,15 @@ class EV(CTA2045Model):
 
         d = {'time':self.timestamps,'power':self.power,'soc':self.SOC,'current':self.currs,'voltage':self.volts}
 
-        # print(f'time: {len(self.timestamps)} power: {len(self.power)} SOC: {len(self.SOC)} currs: {len(self.currs)} volts: {len(self.volts)}')
         df = pd.DataFrame(d)
-        # df.set_index('time',inplace=True)
         self.df = df
         return df.set_index('time')
-    def generate_time_stamps(self):
+    def generate_time_stamps(self)->pd.DatetimeIndex:
         start = dt.fromtimestamp(self.t_start)
         end = dt.fromtimestamp(self.t_end)
         ts = pd.date_range(start=start, end=end, periods=len(self.power)).round('S') # round seconds
         return ts
-    def get_soc(self,time):
+    def get_soc(self,time:float)->float:
         '''
             Purpose: returns the SoC at the given Epoch timestamp
             Args:
@@ -240,7 +235,7 @@ class EV(CTA2045Model):
         except Exception as e:
             print(e)
         return soc
-    def get_record(self,time):
+    def get_record(self,time:float)->pd.Series:
         '''
             Purpose: returns the record at the given Epoch timestamp
             Args:
@@ -266,7 +261,7 @@ class EV(CTA2045Model):
         if self.verbose:
             print('target record',record)
         return record
-    def get_all_records(self):
+    def get_all_records(self)->pd.DataFrame:
         '''
             Purpose: returns log of all the records
             Args:
@@ -280,7 +275,10 @@ class EV(CTA2045Model):
         except Exception:
             pass # records will be None
         return records
-    def subplot(self,xs,ys,x_name='Time',vlines = None,fname=None): # change to use member variables not args
+    def subplot(self,xs:list,ys:tuple,x_name:str='Time',vlines:list = None,fname:str=None)->None: # change to use member variables not args
+        '''
+            Function that plots multiple ys against a single x-axis (subplots).
+        '''
         num = len(ys)//2 # divide graphs by 2
         (fig,axs) = plt.subplots(num,num) # create 4 graphs
         i = 0
@@ -302,19 +300,20 @@ class EV(CTA2045Model):
         else:
             plt.show()
         return
-    def plot(self,xs,ys,x_name='Time',vlines = None,show=False): # change to use member variables not args
+    def plot(self,xs:list,ys:tuple,x_name:str='Time',show:bool=False): # change to use member variables not args
+        '''
+            Function that plots multiple ys against a single x-axis.
+        '''
         plt.clf()
         ys,y_name = ys
         plt.plot(xs,ys)
         plt.xlabel(x_name)
         plt.ylabel(y_name)
-        # print(x_name,xs)
-        # print(y_name,ys)
         plt.savefig(f'figs/{x_name}_v_{y_name}.png')
         if show:
             plt.show()
         return
-    def discharge(self,time,rate):
+    def discharge(self,time:float,rate:float)->float:
         '''
             Discharges/decreases the battery/SoC based on the given rate for the given time
         '''
@@ -360,7 +359,7 @@ class EV(CTA2045Model):
         # call charge with last soc
         self.charge(init_SoC=soc)
         return
-    def shed(self,payload:dict):
+    def shed(self,payload:dict)->dict:
         '''
             Purpose: modifies the setpoint
             Args:
@@ -375,7 +374,7 @@ class EV(CTA2045Model):
         self.state = operating_status['shed']
         self.update_charging()
         return val
-    def endshed(self,payload:dict):
+    def endshed(self,payload:dict)->dict:
         '''
             Purpose: resets the setpoint
             Args:
@@ -389,7 +388,7 @@ class EV(CTA2045Model):
         self.state = operating_status['endshed']
         #print(f'new min: {self.min_comfort} new max: {self.max_comfort}')
         return val
-    def loadup(self,payload:dict):
+    def loadup(self,payload:dict)->dict:
         '''
             Purpose: calls the charge function
             Args:
@@ -406,7 +405,7 @@ class EV(CTA2045Model):
          # now load up
         self.state = operating_status['loadup']
         return val
-    def operating_status(self,payload:dict):
+    def operating_status(self,payload:dict)->dict:
         '''
             Purpose: obtain the CTA2045 operating status from the model
             Args:
@@ -418,7 +417,7 @@ class EV(CTA2045Model):
         print('OpStatus...')
         val['op_state_code'] = self.state
         return val
-    def commodity_read(self,payload:dict):
+    def commodity_read(self,payload:dict)->dict:
         '''
             Purpose: obtain the state (power/SoC) from the model & convert it to commodity values before returning commodity value
             Args:
@@ -479,7 +478,7 @@ class EV(CTA2045Model):
         if self.verbose:
             print(f'Commodity Read Response: ',val)
         return val
-    def critical_peak_event(self,payload):
+    def critical_peak_event(self,payload:dict)->dict:
         '''
             Purpose: calls the discharge function. If the duration is unknown, the model continously discharge
             Args:
@@ -494,7 +493,7 @@ class EV(CTA2045Model):
         self.state = operating_status['critical peak event']
         self.update_charging()
         return val
-    def grid_emergency(self,payload):
+    def grid_emergency(self,payload:dict)->dict:
         '''
             Purpose: calls the discharge function. If the duration is unknown, the model continously discharge
             Args:
@@ -509,5 +508,8 @@ class EV(CTA2045Model):
         self.state = operating_status['grid emergency']
         self.update_charging()
         return val
-    def get_commodity_log(self):
+    def get_commodity_log(self)->pd.DataFrame:
+        '''
+            Function that returns the log of commodity messages (sent).
+        '''
         return self.commodity_log

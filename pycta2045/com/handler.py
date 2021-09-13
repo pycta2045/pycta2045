@@ -1,6 +1,5 @@
 import serial
-from serial.tools.list_ports import comports #from serial.tools.list_ports_linux import SysFS
-# from multiprocessing import Process, Lock, Queue
+from serial.tools.list_ports import comports
 from threading import Thread, Lock
 import time, pandas as pd, traceback as tb, numpy as np
 from pycta2045.cta2045 import UnsupportedCommandException, UnknownCommandException
@@ -20,10 +19,17 @@ class COM:
     '''
     US = 'DER'
     THEM = 'DCM'
-    def __init__(self, checksum, transform, is_valid, mode='DER', port="/dev/ttyS6",timeout=.4,verbose=False):
+    def __init__(self, checksum:callable, transform:callable, is_valid:callable, mode:str='DER', port:str="/dev/ttyS6",timeout:float=.4,verbose:bool=False):
         '''
+            Constructor
             * Note:
-                * timeout (defualt) is set to 500 ms as specified by CTA2045
+                * checksum: a callabe variable (function) that checks whether or not the received message is complete.
+                * transform: a callable variable (function) that transforms the received message into the desired format.
+                * is_valid: a callable variable (function) that checks if the received message is valid.
+                * mode: desired mode of operation (used mostly for logging) -- DER vs UCM operating mode.
+                * port: com port used to listen on.
+                * timeout (defualt) is set to 500 ms as specified by CTA2045.
+                * verbose: bool to print out notable events.
         '''
         self.port = port
         self.ser = None
@@ -52,9 +58,15 @@ class COM:
         if mode == 'DCM': self.US,self.THEM = ('DCM','DER') # reverse default mode
         return
     def __del__(self):
-        self.stopped = True
+        '''
+            Destructor that ensures all threads have safely exited. 
+        '''
+        self.stopped=True
         return
-    def send(self,data):
+    def send(self,data:str)->bool:
+        '''
+            Member method that translates the passed data into bytearray before sending it through the COM port. 
+        '''
         packet = bytearray()
         self.__log({'src':self.US,'dest':self.THEM,'message':data})
         data = list(map(lambda x:int(x,16),data.split(' ')))
@@ -67,10 +79,10 @@ class COM:
         self.last_msg_timestamp = time.time()
         self.sleep_until = time.time() + self.recv_delay
         return res>=2
-    def __recv(self):
+    def __recv(self)->None:
         '''
-            TODO
-            buffer is a queue used by all threads
+            Private function that (blockingly) waits for messages from the COM port.
+            It uses a buffer (a queue) shared by all threads
         '''
         data = None
         buff = np.array([]) # local buffer used to process chunk of packages
@@ -111,7 +123,7 @@ class COM:
             print(tb.format_tb(e))
 
         return
-    def __log(self,context):
+    def __log(self,context:dict)->None:
         '''
             Purpose: Logs input messages and outputs it into a file
             Args: message (dict) contains:
@@ -127,7 +139,7 @@ class COM:
             print(f"{t}:{st} FROM: {context['src']} TO: {context['dest']} MESSAGE: {context['message']}")
         self.last_message = context['message']
         return
-    def start(self):
+    def start(self)->None:
         '''
             Purpose: starts listen on the given port. It creates a thread with __recv running in it.
             Args: None
@@ -142,9 +154,9 @@ class COM:
             self.stopped = False
             self.thread.start() # starts a new thread to listen to packets
         return
-    def get_next_msg(self):
+    def get_next_msg(self)->str:
         '''
-            non-blocking function that returns the next msg in the buffer. 
+            Non-blocking function that returns the next msg in the buffer. 
             If buffer is empty, it waits until timeout value before raising timeout exception.
         '''
         msg = None
@@ -154,14 +166,24 @@ class COM:
             if self.msg_expected:
                 raise TimeoutException("Timout!")
         return msg
-    def write_log(self,fname):
+    def write_log(self,fname:str)->bool:
+        '''
+            Memeber method that takes in the name of a file and writes the log as a CSV using the passed name. 
+            If a path is desired, include that as part of `fname`.
+        '''
         if fname != None:
             self.__msgs.to_csv(fname)
             return True
         return False
-    def get_log(self):
+    def get_log(self)->pd.DataFrame:
+        '''
+            Member method that dumps the log log of messages (incoming & outgoing) through the port 
+        '''
         return self.__msgs
-    def stop(self):
+    def stop(self)->None:
+        '''
+            Member method that terminates the running threat safely. Upon invoking it, it joins the listening threat (blocks until the thread has exited).  
+        '''
         self.stopped = True
         if not self.thread == None:
             self.thread.join()
