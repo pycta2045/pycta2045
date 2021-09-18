@@ -48,7 +48,7 @@ class CTA2045Device:
         self.stopped = True
         self.thread = None
         self.running = False
-        self.verbose = verbose
+        self.block = False
         return
     def __del__(self):
         self.stop()
@@ -70,7 +70,7 @@ class CTA2045Device:
     def __write(self,msg:str,log:bool=False,end:str='\n')->None:
         if log:
             self.__update_log(msg)
-        if self.verbose:
+        if self.block:
             print(msg,end=end)
         return
     def __recv(self,verbose:bool=True)->dict:
@@ -232,6 +232,7 @@ class CTA2045Device:
     def run(self,block:bool=False)->None:
         self.com.start()
         self.running = True
+        self.block = block
         self.__setup()
         if self.mode == 'DER':
             # validate model in DER mode
