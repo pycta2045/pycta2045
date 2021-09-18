@@ -59,10 +59,14 @@ class DCM:
         return
     def parse_log(self,log):
         header = [log.index.name] + log.columns.tolist()
-        sep = '\t'*5
+        sep = '\t'*2
         l = [sep.join(header)]
         for i,r in log.iterrows():
-            l.append(f"{i}\t{r['event']}\n")
+            e = f"{i}{sep}|->{sep}{r['event']} {r['arguments']}"
+            # for k,v in r['arguments'].items():
+            #     e.append(f"\t{k} = {v}")
+            e+='\n'
+            l.append(e)
         return '\n'.join(l)
     def render(self) -> Layout:
         # grab log from device
@@ -95,11 +99,10 @@ def main():
     
     dcm = DCM()
     con = Console()
-    terminated = False
     q = Queue()
     def usr_input():
         try:
-            while not terminated:
+            while True:
                 inp,_,_ = select.select([sys.stdin],[],[],0)
                 if inp:
                     for l in sys.stdin:
@@ -129,16 +132,9 @@ def main():
                 dcm.update_input_text(text)
         except KeyboardInterrupt:
             pass
-    terminated = True
     dcm.device.stop()
-    thread.join()
-    # count
-    thread_count = threading.active_count()
-
-    for t in threading.enumerate():
-        print(t)
     # output log
-    log = dcm.get_log()
+    log = dcm.device.get_log()
     log.to_csv('logs/DCM_Tui.csv')
     return
 if __name__=="__main__":

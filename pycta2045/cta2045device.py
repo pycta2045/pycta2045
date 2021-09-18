@@ -60,11 +60,13 @@ class CTA2045Device:
     def get_log(self)->pd.DataFrame:
         ts = []
         msgs = []
+        args = []
         while not self.log.empty():
-            t,msg = self.log.get().split(':')
-            ts.append(t)
-            msgs.append(msg)
-        df = pd.DataFrame({'time':ts, 'event':msgs})
+            e = self.log.get().split(':')
+            ts.append(e[0])
+            msgs.append(e[1])
+            args.append(e[2])
+        df = pd.DataFrame({'time':ts, 'event':msgs,'arguments':args})
         df.set_index('time',inplace=True)
         return df
     def __write(self,msg:str,log:bool=False,end:str='\n')->None:
@@ -84,17 +86,17 @@ class CTA2045Device:
                     raise TimeoutException('Timeout!')
                 res = self.cta_mod.from_cta(msg)
                 if type(res) == dict:
-                    self.__write(f"{t}: received {res['command']}",log=True)
+                    self.__write(f"{t}: received {res['command']}: {res['args']}",log=True)
                     if verbose:
                         for k,v in res['args'].items():
                             self.__write(f"\t{k} = {v}")
                 if 'op1' in res:
                     self.last_command = res['op1']
         except UnsupportedCommandException as e:
-            self.__write(f"{t}: received Unsupported Command -- {e.message}",log=True)
+            self.__write(f"{t}: received Unsupported Command -- {e.message}:",log=True)
             raise UnsupportedCommandException(msg) # propagate exception
         except UnknownCommandException as e:
-            self.__write(f"{t}: received Unknwon command -- {msg}",log=True)
+            self.__write(f"{t}: received Unknwon command -- {msg}:",log=True)
             raise UnknownCommandException(msg) # propagate exception
         return res
     def send(self,cmd:str,args:dict={},verbose:bool=False)->bool:
@@ -103,7 +105,7 @@ class CTA2045Device:
         ret = False
         c = self.cta_mod.to_cta(cmd,args=args)
         self.com.send(c)
-        self.__write(f'{time.time()}: sent {cmd}',log=True)
+        self.__write(f'{time.time()}: sent {cmd}: {args}',log=True)
         if verbose:
             if len(args) > 0:
                 self.__write('\twith args:')
