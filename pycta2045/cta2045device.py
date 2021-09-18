@@ -46,7 +46,9 @@ class CTA2045Device:
         self.timeout = timeout
         self.last_log_msg = None
         self.stopped = True
+        self.thread = None
         self.running = False
+        self.verbose = verbose
         return
     def __del__(self):
         self.stop()
@@ -68,11 +70,8 @@ class CTA2045Device:
     def __write(self,msg:str,log:bool=False,end:str='\n')->None:
         if log:
             self.__update_log(msg)
-        print(msg,end=end)
-        return
-    def __update_log(self,msg:str,log:bool=False,end:str='\n')->None:
-        if log:
-            self.__update_log(msg)
+        if self.verbose:
+            print(msg,end=end)
         return
     def __recv(self,verbose:bool=True)->dict:
         res = None
@@ -114,7 +113,6 @@ class CTA2045Device:
                         v = int(v,16)
                     self.__write(f'\t{k}: {v}')
         ret = True # else an exception would be raised and this statement would be skipped when unwinding the stack
-        self.__update_log(f'{time.time()}: sent {cmd}')
         return ret
     def __setup(self)->bool:
         res = None
@@ -273,9 +271,11 @@ class CTA2045Device:
             self.thread.start()
         return
     def stop(self)->None:
-        self.com.stop()
-        self.stopped = True
-        self.thread.join()
+        if not self.stopped:
+            self.com.stop()
+            self.stopped = True
+            if self.thread != None:
+                self.thread.join()
         return
 # ============================= Simplified inteface of CTA2045Device ==================================
 # class SimpleCTA2045Device:
