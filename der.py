@@ -2,8 +2,6 @@
 from pycta2045 import cta2045device as device
 import pycta2045.models as models
 import time, matplotlib.pyplot as plt, argparse as ap
-from rich import pretty
-pretty.install()
 
 
 

@@ -51,7 +51,10 @@ class CTA2045Device:
         self.block = False
         return
     def __del__(self):
-        self.stop()
+        try:
+            self.stop()
+        except:
+            pass
         return
     def __update_log(self,msg:str)->None:
         self.last_log_msg = msg

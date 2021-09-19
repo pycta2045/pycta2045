@@ -1,7 +1,6 @@
 #! /bin/python3
 from pycta2045 import cta2045device as device
 import pandas as pd, argparse as ap, select, sys,os
-from rich.console import Console
 from rich import pretty,print
 
 
