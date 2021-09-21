@@ -2,7 +2,7 @@ from datetime import datetime
 from pycta2045 import CTA2045Device
 from time import sleep
 from rich.table import Table
-import datetime as dt, select, sys, pandas as pd, json
+import datetime as dt, select, sys, pandas as pd, json, argparse as ap
 from queue import Queue
 from threading import Thread
 from rich.align import Align
@@ -67,6 +67,14 @@ def centered_text(text):
     )
 def wrapped_text(text):
     return Align.center(Panel.fit(Text.from_markup(text,justify='left')))
+
+# =================== parse args =====================
+parser = ap.ArgumentParser()
+parser.add_argument('-p',required=False,type=str,help="com port to use for connection. e.g: -p /dev/ttyS2", default='/dev/ttyS2')
+args = parser.parse_args()
+port = args.p
+# =================== end of parsing =====================
+# =================== create layout ======================
 console = Console()
 layout = Layout()
 
@@ -85,14 +93,16 @@ layout["body"].update(
 
 layout['footer'].update(wrapped_text(output))
 layout["header"].update(Clock())
+# =================== create CTA2045 device ==================
 q = Queue()
 thread = Thread(target=get_input)
 thread.daemon=True
 stopped = False
 thread.start()
-dev = CTA2045Device(comport='/dev/ttyS100')
+dev = CTA2045Device(comport=port)
 dev.run()
 
+# =================== start the TUI loop =====================
 
 with Live(layout, screen=True, redirect_stderr=False) as live:
     try:
@@ -111,6 +121,4 @@ with Live(layout, screen=True, redirect_stderr=False) as live:
     except KeyboardInterrupt:
         stopped = True
         dev.stop()
-        sleep(1)
-        exit()
         pass
