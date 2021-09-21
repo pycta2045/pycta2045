@@ -30,6 +30,7 @@ class CTA2045Device:
         self.mode = mode.upper()
         self.model = model
         self.log = Queue()
+        self.complete_log = pd.DataFrame()
         self.cta_mod = CTA2045()
         self.com = COM(mode=mode,checksum=self.cta_mod.checksum,transform=self.cta_mod.hexify,is_valid=self.cta_mod.is_valid,port=comport,verbose=verbose)
         self.last_command = '0x00'
@@ -68,7 +69,8 @@ class CTA2045Device:
             args.append(e[2])
         df = pd.DataFrame({'time':ts, 'event':msgs,'arguments':args})
         df.set_index('time',inplace=True)
-        return df
+        self.complete_log = self.complete_log.append(df)
+        return self.complete_log.copy()
     def __write(self,msg:str,log:bool=False,end:str='\n')->None:
         if log:
             self.__update_log(msg)

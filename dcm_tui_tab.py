@@ -2,12 +2,13 @@ from datetime import datetime
 from pycta2045 import CTA2045Device
 from time import sleep
 from rich.table import Table
-import datetime as dt, select, sys, pandas as pd
+import datetime as dt, select, sys, pandas as pd, json
 from queue import Queue
 from threading import Thread
 from rich.align import Align
 from rich.console import Console
 from rich.layout import Layout
+from rich.panel import Panel
 from rich.live import Live
 from rich.text import Text
 
@@ -15,7 +16,6 @@ EMPTY_SLOT = 40
 LOG_SIZE = 10
 
 log = ['-'*EMPTY_SLOT]*LOG_SIZE
-full_log = pd.DataFrame({})
 prompt = {
         '1':'shed',
         '2':'endshed',
@@ -27,19 +27,30 @@ prompt = {
 }
 output = list(prompt.items())
 output = "\n".join(map(lambda x: f"{x[0]} to {x[1]}",output))
-output = f"Choose from the following menu\n{output}\nTo Exit: CTRL-C + ENTER\n\n"
+output = f"Choose from the following menu\n{output}\n[bold]To Exit: CTRL-C + ENTER[/bold]\n\n"
+
+class Clock:
+    """Renders the time in the center of the screen."""
+
+    def __rich__(self) -> Text:
+        return Text(datetime.now().ctime(), style="bold magenta", justify="center")
 
 def update_table(log):
-    table = Table(title="Log")
-    table.add_column("Timestamp", style="cyan", no_wrap=True)
+    table = Table(title="Log",show_lines=True)
+    table.add_column("Timestamp", style="cyan", no_wrap=True,width=LOG_SIZE,min_width=LOG_SIZE)
     table.add_column("Event", style="magenta")
     table.add_column("arguments", justify="right", style="green")
     if type(log) == pd.DataFrame:
         print(log.columns)
         for index, entry in log.tail(LOG_SIZE).iterrows():
             args = '-' * EMPTY_SLOT if len(entry['arguments']) == 2 else entry['arguments']
+            if not '--' in args: # parse back into dict & process it
+                args = args.replace("'",'"')
+                args = args.replace("\\x00",'')
+                args = json.loads(args)
+                args = '\n'.join(map(lambda x: f'{x[0]}: {x[1]}',args.items()))
             ts = dt.datetime.fromtimestamp(float(index))
-            table.add_row(f'{ts}', entry['event'], args)
+            table.add_row(f'{ts}', entry['event'], Text(args,justify='left'))
     return table
 def get_input():
     global q
@@ -50,19 +61,20 @@ def get_input():
     return
 def valid(inp):
     return inp in prompt
-
+def centered_text(text):
+    return Align.center(
+        Text(text,justify='left')
+    )
+def wrapped_text(text):
+    return Align.center(Panel.fit(Text.from_markup(text,justify='left')))
 console = Console()
 layout = Layout()
 
 layout.split(
     Layout(name="header", size=1),
     Layout(ratio=1, name="body"),
-    Layout(size=10, name="footer"),
+    Layout(size=len(prompt)+6, name="footer"),
 )
-
-#layout["main"].split_row(Layout(name="side"), Layout(name="body", ratio=2))
-
-#layout["side"].split(Layout(), Layout())
 
 layout["body"].update(
     Align.center(
@@ -71,14 +83,7 @@ layout["body"].update(
     )
 )
 
-class Clock:
-    """Renders the time in the center of the screen."""
-
-    def __rich__(self) -> Text:
-        return Text(datetime.now().ctime(), style="bold magenta", justify="center")
-
-
-layout['footer'].update(Text(output,justify="center"))
+layout['footer'].update(wrapped_text(output))
 layout["header"].update(Clock())
 q = Queue()
 thread = Thread(target=get_input)
@@ -98,16 +103,14 @@ with Live(layout, screen=True, redirect_stderr=False) as live:
                 i = q.get()
                 if valid(i):
                     dev.send(prompt[i])
-                    new = f"{output}Sending: {prompt[i]}..."
+                    new = f"{output}Sending: [cyan]{prompt[i]}[/cyan]..."
                 else:
-                    new = f"{output}INVALID INPUT!"
-                layout["footer"].update(Text(new,justify="center"))
-            full_log = full_log.append(dev.get_log())
-            log = full_log
+                    new = f"{output}[red]INVALID INPUT![/red]"
+                layout["footer"].update(wrapped_text(new))
+            log = dev.get_log()
     except KeyboardInterrupt:
         stopped = True
         dev.stop()
         sleep(1)
         exit()
         pass
-
