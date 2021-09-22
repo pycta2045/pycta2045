@@ -4,4 +4,3 @@ from pycta2045.scpi.handler import *
 from pycta2045.models.model import *
 from pycta2045.models.ev_model import *
 from pycta2045.cta2045device import *
-print(f'invoking __init__.py for {__name__}')

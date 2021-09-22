@@ -1,8 +1,10 @@
 """
 Demonstrates a dynamic Layout
 """
-from pycta2045 import CTA2045Device
 import sys, os, pandas as pd, time,  select, traceback as tb, threading, argparse as ap
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from pycta2045 import CTA2045Device
 from queue import Queue
 from datetime import datetime
 from time import sleep

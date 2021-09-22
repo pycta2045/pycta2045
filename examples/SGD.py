@@ -1,16 +1,17 @@
-from agents.cta2045.handler import CTA2045
-from agents.com.handler import COM,TimeoutException
-import sys
+import sys, argparse, os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from pycta2045 import CTA2045
+from pycta2045 import COM,TimeoutException
 
 class SGD:
-    cta = CTA2045()
-    com = COM(checksum=cta.checksum,transform=cta.hexify)
-    def __init__(self):
+    def __init__(self,port):
         # initialize the values
+        self.cta = CTA2045()
+        self.com = COM(checksum=self.cta.checksum,transform=self.cta.hexify,is_valid=self.cta.is_valid,port=port)
         pass
 
     def recv(self):
-        res = self.com.recv()
+        res = self.com.get_next_msg()
         ret = self.cta.from_cta(res)
         return ret
 
@@ -57,6 +58,7 @@ class SGD:
         while True:
             try:
                 res = self.recv()
+                print('here')
                 if res != None:
                     last_command = res['op1']
                     print(res['command'])
@@ -79,6 +81,11 @@ class SGD:
                 continue
 
 # SET UP
-sgd = SGD()
+parser = argparse.ArgumentParser()
+parser.add_argument('-p',required=True,type=str,help="com port to use for connection. e.g: -p /dev/ttyS2", default='/dev/ttyS2')
+args = parser.parse_args()
+port = args.p
+
+sgd = SGD(port)
 sgd.setup()
 sgd.start()

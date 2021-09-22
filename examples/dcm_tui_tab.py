@@ -1,8 +1,9 @@
+import datetime as dt, select, sys, os, pandas as pd, json, argparse as ap
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from datetime import datetime
 from pycta2045 import CTA2045Device
 from time import sleep
 from rich.table import Table
-import datetime as dt, select, sys, pandas as pd, json, argparse as ap
 from queue import Queue
 from threading import Thread
 from rich.align import Align

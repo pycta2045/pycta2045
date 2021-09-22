@@ -1,9 +1,7 @@
-from agents.com.handler import COM
-from agents.cta2045.handler import CTA2045
-import sys
-import traceback as tb
-import threading
-import os
+import sys, traceback as tb, threading, os, argparse
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from pycta2045 import COM
+from pycta2045 import CTA2045
 
 class Output:
     def __init__(self,log_size=10):
@@ -40,10 +38,6 @@ choices = {
     5:"quit"
 }
 
-
-cta=CTA2045()
-com = COM(checksum=cta.checksum, transform=cta.hexify)
-
 def get_input():
     valid=False
     try_again='====> invalid choice! Try again\n'
@@ -61,10 +55,20 @@ def get_input():
             tb.print_tb(e)
     return choice
 
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-p',required=True,type=str,help="com port to use for connection. e.g: -p /dev/ttyS2", default='/dev/ttyS2')
+args = parser.parse_args()
+port = args.p
+
+cta=CTA2045()
+com = COM(checksum=cta.checksum, transform=cta.hexify,is_valid=cta.is_valid,port=port)
 while 1:
     c = get_input()
     os.system('clear')
     if c=='quit':
         exit()
     out.write('start threading...')
-    out.write(f"you entered: {c}")
+    out.write(f"sent: {c}")
+    com.send(cta.to_cta(c))

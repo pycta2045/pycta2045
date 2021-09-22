@@ -1,6 +1,7 @@
 #! /bin/python3
-from pycta2045 import cta2045device as device
 import pandas as pd, argparse as ap, select, sys,os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from pycta2045 import cta2045device as device
 from rich import pretty,print
 
 

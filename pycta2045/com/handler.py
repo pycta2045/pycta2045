@@ -48,7 +48,8 @@ class COM:
         self.thread = None
         self.stopped = True
         self.last_msg_timestamp =  0
-        print('comport was created sucessfully')
+        if verbose:
+            print('comport was created sucessfully')
         self.__msgs = pd.DataFrame(columns = ['time','src','dest','message'])
         self.msg_expected = False
         self.verbose = verbose
@@ -83,7 +84,8 @@ class COM:
         '''
         data = None
         buff = np.array([]) # local buffer used to process chunk of packages
-        print('starting listener...')
+        if self.verbose:
+            print('starting listener...')
         # clear buffer
         self.ser.flushInput()
         self.ser.flushOutput()
@@ -184,5 +186,6 @@ class COM:
         self.stopped = True
         if not self.thread == None:
             self.thread.join()
-        print('stopped com!')
+        if self.verbose: 
+            print('stopped com!')
         return

@@ -1,9 +1,9 @@
 #! /bin/python3
+import time, matplotlib.pyplot as plt, argparse as ap, sys, os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from pycta2045 import cta2045device as device
 import pycta2045.models as models
-import time, matplotlib.pyplot as plt, argparse as ap
-
-
 
 def main():
     parser = ap.ArgumentParser()
