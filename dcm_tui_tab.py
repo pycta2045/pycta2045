@@ -41,10 +41,9 @@ def update_table(log):
     table.add_column("Event", style="magenta")
     table.add_column("arguments", justify="right", style="green")
     if type(log) == pd.DataFrame:
-        print(log.columns)
         for index, entry in log.tail(LOG_SIZE).iterrows():
             args = '-' * EMPTY_SLOT if len(entry['arguments']) == 2 else entry['arguments']
-            if not '--' in args: # parse back into dict & process it
+            if not '--' in args and len(args) > 3: # parse back into dict & process it
                 args = args.replace("'",'"')
                 args = args.replace("\\x00",'')
                 args = json.loads(args)
@@ -121,4 +120,5 @@ with Live(layout, screen=True, redirect_stderr=False) as live:
     except KeyboardInterrupt:
         stopped = True
         dev.stop()
+        thread.join()
         pass
