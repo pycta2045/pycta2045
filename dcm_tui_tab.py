@@ -36,8 +36,8 @@ class Clock:
         return Text(datetime.now().ctime(), style="bold magenta", justify="center")
 
 def update_table(log):
-    table = Table(title="Log",show_lines=True)
-    table.add_column("Timestamp", style="cyan", no_wrap=True,width=LOG_SIZE,min_width=LOG_SIZE)
+    table = Table(title="Log",show_lines=True,min_width=3*EMPTY_SLOT)
+    table.add_column("Timestamp", style="cyan", no_wrap=True)
     table.add_column("Event", style="magenta")
     table.add_column("arguments", justify="right", style="green")
     if type(log) == pd.DataFrame:

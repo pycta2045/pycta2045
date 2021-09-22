@@ -8,11 +8,13 @@ import time, matplotlib.pyplot as plt, argparse as ap
 def main():
     parser = ap.ArgumentParser()
     parser.add_argument('-p',required=False,type=str,help="com port to use for connection. e.g: -p /dev/ttyS2", default='/dev/ttyS2')
+    parser.add_argument('-c',required=True,type=float,help="Capacity of battery (float in kWh)", default=.5)
     args = parser.parse_args()
     port = args.p
+    cap = args.c
     figsize = (50,50) # (w,h)
-    version = '50kw' # experiment version
-    ev = models.EV(max_cap=50,verbose=True,decay_rate=.08)
+    version = '{cap} kWh' # experiment version
+    ev = models.EV(max_cap=cap,verbose=True,decay_rate=.08)
     t_end = ev.t_end
     dev = device.CTA2045Device(mode="DER",model=ev,comport=port)
     log = dev.run(block=True)
