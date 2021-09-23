@@ -1,16 +1,8 @@
 '''
 Author: Mohammed Alsaid (@mohamm-alsaid)
-This uses rich lib to build a simple TUI as a frontend for a DCM device. It serves as an example of using pycta2045 library. 
+This is an example of a simple DCM that uses rich library to display the log in a table format (TUI). It serves as an example of how to use pycta2045 library. 
 '''
-import sys, os, pandas as pd, time,  select, traceback as tb, threading, argparse as ap
-from queue import Queue
-from datetime import datetime
-from time import sleep
-from rich.align import Align
-from rich.console import Console
-from rich.layout import Layout
-from rich.live import Live
-from rich.text import Text
+import datetime as dt, select, sys, os, pandas as pd, json, argparse as ap
 # this is used to work around the import system not looking into the parent folder. There are two other ways around this:
 # 1. Use a virtual environment & install pycta2045 using: `pip3 install -e .`
 #       * This installs pycta2045 lib as an editable package
@@ -18,131 +10,126 @@ from rich.text import Text
 # 2. Make sure pycta2045 installed to begin with using `pip3 install pycta2045`
 # 3. Add the parent dir to the path (i.e. keep the folllowing line of code)
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from datetime import datetime
 from pycta2045 import CTA2045Device
+from time import sleep
+from rich.table import Table
+from queue import Queue
+from threading import Thread
+from rich.align import Align
+from rich.console import Console
+from rich.layout import Layout
+from rich.panel import Panel
+from rich.live import Live
+from rich.text import Text
 
-num_color = 'red'
-text_color = 'cyan'
-input_color = 'magenta'
-warning_color = 'bright_red'
-log_color_style = 'pale_violet_red1'
+EMPTY_SLOT = 40
+LOG_SIZE = 10
+
+log = ['-'*EMPTY_SLOT]*LOG_SIZE
+prompt = {
+        '1':'shed',
+        '2':'endshed',
+        '3':'loadup',
+        '4':'commodity read request',
+        '5':'device info request',
+        '6':'outside comm connection status',
+        '7':'operating status request',
+}
+output = list(prompt.items())
+output = "\n".join(map(lambda x: f"{x[0]} to {x[1]}",output))
+output = f"Choose from the following menu\n{output}\n[bold]To Exit: CTRL-C + ENTER[/bold]\n\n"
+
+class Clock:
+    """Renders the time in the center of the screen."""
+
+    def __rich__(self) -> Text:
+        return Text(datetime.now().ctime(), style="bold magenta", justify="center")
+
+def update_table(log):
+    table = Table(title="Log",show_lines=True,min_width=3*EMPTY_SLOT)
+    table.add_column("Timestamp", style="cyan", no_wrap=True)
+    table.add_column("Event", style="magenta")
+    table.add_column("arguments", justify="right", style="green")
+    if type(log) == pd.DataFrame:
+        for index, entry in log.tail(LOG_SIZE).iterrows():
+            args = '-' * EMPTY_SLOT if len(entry['arguments']) == 2 else entry['arguments']
+            if not '--' in args and len(args) > 3: # parse back into dict & process it
+                args = args.replace("'",'"')
+                args = args.replace("\\x00",'')
+                args = json.loads(args)
+                args = '\n'.join(map(lambda x: f'{x[0]}: {x[1]}',args.items()))
+            ts = dt.datetime.fromtimestamp(float(index))
+            table.add_row(f'{ts}', entry['event'], Text(args,justify='left'))
+    return table
+def get_input():
+    global q
+    global stopped
+    while not stopped:
+        i = input()
+        q.put(i.strip())
+    return
+def valid(inp):
+    return inp in prompt
+def centered_text(text):
+    return Align.center(
+        Text(text,justify='left')
+    )
+def wrapped_text(text):
+    return Align.center(Panel.fit(Text.from_markup(text,justify='left')))
+
+# =================== parse args =====================
 parser = ap.ArgumentParser()
 parser.add_argument('-p',required=False,type=str,help="com port to use for connection. e.g: -p /dev/ttyS2", default='/dev/ttyS2')
 args = parser.parse_args()
 port = args.p
-class DCM:
-    prompt = {
-        0: 'quit',
-        1: 'shed',
-        2: 'endshed',
-        3: 'loadup',
-        4: 'critical peak event',
-        5: 'grid emergency',
-        6: 'operating status request',
-        7: 'commodity read request',
-        8: 'device info request',
-    }
-    def __init__(self,port=port):
-        self.counter = 0
-        self.console = Console()
-        self.layout = Layout()
-        self.layout.split(
-            Layout(name="header", size=1),
-            Layout(ratio=3, name="Output"),
-            Layout(size=10, name="Input"),
-        )
-        self.plain_prompt  = list(map(lambda x: f"[{num_color}]{x[0]}[/{num_color}]: [{text_color}]{x[1]}[/{text_color}]",self.prompt.items()))
-        self.plain_prompt = "\t".join(self.plain_prompt)
-        self.pretty_prompt = Text("").from_markup(self.plain_prompt,justify='center')
-        self.device = CTA2045Device(comport=port)
-        self.device.run()
-        self.log = self.device.get_log()
-        self.log_size = 10
-        return
-    def write(self,msg,log=False,end='\n'):
-        if log:
-            self.log.put(msg)
-            print(",",msg,log,"\nss\n")
-        print(msg)
-        return
-    def parse_log(self,log):
-        header = [log.index.name] + log.columns.tolist()
-        sep = '\t'*2
-        l = [sep.join(header)]
-        for i,r in log.iterrows():
-            e = f"{i}{sep}|->{sep}{r['event']} {r['arguments']}"
-            # for k,v in r['arguments'].items():
-            #     e.append(f"\t{k} = {v}")
-            e+='\n'
-            l.append(e)
-        return '\n'.join(l)
-    def render(self) -> Layout:
-        # grab log from device
-        log = self.device.get_log()
-        # display log
-        self.log = self.log.append(log)
-        log = self.log.tail(self.log_size)
-        self.layout['Output'].update(Text(f"{self.parse_log(log)}",style=log_color_style,justify='left'))
-        self.layout['header'].update(Text(datetime.now().ctime(), style="bold magenta", justify="center"))
-        self.layout['Input'].update(self.pretty_prompt)
-        return self.layout
-    def update_input_text(self,pretty_text):
-        prompt = f"{self.plain_prompt}\n{pretty_text}"
-        self.pretty_prompt = self.pretty_prompt.from_markup(prompt,justify='center')
-        self.render()
-        return
-    def send_command(self,cmd):
-        self.device.send(cmd)
-        return
+# =================== end of parsing =====================
+# =================== create layout ======================
+console = Console()
+layout = Layout()
 
+layout.split(
+    Layout(name="header", size=1),
+    Layout(ratio=1, name="body"),
+    Layout(size=len(prompt)+6, name="footer"),
+)
 
-def validate_input(text,dcm) -> str:
-    if text.isdigit():
-        num = int(text)
-        if num in dcm.prompt:
-            return num
-    return -1
+layout["body"].update(
+    Align.center(
+        update_table(["something"]*10),
+        vertical="middle",
+    )
+)
 
-def main():
-    
-    dcm = DCM()
-    con = Console()
-    q = Queue()
-    def usr_input():
-        try:
-            while True:
-                inp,_,_ = select.select([sys.stdin],[],[],0)
-                if inp:
-                    for l in sys.stdin:
-                        q.put(l.strip())
-                    sys.stdin.flush()
-        except Exception:
-            return
+layout['footer'].update(wrapped_text(output))
+layout["header"].update(Clock())
+# =================== create CTA2045 device ==================
+q = Queue()
+thread = Thread(target=get_input)
+thread.daemon=True
+stopped = False
+thread.start()
+dev = CTA2045Device(comport=port)
+dev.run()
 
-    with Live(dcm.render(), screen=True, redirect_stderr=False,refresh_per_second=20) as live:
-        try:
-            thread = threading.Thread(target=usr_input)
-            thread.daemon = True
-            thread.start()
-            text = f"[b]Enter a choice"
-            while True:
-                if not q.empty():
-                    inp = q.get()
-                    valid_input = validate_input(inp,dcm)
-                    if valid_input > 0:
-                        cmd = dcm.prompt[valid_input]
-                        dcm.send_command(cmd)
-                        text  = f"[b]Sending [{input_color}]{cmd}[/{input_color}]..."
-                    elif valid_input == 0:
-                        break
-                    else:
-                        text = f"[b][{warning_color}]INVALID INPUT {inp}[/{warning_color}]"
-                dcm.update_input_text(text)
-        except KeyboardInterrupt:
-            pass
-    dcm.device.stop()
-    # output log
-    log = dcm.device.get_log()
-    log.to_csv('logs/DCM_Tui.csv')
-    return
-if __name__=="__main__":
-    main()
+# =================== start the TUI loop =====================
+
+with Live(layout, screen=True, redirect_stderr=False) as live:
+    try:
+        while True:
+            sleep(.05)
+            layout["body"].update(Align.center(update_table(log),vertical="middle"))
+            if not q.empty():
+                i = q.get()
+                if valid(i):
+                    dev.send(prompt[i])
+                    new = f"{output}Sending: [cyan]{prompt[i]}[/cyan]..."
+                else:
+                    new = f"{output}[red]INVALID INPUT![/red]"
+                layout["footer"].update(wrapped_text(new))
+            log = dev.get_log()
+    except KeyboardInterrupt:
+        stopped = True
+        dev.stop()
+        thread.join()
+        pass

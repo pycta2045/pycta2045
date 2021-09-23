@@ -1,1 +1,23 @@
 time,event,arguments
+1632383731.5382912,sent intermediate mtsq,{}
+1632383731.6391475,received ack,{}
+1632383731.6881707,sent data-link mtsq,{}
+1632383731.8499105,received ack,{}
+1632383731.8999383,sent max payload request,{}
+1632383732.058314,received ack,{}
+1632383732.062515,received max payload response,"{'reserved': 'default', 'max_payload_length': '4096'}"
+1632383732.109735,sent ack,{}
+1632383732.154436,sent basic mtsq,{}
+1632383732.2671955,received ack,{}
+1632383755.284666,sent operating status request,{}
+1632383755.3652565,received ack,{}
+1632383755.4752586,received operating status response,"{'reserved': 'default', 'op_state_code': 'idle normal'}"
+1632383755.5330508,sent ack,{}
+1632383755.5783687,sent app ack,{'last_opcode': '0x13'}
+1632383755.7111752,received ack,{}
+1632383756.4792352,sent operating status request,{}
+1632383756.6624765,received ack,{}
+1632383756.6771572,received operating status response,"{'reserved': 'default', 'op_state_code': 'idle normal'}"
+1632383756.7233133,sent ack,{}
+1632383756.7678423,sent app ack,{'last_opcode': '0x13'}
+1632383756.8921912,received ack,{}
