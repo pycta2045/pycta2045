@@ -19,13 +19,13 @@ class COM:
     '''
     US = 'DER'
     THEM = 'DCM'
-    def __init__(self, checksum:callable, transform:callable, is_valid:callable, mode:str='DER', port:str="/dev/ttyS6",timeout:float=.4,verbose:bool=False):
+    def __init__(self, transform:callable, is_valid:callable, mode:str='DER', port:str="/dev/ttyS6",timeout:float=.4,verbose:bool=False):
         '''
             Constructor
             * Note:
                 * checksum: a callabe variable (function) that checks whether or not the received message is complete.
                 * transform: a callable variable (function) that transforms the received message into the desired format.
-                * is_valid: a callable variable (function) that checks if the received message is valid.
+                * is_valid: a callable variable (function) that checks if the received message is valid (is a valid).
                 * mode: desired mode of operation (used mostly for logging) -- DER vs UCM operating mode.
                 * port: com port used to listen on.
                 * timeout (defualt) is set to 500 ms as specified by CTA2045.
@@ -39,7 +39,6 @@ class COM:
         self.sleep_until = 1 # should be 100 mS of delay between recveing & sending a message (refer to CTA2045 msg sync info on t_MA & t_IM)
         self.ser.baudrate=19200 # according to CTA2045
         self.ser.timeout=timeout
-        self.checksum: callable = checksum # function type
         self.transform: callable = transform # function type
         self.is_valid_cta: callable = is_valid # function type
         self.ser.bytesize= serial.EIGHTBITS
