@@ -1,18 +1,32 @@
+'''
+Author: Mohammed Alsaid (@mohamm-alsaid)
+UCM: Universal Control Model
+SGD: Smart Grid Device
+This demostrates how to use pycta2045 library to build a simple cta2045 device (neither UCM nor SGD). 
+Note: This device does not conform to UCM's nor SGD's behavior as per CTA2045 specification. 
+'''
 import sys, argparse, os
+# this is used to work around the import system not looking into the parent folder. There are two other ways around this:
+# 1. Use a virtual environment & install pycta2045 using: `pip3 install -e .`
+#       * This installs pycta2045 lib as an editable package
+#       * This might not always work as per PEP 517 see: https://www.python.org/dev/peps/pep-0517/
+# 2. Make sure pycta2045 installed to begin with using `pip3 install pycta2045`
+# 3. Add the parent dir to the path (i.e. keep the folllowing line of code)
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from pycta2045 import CTA2045
 from pycta2045 import COM,TimeoutException
 
-class SGD:
+class DEV:
     def __init__(self,port):
         # initialize the values
         self.cta = CTA2045()
         self.com = COM(checksum=self.cta.checksum,transform=self.cta.hexify,is_valid=self.cta.is_valid,port=port)
+        self.com.start()
         pass
 
     def recv(self):
         res = self.com.get_next_msg()
-        ret = self.cta.from_cta(res)
+        ret = self.cta.from_cta(res[0])
         return ret
 
     def send(self,cmd,**args):
@@ -28,7 +42,7 @@ class SGD:
             else:
                 res = self.recv()
             if type(res) == dict:
-                print('<-= received: ',res['command'])
+                print('<++ received: ',res['command'])
                 for k,v in res['args'].items():
                     print(f'\t{k}\t{v}')
         except Exception as e:
@@ -58,10 +72,9 @@ class SGD:
         while True:
             try:
                 res = self.recv()
-                print('here')
                 if res != None:
                     last_command = res['op1']
-                    print(res['command'])
+                    print('<++ received: ',res['command'])
                     for k,v in res['args'].items():
                         print(f'\t{k} = {v}')
                     res = res['command']
@@ -77,7 +90,7 @@ class SGD:
                 # nothing was received from UCM
                 continue
             except Exception as e:
-                print(e)
+                # ignore the None received from com.get_next_msg (i.e. no msg was received)
                 continue
 
 # SET UP
@@ -86,6 +99,6 @@ parser.add_argument('-p',required=True,type=str,help="com port to use for connec
 args = parser.parse_args()
 port = args.p
 
-sgd = SGD(port)
-sgd.setup()
-sgd.start()
+dev = DEV(port)
+dev.setup()
+dev.start()

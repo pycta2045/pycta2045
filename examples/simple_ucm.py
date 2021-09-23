@@ -1,4 +1,15 @@
+'''
+Author: Mohammed Alsaid (@mohamm-alsaid)
+This demostrates how to build a very simple Universal Control Model (UCM) using pycta2045 library. 
+Note: this sends CTA2045 commands but does not listen/recv to msgs back.
+'''
 import sys, traceback as tb, threading, os, argparse
+# this is used to work around the import system not looking into the parent folder. There are two other ways around this:
+# 1. Use a virtual environment & install pycta2045 using: `pip3 install -e .`
+#       * This installs pycta2045 lib as an editable package
+#       * This might not always work as per PEP 517 see: https://www.python.org/dev/peps/pep-0517/
+# 2. Make sure pycta2045 installed to begin with using `pip3 install pycta2045`
+# 3. Add the parent dir to the path (i.e. keep the folllowing line of code)
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from pycta2045 import COM
 from pycta2045 import CTA2045
@@ -64,11 +75,16 @@ port = args.p
 
 cta=CTA2045()
 com = COM(checksum=cta.checksum, transform=cta.hexify,is_valid=cta.is_valid,port=port)
+com.start()
 while 1:
     c = get_input()
-    os.system('clear')
+    try:
+        msg,time = com.get_next_msg()
+        response = cta.from_cta(msg)
+        out.write(f"received: {response['command']}",log=True)
+    except:
+        pass
     if c=='quit':
         exit()
-    out.write('start threading...')
     out.write(f"sent: {c}")
     com.send(cta.to_cta(c))

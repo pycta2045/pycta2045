@@ -1,19 +1,24 @@
-"""
-Demonstrates a dynamic Layout
-"""
+'''
+Author: Mohammed Alsaid (@mohamm-alsaid)
+This uses rich lib to build a simple TUI as a frontend for a DCM device. It serves as an example of using pycta2045 library. 
+'''
 import sys, os, pandas as pd, time,  select, traceback as tb, threading, argparse as ap
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from pycta2045 import CTA2045Device
 from queue import Queue
 from datetime import datetime
 from time import sleep
-
 from rich.align import Align
 from rich.console import Console
 from rich.layout import Layout
 from rich.live import Live
 from rich.text import Text
+# this is used to work around the import system not looking into the parent folder. There are two other ways around this:
+# 1. Use a virtual environment & install pycta2045 using: `pip3 install -e .`
+#       * This installs pycta2045 lib as an editable package
+#       * This might not always work as per PEP 517 see: https://www.python.org/dev/peps/pep-0517/
+# 2. Make sure pycta2045 installed to begin with using `pip3 install pycta2045`
+# 3. Add the parent dir to the path (i.e. keep the folllowing line of code)
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from pycta2045 import CTA2045Device
 
 num_color = 'red'
 text_color = 'cyan'
