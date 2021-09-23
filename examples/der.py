@@ -3,12 +3,6 @@ Author: Mohammed Alsaid (@mohamm-alsaid)
 This demonstrates how to build a simple an energy resource (Electric Vehicle) using pycta2045 library.
 '''
 import time, matplotlib.pyplot as plt, argparse as ap, sys, os
-# this is used to work around the import system not looking into the parent folder. There are two other ways around this:
-# 1. Use a virtual environment & install pycta2045 using: `pip3 install -e .`
-#       * This installs pycta2045 lib as an editable package
-#       * This might not always work as per PEP 517 see: https://www.python.org/dev/peps/pep-0517/
-# 2. Make sure pycta2045 installed to begin with using `pip3 install pycta2045`
-# 3. Add the parent dir to the path (i.e. keep the folllowing line of code)
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from pycta2045 import cta2045device as device
 import pycta2045.models as models
