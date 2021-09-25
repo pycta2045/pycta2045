@@ -19,7 +19,7 @@ def main():
     dev = device.CTA2045Device(comport=port)
     dev.run(block=True)
     log = dev.get_log()
-    log.to_csv('logs/DCM_log.csv')
+    # log.to_csv('logs/DCM_log.csv')
 if __name__=="__main__":
     main()
     exit()
