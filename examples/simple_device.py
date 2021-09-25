@@ -14,7 +14,7 @@ class DEV:
     def __init__(self,port):
         # initialize the values
         self.cta = CTA2045()
-        self.com = COM(checksum=self.cta.checksum,transform=self.cta.hexify,is_valid=self.cta.is_valid,port=port)
+        self.com = COM(transform=self.cta.hexify,is_valid=self.cta.is_valid,port=port)
         self.com.start()
         pass
 

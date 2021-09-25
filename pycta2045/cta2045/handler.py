@@ -61,16 +61,13 @@ class CTA2045:
         value = " ".join(list(map(lambda x: '0x'+x,padded)))
         return value
     @staticmethod
-    def unhexify(value:str, combine:bool = False, func: callable = None, arguments:dict =None):
+    def unhexify(value:str, combine:bool = False)->str:
         '''
-            Purpose: Returns the decimal representation of given hex (helper function).
+            Purpose: Returns the decimal representation of given hex wrapped in str (helper function).
             Args:
                 * value: Integer in hex (seperate by space -- 0x00 0x01 ...).
-                * length: Number of bytes to convert
+                * combine: produce a single output by combining all the seperated fields in `value` 
             Return: Decimal representation of the passed value 
-            Note:
-                * it returns a single `int` if combine is true
-                * it returns a single space seperated `string` representing multiple ints in the passed value (if combine is false).
         '''
         h = ''
         h += CTA2045.parse_hex(value)
@@ -78,7 +75,7 @@ class CTA2045:
         if combine:
             h = h.replace(' ','')
             ret = int(h,16)
-        return ret
+        return str(ret)
     @staticmethod
     def parse_hex(value:str)->str:
         '''
@@ -177,13 +174,10 @@ class CTA2045:
                     res = res.replace('( ','')
                     # remove the repeated elements 
                     res = res.split()
-                    # print('before del: ',res, ' slice: ',res[i:i+len(repeated)])
                     del res[i:i+repeated_len]
-                    # print('after del: ',res)
                     res = ' '.join(res)
                     byte = ')'
                     rep = ' '.join(repeated)
-                    # i = i+len(repeated)
                 else:
                     rep = byte
                 res = res.replace(byte,rep)
@@ -286,7 +280,7 @@ class CTA2045:
             raise UnsupportedCommandException(val) # pass command
         except Exception as e:
             # unable to translate msg (unknown) -- return None
-            print(tb.format_tb())
+            print(tb.format_tb(e))
             pass
         return response
     def consume_argument(self,arg:dict, pos:int, length:int, msg:str, form:str, key:str)->str:
@@ -304,12 +298,12 @@ class CTA2045:
             combine = False
             # change this into being a seperated hex
             if 'ascii' in arg:
-                value = self.unhexify(value)
+                value = self.unhexify(value,combine=length<=2)
+                # clean string from unprintable characters
+                value = ' '.join(filter(lambda x: 32<=int(x,16)<=126,value.split()))
                 value = ''.join(map(lambda x: chr(int(x)),value.split())).strip() # apply the function on
-            elif 'commodity' in key:
-                value = self.unhexify(value,combine=True)
             else:
-                value = self.parse_hex(value) # leave it as parsed hex
+                value = self.unhexify(value,combine=True)
         return value
     def extract_args(self,cmd:str,val:str)->dict:
         '''

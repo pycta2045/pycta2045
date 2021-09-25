@@ -32,7 +32,7 @@ class CTA2045Device:
         self.log = Queue()
         self.complete_log = pd.DataFrame()
         self.cta_mod = CTA2045()
-        self.com = COM(mode=mode,checksum=self.cta_mod.checksum,transform=self.cta_mod.hexify,is_valid=self.cta_mod.is_valid,port=comport,verbose=verbose)
+        self.com = COM(mode=mode,transform=self.cta_mod.hexify,is_valid=self.cta_mod.is_valid,port=comport,verbose=verbose)
         self.last_command = '0x00'
         # flags for minimum cta2045 support
         self.support_flags = {

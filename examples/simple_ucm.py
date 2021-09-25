@@ -68,7 +68,7 @@ args = parser.parse_args()
 port = args.p
 
 cta=CTA2045()
-com = COM(checksum=cta.checksum, transform=cta.hexify,is_valid=cta.is_valid,port=port)
+com = COM(transform=cta.hexify,is_valid=cta.is_valid,port=port)
 com.start()
 while 1:
     c = get_input()

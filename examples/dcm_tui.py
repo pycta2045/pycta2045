@@ -50,7 +50,6 @@ def update_table(log):
             args = '-' * EMPTY_SLOT if len(entry['arguments']) == 2 else entry['arguments']
             if not '--' in args and len(args) > 3: # parse back into dict & process it
                 args = args.replace("'",'"')
-                args = args.replace("\\x00",'')
                 args = json.loads(args)
                 args = '\n'.join(map(lambda x: f'{x[0]}: {x[1]}',args.items()))
             ts = dt.datetime.fromtimestamp(float(index))
