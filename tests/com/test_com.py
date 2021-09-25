@@ -13,8 +13,9 @@ class TestCOM(unittest.TestCase):
         port = 'fake'
         msg = ''
         c = None
+        print('-'*5,'test port exists fails','-'*5)
         try:
-            c = COM.COM(port=port,checksum=cta.checksum,transform=cta.hexify,is_valid=cta.is_valid)
+            c = COM.COM(port=port,transform=cta.hexify,is_valid=cta.is_valid)
         except SerialException as e:
             msg = e.__str__()
         except Exception as e:
@@ -27,8 +28,9 @@ class TestCOM(unittest.TestCase):
         port = 'ttyS0'
         msg = ''
         c = None
+        print('-'*5,'test port exists succeeds','-'*5)
         try:
-            c = COM.COM(port=f'/dev/{port}',checksum=cta.checksum,transform=cta.hexify,is_valid=cta.is_valid)
+            c = COM.COM(port=f'/dev/{port}',transform=cta.hexify,is_valid=cta.is_valid)
         except Exception as e:
             msg = e.args[0]
         self.assertTrue(c != None)
@@ -38,7 +40,8 @@ class TestCOM(unittest.TestCase):
     def testSend(self,mod):
         port = 'ttyS0'
         c = None
-        c = COM.COM(port=f'/dev/{port}',checksum=cta.checksum,transform=cta.hexify,is_valid=cta.is_valid)
+        print('-'*5,'test com send','-'*5)
+        c = COM.COM(port=f'/dev/{port}',transform=cta.hexify,is_valid=cta.is_valid)
         self.assertTrue(c != None)
         c.ser.write = MagicMock(return_value=2)
 
@@ -52,8 +55,10 @@ class TestCOM(unittest.TestCase):
     def testRecv(self,mod):
         port = 'ttyS0'
         c = None
-        c = COM.COM(port=f'/dev/{port}',checksum=cta.checksum,transform=cta.hexify,is_valid=cta.is_valid)
+        print('-'*5,'test receive','-'*5)
+        c = COM.COM(port=f'/dev/{port}',transform=cta.hexify,is_valid=cta.is_valid)
         self.assertTrue(c != None)
+        c.ser.inWaiting = MagicMock(return_value=0)
         c.start() # start listener
         for cmd in ['shed','endshed','loadup','operating status request']:
             sent_cmd = cta.to_cta(cmd)

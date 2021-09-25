@@ -41,15 +41,23 @@ class CTA2045:
                 * value: Integer in decimal representation.
                 * length: Number of bytes to pad with (ignored if length < resulting hex representation)
             Return: hex representation.
+            Note:
+                * If the length of the passed value exceeds the one specified by CTA2045 standard, only the first part (up to the length specified by the startd) of the value will be taken
+                * If the length is shorter, the method pads the value up to meet the required length by CTA2045 standard
         '''
-        value = hex(value)
-        value = value[2:] if len(value)%2 == 0 else "0" + value[2:]
-        value = [value[i:i+2] for i in range(0,len(value),2)]
+        # To ensure this is hexified properly, must unhexify first.
+        if isinstance(value,(int,np.integer)):
+            value = hex(value)
+            value = value[2:] if len(value)%2 == 0 else "0" + value[2:]
+        if type(value) == str:
+            value = CTA2045.parse_hex(value).split()   
         # ensure that len(value) >= length
         padded = value
         if len(value) < length:
             padded = ['00'] * (length-len(value))
             padded.extend(value)
+        else:
+            padded = value[:length]
         value = " ".join(list(map(lambda x: '0x'+x,padded)))
         return value
     @staticmethod
@@ -77,7 +85,8 @@ class CTA2045:
             (Helper) Function that parses a cta2045 hex into "clean" hex (removes 0x from all the bytes)
         '''
         value = value.replace('0x','')
-        return value
+        value = [value[i:i+2] for i in range(0,len(value),2)]
+        return " ".join(value)
     def get_default(self,key:str)->str:
         '''
             (Helper) Function that returns the default value (i.e. first value in database) for the passed key 
@@ -93,9 +102,15 @@ class CTA2045:
         '''
         if key in args:
             rep = args[key]
-            # convert to approperiate value if it isn't
-            if rep in self.cmds[key]:
-                rep = self.cmds[key][rep]
+            # try to convert to approperiate value if it isn't
+            try:
+                if rep in self.cmds[key]:
+                    rep = self.cmds[key][rep]
+                else:
+                    rep = self.hexify(rep,length=self.cmds[key]['length'])
+            except Exception as e:
+                print(e)
+                pass
         else:
             rep = self.get_default(key=key)
         if 'ascii' in key:
