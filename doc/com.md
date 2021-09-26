@@ -19,4 +19,4 @@ The `is_valid` message in the example above uses _Fletcher_ checksum to determin
     * COM module allows for the retrieval of all logged messages (passed messages + messages waiting in the queue to be popped).
 
 
-> For more information, be sure to checkout the DocStrings in the code and the example programs to learn how to use this module 
+> For more information, be sure to check out the DocStrings in the code and the example programs to learn how to use this module 
