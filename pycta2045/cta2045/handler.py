@@ -81,7 +81,8 @@ class CTA2045:
         '''
             (Helper) Function that parses a cta2045 hex into "clean" hex (removes 0x from all the bytes)
         '''
-        value = value.replace('0x','')
+        value = value.replace('0x','').split()
+        value= "".join(map(lambda x:x.strip(),value))
         value = [value[i:i+2] for i in range(0,len(value),2)]
         return " ".join(value)
     def get_default(self,key:str)->str:
@@ -361,11 +362,14 @@ class CTA2045:
                 cmd = self.cmds['commands'][command]
                 # find appropriate ack type
                 t = cmd['type']['str']
-                cmd_complement.append('ack')
+                if cmd['supported']:
+                    cmd_complement.append('ack')
+                else:
+                    cmd_complement.append('nak')
                 if t == 'basic' and not 'request' in command:
                     cmd_complement.append('app ack')
                 # find complement
-                if 'request' in command:
+                if 'request' in command and cmd['supported']:
                     comp = command.replace('request','response')
                     if comp in self.cmds['commands'].keys():
                         cmd_complement.append(comp)
