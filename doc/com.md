@@ -10,7 +10,7 @@ COM(...,is_valid=cta_obj.is_valid,...)
 ```
 The `is_valid` message in the example above uses _Fletcher_ checksum to determine whether the message is valid.
 
-## Features:
+## Features
 * __start__: 
     * The COM module, when `start()` is invoked, starts a daemon in the background to listen for incoming messages via the given port during instantiation. It stores the received message in a thread-safe FIFO queue along with a reception timestamp in a tuple format `(message, timestamp)`.  
 * __get_next_msg__: 

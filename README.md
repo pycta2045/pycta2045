@@ -12,11 +12,11 @@ PyCTA2045 is a library that provides software adoption of the CTA2045 standard (
 ```
 sudo apt-get install libatlas-base-dev libopenjp2-7 libtiff5 -y 
 ```
-### Install using the requirements file
+### Install dependencies using the requirements file
 ```
 pip3 install -r requirements.txt
 ```
-### __OR__ install the library directly
+### __OR__ Install the library directly
 ```
 pip3 install pycta2045
 ```
