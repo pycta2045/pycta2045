@@ -35,16 +35,13 @@ class SCPI:
             self.logging=logging
         except Exception as e:
             # close socket
-            # if self.SOC 
             self.soc.close()
             raise Exception(f"failed to open socket on {addr}:{port}")
         return
     def __del__(self):
-        # self.soc.shutdown(socket.SHUT_RD)
         self.soc.close()
     def log(self,l):
         l['time'] = int(time.time()) 
-        #print(l)
         df = pd.DataFrame(l)
         df.set_index('time',inplace=True)
         df.to_csv(self.log_file,mode='a',header=False)

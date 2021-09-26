@@ -8,14 +8,16 @@ timeout = 1 # timeout len used in connection
 port = 5025 # port used for connection
 buf_sz = 1024 # size of buffer used in recv
 addr = "127.0.0.1" # using local mock
+test_running = False
 def MockServer(soc):
     '''
         This is a blocking function that listens to requests from SCPI client
     '''
     cmd = ''
     res = '200'
+    global test_running
     try:
-        while True:
+        while test_running:
             (cs,add) = soc.accept()
             data = ''
             try:
@@ -43,12 +45,15 @@ class TestSCPI(unittest.TestCase):
         self.server.listen(5)
         
         self.process = multiprocessing.Process(target=MockServer,args=(self.server,))
+        global test_running
+        test_running = True
+        self.process.daemon = True
         self.process.start()
-        # time.sleep(0.02)
         return
     @classmethod
     def tearDownClass(self):
-        self.process.terminate()
+        global test_running
+        test_running = False
         self.server.close()
         return
 

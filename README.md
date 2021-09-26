@@ -10,7 +10,7 @@ PyCTA2045 is a library that provides software adoption of the CTA2045 standard (
 ## Installation
 ### Install the dependencies
 ```
-sudo apt-get install libatlas-base-dev libopenjp2-7 libtiff5 socat -y 
+sudo apt-get install libatlas-base-dev python3-testresources libopenjp2-7 libtiff5 socat -y 
 ```
 ### Install dependencies using the requirements file
 ```
