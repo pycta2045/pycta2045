@@ -10,7 +10,7 @@ PyCTA2045 is a library that provides software adoption of the CTA2045 standard (
 ## Installation
 ### Install the dependencies
 ```
-sudo apt-get install libatlas-base-dev libopenjp2-7 libtiff5 -y 
+sudo apt-get install libatlas-base-dev libopenjp2-7 libtiff5 socat -y 
 ```
 ### Install dependencies using the requirements file
 ```
@@ -25,9 +25,13 @@ pip3 install pycta2045
 Check [examples/](examples/) and documentation for more information [here](doc/)
 
 ## Virtual ports
-1. use `socat -d pty,link=/dev/ttyS99,raw,echo=0 pty,link=/dev/ttyS100,raw,echo=0` to create two virtual ports
+1. use `nohup socat -d pty,link=/dev/ttyS99,raw,echo=0 pty,link=/dev/ttyS100,raw,echo=0` to create two virtual ports
+    * This should run in the background and outputs the `process ID` to stdout
+    * Keep the `process ID` handy
 2. use one of the virtual ports as the controller end & other as the smart device's end
 3. start DCM/mock on one while the smart device on the other via `python3 com.py /dev/#port_given_by_socat`
+4. when done with virtual ports, use the `process ID` to kill socat's process
+    * kill `process ID`
 
 ## Tests
 run all tests with `python -m unittest tests/all.py`
