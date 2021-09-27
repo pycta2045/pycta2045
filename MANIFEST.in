@@ -1,4 +1,6 @@
 graft pycta2045
+graft doc
+graft examples
 
 global-include *.json
 global-exclude *.csv
