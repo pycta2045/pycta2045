@@ -48,6 +48,7 @@ class CTA2045Device:
         self.running = False
         self.block = False
         self.beat_time = 0
+        self.FDT = {} # Empty Function Dispatch Table
         return
     def __del__(self):
         try:
@@ -171,6 +172,8 @@ class CTA2045Device:
         if self.mode == 'DCM' and now - self.beat_time >= 60: # 60 secs == 1 min
             self.send('outside comm connection status')
             self.beat_time = time.time()  # record time
+            self.send('commodity read request') # to log the commodity
+            self.send('operating status request') # to log the op status
         return
     # ------------------------- DCM Loop ----------------------------------
     # -----------------------------------------------------------------------------
@@ -269,7 +272,6 @@ class CTA2045Device:
                 # Bring the daemon to the "foreground"
                 self.thread.join()
         elif self.mode=='DCM':
-            self.FDT = {} # empty it
             # sent unsupported commands -- doesn't make sense for DCM to ack any of them
             self.cta_mod.set_supported('shed',False)
             self.cta_mod.set_supported('endshed',False)
