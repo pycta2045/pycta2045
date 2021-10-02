@@ -128,7 +128,6 @@ class CTA2045Device:
                 ]
         for cmd,flag in cmds:
             try:
-                #cmd = 'intermediate mtsq'
                 if self.send(cmd):
                     # wait for response
                     res = self.__recv()
