@@ -47,6 +47,8 @@ class CTA2045Device:
         self.thread = None
         self.running = False
         self.block = False
+        self.beat_time = 0
+        self.FDT = {} # Empty Function Dispatch Table
         return
     def __del__(self):
         try:
@@ -126,6 +128,8 @@ class CTA2045Device:
                 ('max payload request','max payload'),
                 ('basic mtsq','basic')
                 ]
+        # heart beat before anything
+        self.__beat()
         for cmd,flag in cmds:
             try:
                 if self.send(cmd):
@@ -158,6 +162,18 @@ class CTA2045Device:
             msg += f"{k}: {v}\n"
         self.__write(msg)
         self.__write("enter a choice: ")
+        return
+    def __beat(self):
+        '''
+            The purpose of this function is to send heartbeat when the time is right
+        '''
+        now = time.time()
+        # check if a minute has passed & mode is DCM (only DCMs send heartbeats)
+        if self.mode == 'DCM' and now - self.beat_time >= 60: # 60 secs == 1 min
+            self.send('outside comm connection status')
+            self.beat_time = time.time()  # record time
+            self.send('commodity read request') # to log the commodity
+            self.send('operating status request') # to log the op status
         return
     # ------------------------- DCM Loop ----------------------------------
     # -----------------------------------------------------------------------------
@@ -203,6 +219,7 @@ class CTA2045Device:
     # -----------------------------------------------------------------------------
     def __run_daemon(self)->None:
         while not self.stopped:
+            self.__beat()
             args = {}
             try:
                 res = self.__recv() # always waiting for commands
@@ -255,7 +272,6 @@ class CTA2045Device:
                 # Bring the daemon to the "foreground"
                 self.thread.join()
         elif self.mode=='DCM':
-            self.FDT = {} # empty it
             # sent unsupported commands -- doesn't make sense for DCM to ack any of them
             self.cta_mod.set_supported('shed',False)
             self.cta_mod.set_supported('endshed',False)
