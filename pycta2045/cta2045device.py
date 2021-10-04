@@ -47,9 +47,16 @@ class CTA2045Device:
         self.thread = None
         self.running = False
         self.block = False
-        self.beat_time = 0
-        self.FDT = {} # Empty Function Dispatch Table
+        self.last_msg = 1
+        self.FDT = {}
+
         return
+
+    def heartbeat(self):
+        now = time.time()
+        if (now - self.last_msg) >= 60:
+            self.send('outside comm connection status')
+            self.last_msg = now
     def __del__(self):
         try:
             self.stop()
@@ -219,7 +226,7 @@ class CTA2045Device:
     # -----------------------------------------------------------------------------
     def __run_daemon(self)->None:
         while not self.stopped:
-            self.__beat()
+            self.heartbeat()
             args = {}
             try:
                 res = self.__recv() # always waiting for commands
