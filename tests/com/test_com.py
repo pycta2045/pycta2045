@@ -72,5 +72,9 @@ class TestCOM(unittest.TestCase):
                 self.assertTrue(sent_cmd == ret)
         c.stop()
 
+    @patch('serial.Serial')
+    def testDelay(self,mod):
+        self.assertTrue(True)
+
 if __name__=="__main__":
     unittest.main()
