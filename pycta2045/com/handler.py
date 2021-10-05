@@ -68,7 +68,7 @@ class COM:
         data = list(map(lambda x:int(x,16),data.split(' ')))
         packet.extend(data)
         res = self.ser.write(packet)
-        return True
+        return len(packet)==res
     def send(self,data:str)->bool:
         '''
             Wrapper around __send. Ensures atomic access to the serial object. 

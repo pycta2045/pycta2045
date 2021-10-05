@@ -7,6 +7,7 @@ class TestEV(unittest.TestCase):
     def testInit(self):
         c = EV()
         self.assertFalse(c == None)
+    
     def testCharge(self):
         c = EV(max_comfort=1.)
         df = c.charge()
@@ -15,6 +16,7 @@ class TestEV(unittest.TestCase):
         sz = df.shape[0]
         df = c.charge()
         self.assertFalse(sz == df.shape[0])
+    
     def testGetSoc(self):
         max_comfort = .92
         c = EV(max_comfort=max_comfort)
@@ -41,6 +43,7 @@ class TestEV(unittest.TestCase):
         # soc = soc[-1]
         self.assertTrue(soc == max_comfort) # should still be max comfort
         self.assertFalse(df_start.shape[0] >= df_end.shape[0])
+    
     def testGenerateTimestamps(self):
         c = EV()
         df_start = c.charge()
@@ -48,14 +51,12 @@ class TestEV(unittest.TestCase):
         ts = c.generate_time_stamps()
 
         # assert the start
-        self.assertTrue(ts[0].tz_localize('US/Pacific').timestamp() == int(c.t_start))
+        self.assertTrue(int(ts[0].timestamp()) == int(c.t_start))
 
         times = pd.date_range(start=dt.fromtimestamp(c.t_start),end=dt.fromtimestamp(c.t_end),periods=len(c.currs)).round('S')
         for i,j in zip(ts,times):
             self.assertTrue(i.timestamp() == j.timestamp())
         # assert the end is within 300 seconds margin -- 5 mins
-        self.assertTrue(abs(c.t_end-ts[-1].tz_localize('US/Pacific').timestamp())<=300)
-        # self.assertTrue(abs(c.max_time-ts[-1].timestamp())<=300)
-
+        self.assertTrue(abs(c.t_end-ts[-1].timestamp())<=300)
 if __name__=="__main__":
     unittest.main()

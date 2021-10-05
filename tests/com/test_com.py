@@ -43,7 +43,7 @@ class TestCOM(unittest.TestCase):
         print('-'*5,'test com send','-'*5)
         c = COM.COM(port=f'/dev/{port}',transform=cta.hexify,is_valid=cta.is_valid)
         self.assertTrue(c != None)
-        c.ser.write = MagicMock(return_value=2)
+        c.ser.write = MagicMock(return_value=8)
 
         for cmd in ['shed','endshed','loadup','operating status request']:
             sent_cmd = cta.to_cta(cmd)
@@ -65,16 +65,11 @@ class TestCOM(unittest.TestCase):
             sent_cmd_bytes = cta.to_cta_bytes(cmd)
             c.ser.read = MagicMock(return_value=sent_cmd_bytes)
             c.ser.inWaiting = MagicMock(return_value=len(sent_cmd_bytes))
-            time.sleep(1)
             ret = c.get_next_msg()
             if ret != None:
                 ret,_ = ret
                 self.assertTrue(sent_cmd == ret)
         c.stop()
-
-    @patch('serial.Serial')
-    def testDelay(self,mod):
-        self.assertTrue(True)
 
 if __name__=="__main__":
     unittest.main()
