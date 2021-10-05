@@ -19,7 +19,10 @@ class COM:
     '''
     US = 'DER'
     THEM = 'DCM'
-    def __init__(self, transform:callable, is_valid:callable, mode:str='DER', port:str="/dev/ttyS6",timeout:float=.4,verbose:bool=False):
+    def __init__(self, transform:callable, is_valid:callable,
+                 mode:str='DER', port:str="/dev/ttyS6", 
+                 timeout:float=.4, t_ma:float=.04,
+                 t_ar:float = .1, verbose:bool=False):
         '''
             Constructor
             * Note:
@@ -29,13 +32,15 @@ class COM:
                 * mode: desired mode of operation (used mostly for logging) -- DER vs UCM operating mode.
                 * port: com port used to listen on.
                 * timeout (defualt) is set to 500 ms as specified by CTA2045.
+                * t_ma: time delay before trasmitting a message as specified by CTA2045 (default = minimum = 40 mS)
+                * t_ar: time delay after trasmitting a message as specified by CTA2045 (default = minimum = 100 mS)
                 * verbose: bool to print out notable events.
         '''
         self.port = port
         self.ser = None
         self.ser = serial.Serial(self.port)
-        self.t_ma = .04 # delay before sending ack/nak
-        self.t_ar = .1 # delay after sending ack/nak
+        self.t_ma = t_ma # delay before sending ack/nak
+        self.t_ar = t_ar # delay after sending ack/nak
         self.ser.baudrate=19200 # according to CTA2045
         self.ser.timeout=timeout
         self.transform: callable = transform # function type
@@ -76,7 +81,7 @@ class COM:
         res = False
         with self.lock: # Ensure lock is aquired
             res = self.__send(data) # send data
-        time.sleep(self.t_ar)
+        time.sleep(self.t_ma+self.t_ar)
         return res       
     def __recv(self)->None:
         '''
