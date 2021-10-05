@@ -47,16 +47,22 @@ class CTA2045Device:
         self.thread = None
         self.running = False
         self.block = False
-        self.last_msg = 1
+        self.last_beat = 1
         self.FDT = {}
 
         return
 
-    def heartbeat(self):
+    def __heartbeat(self):
+        '''
+            The purpose of this function is to send heartbeat when the time is right
+        '''
         now = time.time()
-        if (now - self.last_msg) >= 60:
+        # check if a minute has passed & mode is DCM (only DCMs send heartbeats)
+        if self.mode == 'DCM' and (now - self.last_beat) >= 60: # 60 secs == 1 min
             self.send('outside comm connection status')
-            self.last_msg = now
+            self.send('commodity read request')
+            self.send('operating status request')
+            self.last_beat = now # record time
     def __del__(self):
         try:
             self.stop()
@@ -93,7 +99,7 @@ class CTA2045Device:
             if res != None:
                 msg,t = res # check against timeout
                 if time.time() - t >= self.timeout:
-                    self.__update_log(f"{t}\twaiting for response timeout!\t",log=True)
+                    self.__update_log(f"{t}\twaiting for response timeout!\t")
                     raise TimeoutException('Timeout!')
                 res = self.cta_mod.from_cta(msg)
                 if type(res) == dict:
@@ -101,7 +107,7 @@ class CTA2045Device:
                     if verbose:
                         for k,v in res['args'].items():
                             self.__write(f"\t{k} = {v}")
-                if 'op1' in res:
+                if 'op1' in res and res['op1']!='none':
                     self.last_command = res['op1']
         except UnsupportedCommandException as e:
             self.__write(f"{t}\treceived Unsupported Command -- {e.message}\t",log=True)
@@ -136,7 +142,7 @@ class CTA2045Device:
                 ('basic mtsq','basic')
                 ]
         # heart beat before anything
-        self.__beat()
+        self.__heartbeat()
         for cmd,flag in cmds:
             try:
                 if self.send(cmd):
@@ -147,7 +153,6 @@ class CTA2045Device:
                 if 'max' in cmd:
                     res = self.__recv() # capture max payload
                     if res != None and 'args' in res and 'max' in res['command']:
-                        self.send('ack')
                         length = res['args']['max_payload_length']
                         self.support_flags[flag] = int(length)
             except TimeoutException:
@@ -169,18 +174,6 @@ class CTA2045Device:
             msg += f"{k}: {v}\n"
         self.__write(msg)
         self.__write("enter a choice: ")
-        return
-    def __beat(self):
-        '''
-            The purpose of this function is to send heartbeat when the time is right
-        '''
-        now = time.time()
-        # check if a minute has passed & mode is DCM (only DCMs send heartbeats)
-        if self.mode == 'DCM' and now - self.beat_time >= 60: # 60 secs == 1 min
-            self.send('outside comm connection status')
-            self.beat_time = time.time()  # record time
-            self.send('commodity read request') # to log the commodity
-            self.send('operating status request') # to log the op status
         return
     # ------------------------- DCM Loop ----------------------------------
     # -----------------------------------------------------------------------------
@@ -226,7 +219,7 @@ class CTA2045Device:
     # -----------------------------------------------------------------------------
     def __run_daemon(self)->None:
         while not self.stopped:
-            self.heartbeat()
+            self.__heartbeat()
             args = {}
             try:
                 res = self.__recv() # always waiting for commands
@@ -248,7 +241,7 @@ class CTA2045Device:
                 # nothing was received from UCM
                 pass
             except (UnsupportedCommandException,UnknownCommandException) as e:
-                self.send('nak',{'nak_reason':'unsupported'})
+                self.send('app nak',{'app_nak_reason':'opcode not supported'})
             except KeyboardInterrupt as e:
                 break # exit loop & return
         return

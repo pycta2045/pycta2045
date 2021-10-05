@@ -3,7 +3,7 @@ from unittest.mock import MagicMock,patch, create_autospec
 import pycta2045.com.handler as COM
 import serial.tools.list_ports as lp
 from pycta2045.cta2045.handler import CTA2045
-import serial
+import serial,time
 from serial import SerialException
 
 
@@ -65,6 +65,7 @@ class TestCOM(unittest.TestCase):
             sent_cmd_bytes = cta.to_cta_bytes(cmd)
             c.ser.read = MagicMock(return_value=sent_cmd_bytes)
             c.ser.inWaiting = MagicMock(return_value=len(sent_cmd_bytes))
+            time.sleep(1)
             ret = c.get_next_msg()
             if ret != None:
                 ret,_ = ret

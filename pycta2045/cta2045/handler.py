@@ -362,11 +362,7 @@ class CTA2045:
                 cmd = self.cmds['commands'][command]
                 # find appropriate ack type
                 t = cmd['type']['str']
-                if cmd['supported']:
-                    cmd_complement.append('ack')
-                else:
-                    cmd_complement.append('nak')
-                if t == 'basic' and not 'request' in command:
+                if t == 'basic' and not ('request' in command or 'response' in command):
                     cmd_complement.append('app ack')
                 # find complement
                 if 'request' in command and cmd['supported']:
@@ -375,7 +371,7 @@ class CTA2045:
                         cmd_complement.append(comp)
         except Exception as e:
             # command not found or unable to response -- send a nak
-            cmd_complement = ['nak']
+            cmd_complement = ['app nak']
         return cmd_complement
     def get_code_value(self,key:str=None,code:str=None)->str:
         '''
@@ -433,8 +429,11 @@ class CTA2045:
             if np.array_equal(msg,checked_data):
                 valid = True
         else: # could be link ack/nak
-            if self.from_cta(" ".join(msg)) != None:
-                valid = True
+            try:
+                if self.from_cta(" ".join(msg)) != None:
+                    valid = True
+            except:
+                pass
         return valid
     def from_cta_bytes(self,encoded_bytes:bytes)->dict:
         '''

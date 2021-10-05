@@ -2,7 +2,7 @@ import serial
 from serial.tools.list_ports import comports
 from threading import Thread, Lock
 import time, pandas as pd, traceback as tb, numpy as np
-from pycta2045.cta2045 import UnsupportedCommandException, UnknownCommandException
+from pycta2045.cta2045 import UnsupportedCommandException, UnknownCommandException, CTA2045
 from queue import Queue, Empty
 
 class TimeoutException(Exception):
@@ -34,9 +34,8 @@ class COM:
         self.port = port
         self.ser = None
         self.ser = serial.Serial(self.port)
-        self.send_delay = .04 # (send delay) 40 ms of MAX time after receiving a msg and BEFORE sending ack/nak (200 ms according to CTA2045)
-        self.recv_delay = .1 # (recv delay) 100 ms of MIN time after tansmission until the start of another (according to CTA2045)
-        self.sleep_until = 1 # should be 100 mS of delay between recveing & sending a message (refer to CTA2045 msg sync info on t_MA & t_IM)
+        self.t_ma = .04 # delay before sending ack/nak
+        self.t_ar = .1 # delay after sending ack/nak
         self.ser.baudrate=19200 # according to CTA2045
         self.ser.timeout=timeout
         self.transform: callable = transform # function type
@@ -46,12 +45,12 @@ class COM:
         self.lock = Lock()
         self.thread = None
         self.stopped = True
-        self.last_msg_timestamp =  0
         if verbose:
             print('comport was created sucessfully')
         self.__msgs = pd.DataFrame(columns = ['time','src','dest','message'])
-        self.msg_expected = False
         self.verbose = verbose
+        self.cta = CTA2045()
+        
         if mode == 'DCM': self.US,self.THEM = ('DCM','DER') # reverse default mode
         return
     def __del__(self):
@@ -60,22 +59,25 @@ class COM:
         '''
         self.stopped=True
         return
-    def send(self,data:str)->bool:
+    def __send(self,data:str)->bool:
         '''
             Member method that translates the passed data into bytearray before sending it through the COM port. 
         '''
         packet = bytearray()
         self.__log({'src':self.US,'dest':self.THEM,'message':data})
         data = list(map(lambda x:int(x,16),data.split(' ')))
-        if len(data) > 4:
-            self.msg_expected = True
         packet.extend(data)
-        if time.time() - self.last_msg_timestamp < self.sleep_until:
-            time.sleep(self.send_delay) # delay until you can send the next msg
         res = self.ser.write(packet)
-        self.last_msg_timestamp = time.time()
-        self.sleep_until = time.time() + self.recv_delay
-        return res>=2
+        return True
+    def send(self,data:str)->bool:
+        '''
+            Wrapper around __send. Ensures atomic access to the serial object. 
+        '''
+        res = False
+        with self.lock: # Ensure lock is aquired
+            res = self.__send(data) # send data
+        time.sleep(self.t_ar)
+        return res       
     def __recv(self)->None:
         '''
             Private function that (blockingly) waits for messages from the COM port.
@@ -90,33 +92,42 @@ class COM:
         self.ser.flushOutput()
         try:
             while True:
-                if time.time() - self.last_msg_timestamp < self.sleep_until:
-                    time.sleep(self.recv_delay)
-                if self.ser.inWaiting() > 0:
-                    data = self.ser.read(self.ser.inWaiting())
-                    data = list(map(lambda x: self.transform(int(hex(x),16)),data))
-                    # iterate over bytes in data and append each one onto the buffer
-                    # each time you append to the buffer, check if that completes a cta2045 command
-                    for i in data:
-                        buff = np.append(buff,i)
-                        try:
-                            if self.is_valid_cta(buff):
-                                buff = " ".join(buff)
-                                self.buffer.put((buff,time.time())) # this is thread-safe queue -- no need to acquire lock
-                                if self.verbose:
-                                    print('BUFFER SIZE: ',self.buffer.qsize())
-                                self.last_msg_time_timestamp = time.time()
-                                self.sleep_until = time.time() + self.send_delay # send delay
-                                # log
-                                self.__log({'src':self.THEM,'dest':self.US,'message':buff})
-                                buff = np.array([])
-                        except UnknownCommandException as e:
-                            continue                    
-                    if self.msg_expected:
-                        self.msg_expected = False
-                if self.stopped:
-                    print('exiting...')
-                    break
+                with self.lock:
+                    if self.ser.inWaiting() > 0:
+                        data = self.ser.read(self.ser.inWaiting())
+                        data = list(map(lambda x: self.transform(int(hex(x),16)),data))
+                        # iterate over bytes in data and append each one onto the buffer
+                        # each time you append to the buffer, check if that completes a cta2045 command
+                        for i in data:
+                            buff = np.append(buff,i)
+                            try:
+                                if self.is_valid_cta(buff):
+                                    buff = " ".join(buff)
+                                    self.buffer.put((buff,time.time())) # this is thread-safe queue -- no need to acquire lock
+                                    if self.verbose:
+                                        print('BUFFER SIZE: ',self.buffer.qsize())
+                                    # log
+                                    self.__log({'src':self.THEM,'dest':self.US,'message':buff})
+                                    # wait before sending ack to block any thread from sending
+                                    time.sleep(self.t_ma)
+                                    # ensure not ack/nak
+                                    if len(buff.split())>2:
+                                        # send ack
+                                        self.__send(self.cta.to_cta('ack'))
+                                    buff = np.array([])
+                                    # wait after to block any thread from sending anything for t_ar
+                                    time.sleep(self.t_ar)
+                            except (UnknownCommandException,UnsupportedCommandException) as e:
+                                if len(buff.split())>=6:
+                                    time.sleep(self.t_ma)
+                                    if len(buff)>2:
+                                            # send nak
+                                            self.send(self.cta.to_cta('nak'))
+                                    time.sleep(self.t_ar)
+                                continue
+                    if self.stopped:
+                        print('exiting...')
+                        break
         except Exception as e:
             print(tb.format_tb(e))
 
@@ -161,8 +172,7 @@ class COM:
         try:
             msg = self.buffer.get(timeout=self.ser.timeout) # no need to acquire -- blocks by default
         except Empty as e:
-            if self.msg_expected:
-                raise TimeoutException("Timout!")
+            raise TimeoutException("Timout!")
         return msg
     def write_log(self,fname:str)->bool:
         '''
