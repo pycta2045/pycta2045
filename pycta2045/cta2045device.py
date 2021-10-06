@@ -60,6 +60,8 @@ class CTA2045Device:
         # check if a minute has passed & mode is DCM (only DCMs send heartbeats)
         if self.mode == 'DCM' and (now - self.last_beat) >= 60: # 60 secs == 1 min
             self.send('outside comm connection status')
+            self.send('commodity read request')
+            self.send('operating status request')
             self.last_beat = now # record time
     def __del__(self):
         try:
