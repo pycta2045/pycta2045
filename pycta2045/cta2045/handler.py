@@ -362,7 +362,7 @@ class CTA2045:
                 cmd = self.cmds['commands'][command]
                 # find appropriate ack type
                 t = cmd['type']['str']
-                if t == 'basic' and not ('request' in command or 'response' in command):
+                if t == 'basic' and not 'request' in command:
                     cmd_complement.append('app ack')
                 # find complement
                 if 'request' in command and cmd['supported']:
