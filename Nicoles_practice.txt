@@ -1,0 +1,32 @@
+1633487721.4393303	sent outside comm connection status	{}
+1633487721.778362	sent commodity read request	{}
+1633487722.1588857	sent operating status request	{}
+1633487722.5420384	sent intermediate mtsq	{}
+1633487721.3464417	received ack	{}
+1633487722.7752306	sent data-link mtsq	{}
+1633487721.4896328	received app ack	{'reserved': 'default', 'last_opcode': '14'}
+1633487722.968934	sent max payload request	{}
+1633487721.7251878	received ack	{}
+1633487721.8701196	received commodity read response	{'reserved': 'default', 'intermediate_response_code': 'success', 'commodity_code0': 'electricity consumed', 'instantaneous_rate0': 'default', 'cumulative_amount0': '450', 'commodity_code1': 'present energy', 'instantaneous_rate1': 'default', 'cumulative_amount1': '49'}
+1633487723.3101861	sent basic mtsq	{}
+1633487722.109058	received ack	{}
+1633487722.2536995	received operating status response	{'reserved': 'default', 'op_state_code': 'idle curtailed'}
+1633487723.5487862	sent app ack	{'last_opcode': '0x13'}
+1633487722.489063	received ack	{}
+1633487722.6818864	received ack	{}
+1633487722.875936	received ack	{}
+1633487723.0190666	received max payload response	{'reserved': 'default', 'max_payload_length': '4096'}
+1633487723.2577221	received ack	{}
+1633487723.4613154	received ack	{}
+1633487724.8143432	received ack	{}
+1633487724.9055846	sent shed	{}
+1633487724.9587233	received app ack	{'reserved': 'default', 'last_opcode': '1'}
+1633487725.3604848	received ack	{}
+1633487725.4506125	sent shed	{}
+1633487725.505311	received app ack	{'reserved': 'default', 'last_opcode': '1'}
+1633487725.904597	received ack	{}
+1633487725.9973063	sent shed	{}
+1633487726.0480285	received app ack	{'reserved': 'default', 'last_opcode': '1'}
+1633487726.4517946	received ack	{}
+1633487726.5431952	sent endshed	{}
+1633487726.5952	received app ack	{'reserved': 'default', 'last_opcode': '2'}
