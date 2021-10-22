@@ -51,6 +51,9 @@ class CTA2045Device:
         self.last_beat = 1
         self.FDT = {}
         self.row = []
+        self.comlist = 0
+        self.oplist = 0
+
         # initialize wiringpi
         wiringpi.mcp3004Setup(100,0) # channel 100
 
@@ -73,32 +76,40 @@ class CTA2045Device:
         except:
             pass
         return
-    def __dump_file(self):
-        ts = dt.fromtimestamp(int(float(self.row[0])))
-        d = self.row[1]
-        actual_power = (wiringpi.analogRead(100) / 1023) * 4.4 # 4.4 is reference voltage
-        actual_power *= 2400 # 240 (volts) scaled by 10
-        cr = ''
-        cr += f"\t{d['cumulative_amount0']},\t{d['instantaneous_rate0']},"
-        cr += f"\t{d['cumulative_amount1']},\t{d['cumulative_amount2']}"
-        op = self.row[2]['op_state_code']
-        row = f"{ts},{cr},\t{round(actual_power,3)},\t{op}\n"
-        with open('log.csv','a') as f:
-            f.write(row)
-        return
 
     def __update_log(self,msg:str)->None:
-        if 'read response' in msg:
-            self.row.append(msg.split('\t')[0])
-            self.row.append(eval(msg.split('\t')[-1]))
-        elif 'status response' in msg and len(self.row) == 2:
-            self.row.append(eval(msg.split('\t')[-1]))
-            # dump into file
-            self.__dump_file()
-            self.row = [] # reset list
         self.last_log_msg = msg
         self.log.put(msg)
+
+        if 'commodity read response' in msg:
+            with open('opandcomlog.csv', 'a') as l:
+
+                self.comlist = msg.split('\t')
+
+                l.write(str(dt.fromtimestamp(int(float(self.comlist[0]))))+',')
+
+                arguments = eval(self.comlist[2])
+
+                l.write(arguments['instantaneous_rate0']+',')
+
+                l.write(arguments['cumulative_amount0']+ ',')
+
+                l.write(arguments['cumulative_amount1']+',')
+
+                l.write(arguments['cumulative_amount2']+',')
+
+        if 'operating status response' in msg:
+
+            with open('opandcomlog.csv', 'a') as l:
+
+                self.oplist = msg.split('\t')
+
+                oparg = eval(self.oplist[2])
+
+                l.write(oparg['op_state_code']+'\n')
+
         return
+
     def get_log(self)->pd.DataFrame:
         ts = []
         msgs = []
