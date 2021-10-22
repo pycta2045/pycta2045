@@ -5,6 +5,7 @@ from pycta2045.models import *
 from queue import Queue
 from datetime import datetime as dt
 from threading import Thread
+import wiringpi # used to provide a custom logging in WH station
 
 
 
@@ -49,6 +50,9 @@ class CTA2045Device:
         self.block = False
         self.last_beat = 1
         self.FDT = {}
+        self.row = []
+        # initialize wiringpi
+        wiringpi.mcp3004Setup(100,0) # channel 100
 
         return
 
@@ -69,7 +73,29 @@ class CTA2045Device:
         except:
             pass
         return
+    def __dump_file(self):
+        ts = dt.fromtimestamp(int(float(self.row[0])))
+        d = self.row[1]
+        actual_power = (wiringpi.analogRead(100) / 1023) * 4.4 # 4.4 is reference voltage
+        actual_power *= 2400 # 240 (volts) scaled by 10
+        cr = ''
+        cr += f"\t{d['cumulative_amount0']},\t{d['instantaneous_rate0']},"
+        cr += f"\t{d['cumulative_amount1']},\t{d['cumulative_amount2']}"
+        op = self.row[2]['op_state_code']
+        row = f"{ts},{cr},\t{round(actual_power,3)},\t{op}\n"
+        with open('log.csv','a') as f:
+            f.write(row)
+        return
+
     def __update_log(self,msg:str)->None:
+        if 'read response' in msg:
+            self.row.append(msg.split('\t')[0])
+            self.row.append(eval(msg.split('\t')[-1]))
+        elif 'status response' in msg and len(self.row) == 2:
+            self.row.append(eval(msg.split('\t')[-1]))
+            # dump into file
+            self.__dump_file()
+            self.row = [] # reset list
         self.last_log_msg = msg
         self.log.put(msg)
         return
